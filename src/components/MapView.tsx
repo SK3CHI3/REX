@@ -4,7 +4,7 @@ import { Case } from '@/types';
 
 interface MapViewProps {
   cases: Case[];
-  onCaseSelect: (case: Case) => void;
+  onCaseSelect: (caseItem: Case) => void;
 }
 
 const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
