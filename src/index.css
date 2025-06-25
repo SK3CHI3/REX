@@ -1,4 +1,5 @@
 
+@import 'leaflet/dist/leaflet.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -65,26 +66,20 @@
 }
 
 /* Map container styles */
-.map-container {
+.leaflet-container {
   height: 100vh;
   width: 100vw;
+  z-index: 1;
 }
 
-/* Custom pin styles */
-.case-pin {
-  width: 12px;
-  height: 12px;
-  background-color: hsl(var(--primary));
-  border: 2px solid hsl(var(--background));
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  transition: all 0.2s ease;
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.case-pin:hover {
-  transform: scale(1.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+.leaflet-popup-content {
+  margin: 8px 12px;
+  line-height: 1.4;
 }
 
 /* Animation classes */
