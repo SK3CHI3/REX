@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from 'react-leaflet';
 import { Case } from '@/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -17,10 +17,10 @@ L.Icon.Default.mergeOptions({
 const redIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+  iconSize: [20, 32],
+  iconAnchor: [10, 32],
+  popupAnchor: [1, -28],
+  shadowSize: [32, 32]
 });
 
 interface MapViewProps {
@@ -43,8 +43,18 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
     }
   };
 
+  const getTypeColor = (type: Case['type']) => {
+    switch (type) {
+      case 'death': return 'text-red-700 bg-red-50';
+      case 'assault': return 'text-orange-700 bg-orange-50';
+      case 'harassment': return 'text-yellow-700 bg-yellow-50';
+      case 'unlawful_arrest': return 'text-purple-700 bg-purple-50';
+      default: return 'text-gray-700 bg-gray-50';
+    }
+  };
+
   return (
-    <div className="absolute inset-0 pt-14 sm:pt-16 lg:pt-20">
+    <div className="absolute inset-0 pt-14 sm:pt-16 lg:pt-18">
       <MapContainer
         center={kenyaCenter}
         zoom={6}
@@ -66,6 +76,20 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
               click: () => onCaseSelect(caseItem)
             }}
           >
+            <Tooltip 
+              permanent={false}
+              direction="top"
+              offset={[0, -10]}
+              className="custom-tooltip"
+            >
+              <div className="text-xs font-medium">
+                <div className="font-semibold text-gray-900">{caseItem.victimName}</div>
+                <div className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${getTypeColor(caseItem.type)}`}>
+                  {getTypeLabel(caseItem.type)}
+                </div>
+              </div>
+            </Tooltip>
+            
             <Popup 
               className="custom-popup"
               closeButton={true}
@@ -75,8 +99,10 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
               <div className="min-w-[250px] max-w-[300px] p-2">
                 <h3 className="font-semibold text-base mb-2 text-gray-900">{caseItem.victimName}</h3>
                 <div className="space-y-1 text-sm text-gray-600 mb-3">
-                  <p className="font-medium text-red-600">{getTypeLabel(caseItem.type)}</p>
-                  <p>{caseItem.location}, {caseItem.county}</p>
+                  <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(caseItem.type)}`}>
+                    {getTypeLabel(caseItem.type)}
+                  </div>
+                  <p className="mt-2">{caseItem.location}, {caseItem.county}</p>
                   <p>{new Date(caseItem.date).toLocaleDateString()}</p>
                 </div>
                 <button 
@@ -109,22 +135,13 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
         </div>
       )}
 
-      {/* Map info panel - mobile optimized */}
+      {/* Compact legend - mobile optimized */}
       {cases.length > 0 && (
-        <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 pointer-events-none z-20">
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="font-semibold text-gray-900">Cases on Map</h4>
-              <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
-                {cases.length}
-              </span>
-            </div>
-            <p className="text-sm text-gray-600 mb-3">
-              Tap on red markers to view case details
-            </p>
-            <div className="flex items-center space-x-2 text-xs text-gray-500">
+        <div className="absolute bottom-4 left-4 pointer-events-none z-20">
+          <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-3">
+            <div className="flex items-center space-x-2 text-xs">
               <div className="w-3 h-3 bg-red-600 rounded-full flex-shrink-0"></div>
-              <span>Police brutality incident</span>
+              <span className="text-gray-700 font-medium">{cases.length} incidents</span>
             </div>
           </div>
         </div>

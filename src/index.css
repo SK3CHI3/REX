@@ -98,6 +98,21 @@
   background: white !important;
 }
 
+/* Custom tooltip styles */
+.custom-tooltip .leaflet-tooltip {
+  background: rgba(0, 0, 0, 0.8) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: white !important;
+  font-size: 12px !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.custom-tooltip .leaflet-tooltip:before {
+  border-top-color: rgba(0, 0, 0, 0.8) !important;
+}
+
 /* Mobile-optimized controls */
 .leaflet-control-zoom {
   border: none !important;
@@ -122,8 +137,8 @@
 /* Improved marker clustering for mobile */
 @media (max-width: 640px) {
   .leaflet-marker-icon {
-    margin-left: -12px !important;
-    margin-top: -20px !important;
+    margin-left: -10px !important;
+    margin-top: -16px !important;
   }
   
   .leaflet-popup-content-wrapper {
@@ -169,4 +184,24 @@
 /* Prevent zoom on double tap for mobile */
 .leaflet-container {
   touch-action: pan-x pan-y;
+}
+
+/* Custom filter animations */
+.animate-in {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.slide-in-from-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
