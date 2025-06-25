@@ -13,10 +13,10 @@ interface CaseModalProps {
 const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
   const getStatusColor = (status: Case['status']) => {
     switch (status) {
-      case 'verified': return 'bg-green-600';
-      case 'investigating': return 'bg-yellow-600';
-      case 'dismissed': return 'bg-gray-600';
-      default: return 'bg-gray-600';
+      case 'verified': return 'bg-emerald-600 text-white';
+      case 'investigating': return 'bg-amber-600 text-white';
+      case 'dismissed': return 'bg-gray-600 text-white';
+      default: return 'bg-gray-600 text-white';
     }
   };
 
@@ -32,98 +32,128 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
-      <Card className="w-full max-w-2xl mx-4 sm:mx-0 max-h-[90vh] overflow-y-auto slide-up">
-        <div className="sticky top-0 bg-card border-b border-border p-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <User className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-semibold">{caseData.victimName}</h2>
-            {caseData.age && (
-              <span className="text-sm text-muted-foreground">Age {caseData.age}</span>
-            )}
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <Card className="w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-4 duration-300 sm:slide-in-from-bottom-0 sm:fade-in">
+        {/* Header - sticky */}
+        <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 p-4 flex items-center justify-between z-10">
+          <div className="flex items-center space-x-3 min-w-0 flex-1">
+            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <User className="w-5 h-5 text-red-600" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-semibold text-gray-900 truncate">{caseData.victimName}</h2>
+              {caseData.age && (
+                <span className="text-sm text-gray-500">Age {caseData.age}</span>
+              )}
+            </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-4 h-4" />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose}
+            className="flex-shrink-0 h-10 w-10 p-0 rounded-full hover:bg-gray-100"
+          >
+            <X className="w-5 h-5" />
           </Button>
         </div>
 
-        <CardContent className="p-4 space-y-4">
+        {/* Content - scrollable */}
+        <CardContent className="p-4 space-y-6 overflow-y-auto">
+          {/* Status badges */}
           <div className="flex flex-wrap gap-2">
             <Badge className={getStatusColor(caseData.status)}>
               {caseData.status.charAt(0).toUpperCase() + caseData.status.slice(1)}
             </Badge>
-            <Badge variant="outline" className="border-primary text-primary">
+            <Badge variant="outline" className="border-red-200 text-red-700 bg-red-50">
               {getTypeLabel(caseData.type)}
             </Badge>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex items-center space-x-2 text-sm">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <span>{new Date(caseData.date).toLocaleDateString()}</span>
+          {/* Quick info grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Calendar className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Date</p>
+                <p className="text-sm font-medium text-gray-900">{new Date(caseData.date).toLocaleDateString()}</p>
+              </div>
             </div>
-            <div className="flex items-center space-x-2 text-sm">
-              <MapPin className="w-4 h-4 text-muted-foreground" />
-              <span>{caseData.location}, {caseData.county}</span>
+            <div className="flex items-center space-x-3">
+              <MapPin className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Location</p>
+                <p className="text-sm font-medium text-gray-900">{caseData.location}, {caseData.county}</p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-muted/50 rounded-lg p-4">
-            <h3 className="font-medium mb-2 flex items-center space-x-2">
-              <AlertTriangle className="w-4 h-4" />
+          {/* Description */}
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <h3 className="font-semibold mb-3 flex items-center space-x-2 text-gray-900">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
               <span>Incident Description</span>
             </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-gray-700 leading-relaxed">
               {caseData.description}
             </p>
           </div>
 
-          {caseData.photos && caseData.photos.length > 0 && (
-            <div>
-              <h3 className="font-medium mb-3">Evidence Photos</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {caseData.photos.map((photo, index) => (
-                  <img
-                    key={index}
-                    src={photo}
-                    alt={`Evidence ${index + 1}`}
-                    className="w-full h-32 object-cover rounded-lg border border-border"
-                  />
-                ))}
-              </div>
+          {/* Evidence section */}
+          {((caseData.photos && caseData.photos.length > 0) || (caseData.videoLinks && caseData.videoLinks.length > 0)) && (
+            <div className="space-y-4">
+              <h3 className="font-semibold text-gray-900">Evidence</h3>
+              
+              {caseData.photos && caseData.photos.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Photos ({caseData.photos.length})</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {caseData.photos.map((photo, index) => (
+                      <img
+                        key={index}
+                        src={photo}
+                        alt={`Evidence ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform cursor-pointer"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {caseData.videoLinks && caseData.videoLinks.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">Video Evidence</h4>
+                  <div className="space-y-2">
+                    {caseData.videoLinks.map((link, index) => (
+                      <a
+                        key={index}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block text-sm text-red-600 hover:text-red-700 hover:underline bg-red-50 p-3 rounded-lg border border-red-200"
+                      >
+                        📹 Video Evidence {index + 1}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {caseData.videoLinks && caseData.videoLinks.length > 0 && (
-            <div>
-              <h3 className="font-medium mb-3">Video Evidence</h3>
-              <div className="space-y-2">
-                {caseData.videoLinks.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-sm text-primary hover:underline"
-                  >
-                    Video Evidence {index + 1}
-                  </a>
-                ))}
+          {/* Metadata */}
+          <div className="border-t border-gray-200 pt-4 space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-500">Source:</span>
+                <span className="ml-2 font-medium text-gray-900">{caseData.source}</span>
               </div>
+              {caseData.reportedBy && (
+                <div>
+                  <span className="text-gray-500">Reported by:</span>
+                  <span className="ml-2 font-medium text-gray-900">{caseData.reportedBy}</span>
+                </div>
+              )}
             </div>
-          )}
-
-          <div className="border-t border-border pt-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Source:</span>
-              <span>{caseData.source}</span>
-            </div>
-            {caseData.reportedBy && (
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Reported by:</span>
-                <span>{caseData.reportedBy}</span>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
