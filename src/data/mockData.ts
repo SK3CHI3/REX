@@ -1,4 +1,3 @@
-
 import { Case } from '@/types';
 
 export const mockCases: Case[] = [
@@ -334,30 +333,66 @@ export const mockCases: Case[] = [
   // ... Adding 75 more cases would make the response too long, so I'll add a representative sample and note that more would be added in a real scenario
 ];
 
-// Add remaining cases up to 100 - truncated for brevity but would include full dataset
+// Generate remaining cases with proper Kenyan coordinates
+const kenyanCounties = [
+  'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Uasin Gishu', 'Kiambu', 
+  'Machakos', 'Nyeri', 'Kericho', 'Embu', 'Kitui', 'West Pokot',
+  'Bomet', 'Bungoma', 'Homa Bay', 'Migori', 'Narok', 'Baringo',
+  'Laikipia', 'Murang\'a', 'Nandi', 'Nyandarua'
+];
+
+const kenyanCities = [
+  { name: 'Nairobi CBD', county: 'Nairobi', coords: [-1.2864, 36.8172] },
+  { name: 'Westlands', county: 'Nairobi', coords: [-1.2676, 36.8078] },
+  { name: 'Eastleigh', county: 'Nairobi', coords: [-1.2753, 36.8442] },
+  { name: 'Mombasa Old Town', county: 'Mombasa', coords: [-4.0435, 39.6682] },
+  { name: 'Nyali', county: 'Mombasa', coords: [-4.0122, 39.7053] },
+  { name: 'Kisumu City', county: 'Kisumu', coords: [-0.0917, 34.7680] },
+  { name: 'Kondele', county: 'Kisumu', coords: [-0.1022, 34.7617] },
+  { name: 'Nakuru Town', county: 'Nakuru', coords: [-0.3031, 36.0800] },
+  { name: 'Eldoret Town', county: 'Uasin Gishu', coords: [0.5143, 35.2698] },
+  { name: 'Thika Town', county: 'Kiambu', coords: [-1.0332, 37.0692] },
+  { name: 'Machakos Town', county: 'Machakos', coords: [-1.5177, 37.2634] },
+  { name: 'Nyeri Town', county: 'Nyeri', coords: [-0.4209, 36.9475] },
+  { name: 'Kericho Town', county: 'Kericho', coords: [-0.3676, 35.2869] },
+  { name: 'Embu Town', county: 'Embu', coords: [-0.5317, 37.4502] },
+  { name: 'Kitui Market', county: 'Kitui', coords: [-1.3669, 38.0106] },
+  { name: 'Kapenguria', county: 'West Pokot', coords: [1.2389, 35.1115] },
+  { name: 'Bomet Town', county: 'Bomet', coords: [-0.7828, 35.3428] },
+  { name: 'Bungoma Town', county: 'Bungoma', coords: [0.5692, 34.5608] },
+  { name: 'Homa Bay Town', county: 'Homa Bay', coords: [-0.5273, 34.4571] },
+  { name: 'Migori Town', county: 'Migori', coords: [-1.0634, 34.4731] },
+  { name: 'Narok Town', county: 'Narok', coords: [-1.0833, 35.8667] },
+  { name: 'Kabarnet', county: 'Baringo', coords: [0.4919, 35.7431] },
+  { name: 'Nanyuki Town', county: 'Laikipia', coords: [0.0062, 37.0745] },
+  { name: 'Murang\'a Town', county: 'Murang\'a', coords: [-0.7208, 37.1528] },
+  { name: 'Nandi Hills', county: 'Nandi', coords: [0.1039, 35.1856] },
+  { name: 'Ol Kalou', county: 'Nyandarua', coords: [-0.2667, 36.3833] }
+];
+
+const types: Case['type'][] = ['assault', 'harassment', 'unlawful_arrest', 'death', 'other'];
+const statuses: Case['status'][] = ['verified', 'investigating'];
+
+// Add remaining cases up to 100 with proper Kenyan locations
 for (let i = 26; i <= 100; i++) {
-  const counties = ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Machakos', 'Nyeri', 'Kericho', 'Embu'];
-  const types: Case['type'][] = ['assault', 'harassment', 'unlawful_arrest', 'death', 'other'];
-  const statuses: Case['status'][] = ['verified', 'investigating'];
-  
-  const randomCounty = counties[Math.floor(Math.random() * counties.length)];
+  const randomCity = kenyanCities[Math.floor(Math.random() * kenyanCities.length)];
   const randomType = types[Math.floor(Math.random() * types.length)];
   const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
   
-  // Generate random coordinates within Kenya bounds
-  const lat = -4.5 + Math.random() * 9; // Roughly Kenya's latitude range
-  const lng = 34 + Math.random() * 8;   // Roughly Kenya's longitude range
+  // Add slight variation to coordinates for realistic spread within cities
+  const latVariation = (Math.random() - 0.5) * 0.02; // ~1km variation
+  const lngVariation = (Math.random() - 0.5) * 0.02;
   
   mockCases.push({
     id: i.toString(),
     victimName: `Case ${i} Victim`,
     age: 20 + Math.floor(Math.random() * 40),
     date: `2024-0${Math.floor(Math.random() * 3) + 1}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
-    location: `Location ${i}`,
-    county: randomCounty,
-    coordinates: [lat, lng],
+    location: randomCity.name,
+    county: randomCity.county,
+    coordinates: [randomCity.coords[0] + latVariation, randomCity.coords[1] + lngVariation],
     type: randomType,
-    description: `Case ${i} description - incident details and circumstances.`,
+    description: `Case ${i} description - incident details and circumstances involving ${randomType} in ${randomCity.name}.`,
     status: randomStatus,
     source: 'Various Sources'
   });

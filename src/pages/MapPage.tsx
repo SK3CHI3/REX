@@ -27,14 +27,14 @@ const MapPage = () => {
   });
 
   return (
-    <div className="h-screen w-full bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 overflow-hidden">
+    <div className="h-screen w-full bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 overflow-hidden flex flex-col">
       <Header 
         onOpenFilters={() => {}} // Not needed with sidebar
         onSubmitCase={() => setIsSubmitModalOpen(true)}
         caseCount={filteredCases.length}
       />
       
-      <div className="flex h-full pt-20">
+      <div className="flex flex-1 pt-20">
         <DataSidebar
           selectedCase={selectedCase}
           filters={filters}
@@ -42,7 +42,7 @@ const MapPage = () => {
           filteredCasesCount={filteredCases.length}
         />
         
-        <div className="flex-1">
+        <div className="flex-1 relative">
           <MapView 
             cases={filteredCases}
             onCaseSelect={setSelectedCase}

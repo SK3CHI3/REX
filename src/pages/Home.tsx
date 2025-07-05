@@ -84,10 +84,10 @@ const Home = () => {
         </div>
 
         <div className="relative max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-stretch">
+          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[600px]">
             
             {/* Left Side - Main Content */}
-            <div className="space-y-8 animate-fade-in flex flex-col justify-center">
+            <div className="space-y-8 animate-fade-in flex flex-col justify-center h-full">
               {/* Badge */}
               <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium w-fit">
                 <Shield className="w-4 h-4" />
@@ -136,25 +136,25 @@ const Home = () => {
                 </button>
               </div>
 
-              {/* Key Metrics */}
-              <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <div className="text-2xl font-bold text-white">24/7</div>
+              {/* Key Metrics - No background card */}
+              <div className="pt-8">
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="flex flex-col items-start">
+                    <div className="text-3xl font-bold text-white mb-1">24/7</div>
                     <div className="text-sm text-gray-400">Live Monitoring</div>
                   </div>
-                  <div>
-                    <div className="text-2xl font-bold text-white">100%</div>
+                  <div className="flex flex-col items-start">
+                    <div className="text-3xl font-bold text-white mb-1">100%</div>
                     <div className="text-sm text-gray-400">Data Transparency</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Side - Data Visualization & Recent Cases - Match height */}
-            <div className="space-y-8 animate-fade-in lg:pl-8 flex flex-col justify-center">
-              {/* Live Stats Card */}
-              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl flex-1 flex flex-col">
+            {/* Right Side - Data Visualization & Recent Cases - Full height card */}
+            <div className="animate-fade-in lg:pl-8 h-full min-h-[600px]">
+              {/* Live Stats Card - Full height */}
+              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl h-full flex flex-col">
                 <div className="flex items-center space-x-3 mb-6">
                   <TrendingUp className="w-6 h-6 text-red-400" />
                   <h3 className="text-xl font-bold">Live Statistics</h3>
@@ -182,7 +182,7 @@ const Home = () => {
                 </div>
 
                 {/* Recent Cases */}
-                <div className="space-y-4 flex-1">
+                <div className="space-y-4 flex-1 flex flex-col">
                   <div className="flex items-center justify-between">
                     <h4 className="text-lg font-semibold flex items-center">
                       <Clock className="w-4 h-4 mr-2 text-gray-400" />
@@ -193,7 +193,7 @@ const Home = () => {
                     </Badge>
                   </div>
                   
-                  <div className="space-y-3 flex-1 overflow-y-auto max-h-60">
+                  <div className="space-y-3 flex-1 overflow-y-auto">
                     {recentCases.map((case_, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
                         <div className="flex items-center space-x-3">
