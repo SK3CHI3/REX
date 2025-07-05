@@ -1,8 +1,8 @@
-
 import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown, TrendingUp, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { mockCases } from '@/data/mockData';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -16,12 +16,14 @@ const Home = () => {
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Recent cases data
+  // Recent cases data - updated with more realistic data
   const recentCases = [
     { location: 'Nairobi CBD', date: '2 days ago', type: 'Assault' },
     { location: 'Mombasa Road', date: '4 days ago', type: 'Unlawful Arrest' },
     { location: 'Kisumu Central', date: '1 week ago', type: 'Harassment' },
     { location: 'Nakuru Town', date: '1 week ago', type: 'Death' },
+    { location: 'Eldoret Market', date: '2 weeks ago', type: 'Assault' },
+    { location: 'Thika Town', date: '2 weeks ago', type: 'Harassment' },
   ];
 
   return (
@@ -82,12 +84,12 @@ const Home = () => {
         </div>
 
         <div className="relative max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-stretch">
             
             {/* Left Side - Main Content */}
-            <div className="space-y-8 animate-fade-in">
+            <div className="space-y-8 animate-fade-in flex flex-col justify-center">
               {/* Badge */}
-              <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium">
+              <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium w-fit">
                 <Shield className="w-4 h-4" />
                 <span>Accountability Through Transparency</span>
               </div>
@@ -149,10 +151,10 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Right Side - Data Visualization & Recent Cases */}
-            <div className="space-y-8 animate-fade-in lg:pl-8">
+            {/* Right Side - Data Visualization & Recent Cases - Match height */}
+            <div className="space-y-8 animate-fade-in lg:pl-8 flex flex-col justify-center">
               {/* Live Stats Card */}
-              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl flex-1 flex flex-col">
                 <div className="flex items-center space-x-3 mb-6">
                   <TrendingUp className="w-6 h-6 text-red-400" />
                   <h3 className="text-xl font-bold">Live Statistics</h3>
@@ -167,20 +169,20 @@ const Home = () => {
                   </div>
                   <div className="text-center group">
                     <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      247
+                      {mockCases.length}
                     </div>
                     <div className="text-sm text-gray-400 font-medium">Total Cases</div>
                   </div>
                   <div className="text-center group">
                     <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      18
+                      {mockCases.filter(c => new Date(c.date).getMonth() === new Date().getMonth()).length}
                     </div>
                     <div className="text-sm text-gray-400 font-medium">This Month</div>
                   </div>
                 </div>
 
                 {/* Recent Cases */}
-                <div className="space-y-4">
+                <div className="space-y-4 flex-1">
                   <div className="flex items-center justify-between">
                     <h4 className="text-lg font-semibold flex items-center">
                       <Clock className="w-4 h-4 mr-2 text-gray-400" />
@@ -191,7 +193,7 @@ const Home = () => {
                     </Badge>
                   </div>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-3 flex-1 overflow-y-auto max-h-60">
                     {recentCases.map((case_, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
                         <div className="flex items-center space-x-3">
@@ -318,6 +320,21 @@ const Home = () => {
             and accountable society through data-driven advocacy.
           </p>
           
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+              <div className="text-3xl font-bold text-red-400 mb-2">{mockCases.length}</div>
+              <div className="text-gray-300">Cases Documented</div>
+            </div>
+            <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+              <div className="text-3xl font-bold text-red-400 mb-2">47</div>
+              <div className="text-gray-300">Counties Covered</div>
+            </div>
+            <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+              <div className="text-3xl font-bold text-red-400 mb-2">24/7</div>
+              <div className="text-gray-300">Live Monitoring</div>
+            </div>
+          </div>
+          
           <Button
             onClick={handleEnterApp}
             size="lg"
@@ -330,22 +347,71 @@ const Home = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 border-t border-white/10 bg-black/40 backdrop-blur-sm">
+      <footer className="py-16 px-4 border-t border-white/10 bg-black/40 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center">
-                <AlertTriangle className="w-4 h-4 text-white" />
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            {/* Brand */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xl font-bold">REX</span>
               </div>
-              <span className="text-lg font-bold">REX</span>
+              <p className="text-gray-400 text-sm">
+                Building a safer Kenya through transparency and accountability in law enforcement.
+              </p>
             </div>
-            
-            <p className="text-gray-400 text-sm text-center md:text-right">
-              © 2024 REX. Building a safer Kenya through transparency and accountability.
-              <br className="md:hidden" />
-              <span className="hidden md:inline"> | </span>
-              Together for justice.
-            </p>
+
+            {/* Platform */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-white">Platform</h4>
+              <div className="space-y-2">
+                <button onClick={handleEnterApp} className="block text-gray-400 hover:text-white text-sm transition-colors">
+                  Interactive Map
+                </button>
+                <button onClick={() => scrollToSection('about')} className="block text-gray-400 hover:text-white text-sm transition-colors">
+                  About
+                </button>
+                <button onClick={() => scrollToSection('features')} className="block text-gray-400 hover:text-white text-sm transition-colors">
+                  Features
+                </button>
+              </div>
+            </div>
+
+            {/* Data */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-white">Data</h4>
+              <div className="space-y-2">
+                <div className="text-gray-400 text-sm">Total Cases: {mockCases.length}</div>
+                <div className="text-gray-400 text-sm">Counties: 47</div>
+                <div className="text-gray-400 text-sm">Last Updated: Today</div>
+              </div>
+            </div>
+
+            {/* Contact */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-white">Support</h4>
+              <div className="space-y-2">
+                <div className="text-gray-400 text-sm">Report an Issue</div>
+                <div className="text-gray-400 text-sm">Community Guidelines</div>
+                <div className="text-gray-400 text-sm">Privacy Policy</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom */}
+          <div className="pt-8 border-t border-white/10">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <p className="text-gray-400 text-sm text-center md:text-left mb-4 md:mb-0">
+                © 2024 REX. Building a safer Kenya through transparency and accountability.
+              </p>
+              <div className="flex items-center space-x-6">
+                <span className="text-gray-400 text-sm">Together for justice</span>
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-green-400 text-sm font-medium">Live</span>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
