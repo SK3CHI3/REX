@@ -1,6 +1,7 @@
 
-import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown } from 'lucide-react';
+import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown, TrendingUp, Clock, MapIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
@@ -15,11 +16,19 @@ const Home = () => {
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Recent cases data
+  const recentCases = [
+    { location: 'Nairobi CBD', date: '2 days ago', type: 'Assault' },
+    { location: 'Mombasa Road', date: '4 days ago', type: 'Unlawful Arrest' },
+    { location: 'Kisumu Central', date: '1 week ago', type: 'Harassment' },
+    { location: 'Nakuru Town', date: '1 week ago', type: 'Death' },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
-      {/* Navigation Header */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Floating Navigation Header */}
+      <nav className="fixed top-4 left-4 right-4 z-50 bg-black/40 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
@@ -34,19 +43,19 @@ const Home = () => {
             <div className="hidden md:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('about')}
-                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
               >
                 About
               </button>
               <button 
                 onClick={() => scrollToSection('features')}
-                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
               >
                 Features
               </button>
               <button 
                 onClick={() => scrollToSection('impact')}
-                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+                className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
               >
                 Impact
               </button>
@@ -55,7 +64,7 @@ const Home = () => {
             <Button
               onClick={handleEnterApp}
               size="sm"
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg hover:shadow-xl transition-all"
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 transform duration-200"
             >
               Launch App
             </Button>
@@ -63,82 +72,159 @@ const Home = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4">
+      {/* Hero Section - Split Layout */}
+      <section className="relative min-h-screen flex items-center px-4 pt-24">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-600/20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
-        <div className="relative max-w-6xl mx-auto text-center space-y-12">
-          {/* Badge */}
-          <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium animate-fade-in">
-            <Shield className="w-4 h-4" />
-            <span>Accountability Through Transparency</span>
-          </div>
-          
-          {/* Main Headline */}
-          <div className="space-y-6 animate-fade-in">
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black leading-tight">
-              <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                Kenya's
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent">
-                Justice
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                Tracker
-              </span>
-            </h1>
+        <div className="relative max-w-7xl mx-auto w-full">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             
-            <p className="text-xl sm:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light">
-              An interactive platform documenting police brutality incidents across Kenya. 
-              <span className="text-red-400 font-medium"> Empowering communities through data transparency.</span>
-            </p>
-          </div>
+            {/* Left Side - Data Visualization & Recent Cases */}
+            <div className="space-y-8 animate-fade-in">
+              {/* Live Stats Card */}
+              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+                <div className="flex items-center space-x-3 mb-6">
+                  <TrendingUp className="w-6 h-6 text-red-400" />
+                  <h3 className="text-xl font-bold">Live Statistics</h3>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-6 mb-8">
+                  <div className="text-center group">
+                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+                      47
+                    </div>
+                    <div className="text-sm text-gray-400 font-medium">Counties</div>
+                  </div>
+                  <div className="text-center group">
+                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+                      247
+                    </div>
+                    <div className="text-sm text-gray-400 font-medium">Total Cases</div>
+                  </div>
+                  <div className="text-center group">
+                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+                      18
+                    </div>
+                    <div className="text-sm text-gray-400 font-medium">This Month</div>
+                  </div>
+                </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 animate-fade-in">
-            <Button
-              onClick={handleEnterApp}
-              size="lg"
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-10 py-6 text-lg font-bold rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105 group"
-            >
-              <span>Explore Interactive Map</span>
-              <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            
-            <button 
-              onClick={() => scrollToSection('about')}
-              className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors text-lg font-medium group"
-            >
-              <span>Learn More</span>
-              <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
-            </button>
-          </div>
+                {/* Recent Cases */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold flex items-center">
+                      <Clock className="w-4 h-4 mr-2 text-gray-400" />
+                      Recent Cases
+                    </h4>
+                    <Badge variant="secondary" className="bg-red-900/50 text-red-300 border-red-500/30">
+                      Live Updates
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {recentCases.map((case_, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                          <div>
+                            <p className="text-sm font-medium text-white">{case_.location}</p>
+                            <p className="text-xs text-gray-400">{case_.type}</p>
+                          </div>
+                        </div>
+                        <span className="text-xs text-gray-500">{case_.date}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-          {/* Live Stats */}
-          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12 animate-fade-in">
-            <div className="text-center group">
-              <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                47
+              {/* Map Preview */}
+              <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl">
+                <div className="flex items-center space-x-3 mb-4">
+                  <MapIcon className="w-5 h-5 text-blue-400" />
+                  <h4 className="text-lg font-semibold">Interactive Map</h4>
+                </div>
+                <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-2xl h-32 flex items-center justify-center border border-blue-500/20">
+                  <Button
+                    onClick={handleEnterApp}
+                    variant="ghost"
+                    className="text-blue-300 hover:text-white hover:bg-blue-600/20"
+                  >
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Explore Full Map
+                  </Button>
+                </div>
               </div>
-              <div className="text-sm text-gray-400 font-medium">Counties Covered</div>
             </div>
-            <div className="text-center group">
-              <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                150+
+
+            {/* Right Side - Main Content */}
+            <div className="space-y-8 animate-fade-in lg:pl-8">
+              {/* Badge */}
+              <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium">
+                <Shield className="w-4 h-4" />
+                <span>Accountability Through Transparency</span>
               </div>
-              <div className="text-sm text-gray-400 font-medium">Documented Cases</div>
-            </div>
-            <div className="text-center group">
-              <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                2024
+              
+              {/* Main Headline */}
+              <div className="space-y-6">
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight">
+                  <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                    Kenya's
+                  </span>
+                  <br />
+                  <span className="bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent">
+                    Justice
+                  </span>
+                  <br />
+                  <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                    Tracker
+                  </span>
+                </h1>
+                
+                <p className="text-xl text-gray-300 leading-relaxed font-light">
+                  An interactive platform documenting police brutality incidents across Kenya. 
+                  <span className="text-red-400 font-medium"> Empowering communities through data transparency.</span>
+                </p>
               </div>
-              <div className="text-sm text-gray-400 font-medium">Last Updated</div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6">
+                <Button
+                  onClick={handleEnterApp}
+                  size="lg"
+                  className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-10 py-6 text-lg font-bold rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105 group"
+                >
+                  <span>Explore Interactive Map</span>
+                  <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                
+                <button 
+                  onClick={() => scrollToSection('about')}
+                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors text-lg font-medium group"
+                >
+                  <span>Learn More</span>
+                  <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+                </button>
+              </div>
+
+              {/* Key Metrics */}
+              <div className="bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <div className="text-2xl font-bold text-white">24/7</div>
+                    <div className="text-sm text-gray-400">Live Monitoring</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-white">100%</div>
+                    <div className="text-sm text-gray-400">Data Transparency</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
