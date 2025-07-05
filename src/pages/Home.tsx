@@ -1,5 +1,5 @@
 
-import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown, TrendingUp, Clock, MapIcon } from 'lucide-react';
+import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown, TrendingUp, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
@@ -84,86 +84,8 @@ const Home = () => {
         <div className="relative max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             
-            {/* Left Side - Data Visualization & Recent Cases */}
+            {/* Left Side - Main Content */}
             <div className="space-y-8 animate-fade-in">
-              {/* Live Stats Card */}
-              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
-                <div className="flex items-center space-x-3 mb-6">
-                  <TrendingUp className="w-6 h-6 text-red-400" />
-                  <h3 className="text-xl font-bold">Live Statistics</h3>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-6 mb-8">
-                  <div className="text-center group">
-                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      47
-                    </div>
-                    <div className="text-sm text-gray-400 font-medium">Counties</div>
-                  </div>
-                  <div className="text-center group">
-                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      247
-                    </div>
-                    <div className="text-sm text-gray-400 font-medium">Total Cases</div>
-                  </div>
-                  <div className="text-center group">
-                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      18
-                    </div>
-                    <div className="text-sm text-gray-400 font-medium">This Month</div>
-                  </div>
-                </div>
-
-                {/* Recent Cases */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-lg font-semibold flex items-center">
-                      <Clock className="w-4 h-4 mr-2 text-gray-400" />
-                      Recent Cases
-                    </h4>
-                    <Badge variant="secondary" className="bg-red-900/50 text-red-300 border-red-500/30">
-                      Live Updates
-                    </Badge>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {recentCases.map((case_, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                          <div>
-                            <p className="text-sm font-medium text-white">{case_.location}</p>
-                            <p className="text-xs text-gray-400">{case_.type}</p>
-                          </div>
-                        </div>
-                        <span className="text-xs text-gray-500">{case_.date}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Map Preview */}
-              <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl">
-                <div className="flex items-center space-x-3 mb-4">
-                  <MapIcon className="w-5 h-5 text-blue-400" />
-                  <h4 className="text-lg font-semibold">Interactive Map</h4>
-                </div>
-                <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 rounded-2xl h-32 flex items-center justify-center border border-blue-500/20">
-                  <Button
-                    onClick={handleEnterApp}
-                    variant="ghost"
-                    className="text-blue-300 hover:text-white hover:bg-blue-600/20"
-                  >
-                    <MapPin className="w-4 h-4 mr-2" />
-                    Explore Full Map
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side - Main Content */}
-            <div className="space-y-8 animate-fade-in lg:pl-8">
               {/* Badge */}
               <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium">
                 <Shield className="w-4 h-4" />
@@ -222,6 +144,66 @@ const Home = () => {
                   <div>
                     <div className="text-2xl font-bold text-white">100%</div>
                     <div className="text-sm text-gray-400">Data Transparency</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side - Data Visualization & Recent Cases */}
+            <div className="space-y-8 animate-fade-in lg:pl-8">
+              {/* Live Stats Card */}
+              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+                <div className="flex items-center space-x-3 mb-6">
+                  <TrendingUp className="w-6 h-6 text-red-400" />
+                  <h3 className="text-xl font-bold">Live Statistics</h3>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-6 mb-8">
+                  <div className="text-center group">
+                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+                      47
+                    </div>
+                    <div className="text-sm text-gray-400 font-medium">Counties</div>
+                  </div>
+                  <div className="text-center group">
+                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+                      247
+                    </div>
+                    <div className="text-sm text-gray-400 font-medium">Total Cases</div>
+                  </div>
+                  <div className="text-center group">
+                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+                      18
+                    </div>
+                    <div className="text-sm text-gray-400 font-medium">This Month</div>
+                  </div>
+                </div>
+
+                {/* Recent Cases */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-semibold flex items-center">
+                      <Clock className="w-4 h-4 mr-2 text-gray-400" />
+                      Recent Cases
+                    </h4>
+                    <Badge variant="secondary" className="bg-red-900/50 text-red-300 border-red-500/30">
+                      Live Updates
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {recentCases.map((case_, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                          <div>
+                            <p className="text-sm font-medium text-white">{case_.location}</p>
+                            <p className="text-xs text-gray-400">{case_.type}</p>
+                          </div>
+                        </div>
+                        <span className="text-xs text-gray-500">{case_.date}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>

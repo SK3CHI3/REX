@@ -2,15 +2,14 @@
 import { useState } from 'react';
 import MapView from '@/components/MapView';
 import CaseModal from '@/components/CaseModal';
-import FilterSidebar from '@/components/FilterSidebar';
 import Header from '@/components/Header';
 import SubmitCaseModal from '@/components/SubmitCaseModal';
+import DataSidebar from '@/components/DataSidebar';
 import { Case, FilterState } from '@/types';
 import { mockCases } from '@/data/mockData';
 
 const MapPage = () => {
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     counties: [],
@@ -28,24 +27,26 @@ const MapPage = () => {
   });
 
   return (
-    <div className="relative h-screen w-full bg-background overflow-hidden">
+    <div className="relative h-screen w-full bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 overflow-hidden flex">
       <Header 
-        onOpenFilters={() => setIsFilterOpen(true)}
+        onOpenFilters={() => {}} // Not needed with sidebar
         onSubmitCase={() => setIsSubmitModalOpen(true)}
         caseCount={filteredCases.length}
       />
       
-      <MapView 
-        cases={filteredCases}
-        onCaseSelect={setSelectedCase}
-      />
-
-      <FilterSidebar
-        isOpen={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
+      <DataSidebar
+        selectedCase={selectedCase}
         filters={filters}
         onFiltersChange={setFilters}
+        filteredCasesCount={filteredCases.length}
       />
+      
+      <div className="flex-1 pt-14 sm:pt-16 lg:pt-18">
+        <MapView 
+          cases={filteredCases}
+          onCaseSelect={setSelectedCase}
+        />
+      </div>
 
       {selectedCase && (
         <CaseModal
