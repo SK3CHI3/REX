@@ -1,5 +1,5 @@
 
-import { MapPin, ArrowRight, Shield, Users, Eye } from 'lucide-react';
+import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,109 +10,276 @@ const Home = () => {
     navigate('/map');
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-10 p-4 sm:p-6">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center">
-            <MapPin className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">REX</h1>
-            <p className="text-sm text-gray-600 hidden sm:block">Police Brutality Tracker</p>
-          </div>
-        </div>
-      </header>
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    element?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-      {/* Main Content */}
-      <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
-          {/* Hero Section */}
-          <div className="space-y-6">
-            <div className="inline-flex items-center space-x-2 bg-red-50 text-red-700 px-4 py-2 rounded-full text-sm font-medium">
-              <Shield className="w-4 h-4" />
-              <span>Accountability Through Transparency</span>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
+      {/* Navigation Header */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-xl border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
+                <AlertTriangle className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold tracking-tight">REX</h1>
+                <p className="text-xs text-gray-300 hidden sm:block">Police Brutality Tracker</p>
+              </div>
             </div>
             
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
-              Kenya's Police
+            <div className="hidden md:flex items-center space-x-8">
+              <button 
+                onClick={() => scrollToSection('about')}
+                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+              >
+                About
+              </button>
+              <button 
+                onClick={() => scrollToSection('features')}
+                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+              >
+                Features
+              </button>
+              <button 
+                onClick={() => scrollToSection('impact')}
+                className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+              >
+                Impact
+              </button>
+            </div>
+
+            <Button
+              onClick={handleEnterApp}
+              size="sm"
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg hover:shadow-xl transition-all"
+            >
+              Launch App
+            </Button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center px-4">
+        {/* Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-600/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
+
+        <div className="relative max-w-6xl mx-auto text-center space-y-12">
+          {/* Badge */}
+          <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium animate-fade-in">
+            <Shield className="w-4 h-4" />
+            <span>Accountability Through Transparency</span>
+          </div>
+          
+          {/* Main Headline */}
+          <div className="space-y-6 animate-fade-in">
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black leading-tight">
+              <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                Kenya's
+              </span>
               <br />
-              <span className="text-red-600">Brutality Tracker</span>
+              <span className="bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent">
+                Justice
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                Tracker
+              </span>
             </h1>
             
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              An interactive platform documenting and mapping incidents of police brutality across Kenya. 
-              Promoting justice, accountability, and human rights protection.
+            <p className="text-xl sm:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light">
+              An interactive platform documenting police brutality incidents across Kenya. 
+              <span className="text-red-400 font-medium"> Empowering communities through data transparency.</span>
             </p>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 max-w-md mx-auto">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-red-600">47</div>
-              <div className="text-sm text-gray-600">Counties</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-red-600">150+</div>
-              <div className="text-sm text-gray-600">Cases</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-red-600">2024</div>
-              <div className="text-sm text-gray-600">Updated</div>
-            </div>
-          </div>
-
-          {/* CTA Button */}
-          <div className="space-y-4">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6 animate-fade-in">
             <Button
               onClick={handleEnterApp}
               size="lg"
-              className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-10 py-6 text-lg font-bold rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105 group"
             >
-              <span>Explore The Map</span>
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <span>Explore Interactive Map</span>
+              <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
             
-            <p className="text-sm text-gray-500">
-              Click to view documented cases on an interactive map
-            </p>
+            <button 
+              onClick={() => scrollToSection('about')}
+              className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors text-lg font-medium group"
+            >
+              <span>Learn More</span>
+              <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
+            </button>
           </div>
 
-          {/* Features */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto mt-16">
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto">
-                <MapPin className="w-6 h-6 text-red-600" />
+          {/* Live Stats */}
+          <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-12 animate-fade-in">
+            <div className="text-center group">
+              <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+                47
               </div>
-              <h3 className="font-semibold text-gray-900">Interactive Mapping</h3>
-              <p className="text-sm text-gray-600">Precise geolocation of incidents across Kenya</p>
+              <div className="text-sm text-gray-400 font-medium">Counties Covered</div>
             </div>
-            
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto">
-                <Eye className="w-6 h-6 text-red-600" />
+            <div className="text-center group">
+              <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+                150+
               </div>
-              <h3 className="font-semibold text-gray-900">Transparency</h3>
-              <p className="text-sm text-gray-600">Open data promoting accountability</p>
+              <div className="text-sm text-gray-400 font-medium">Documented Cases</div>
             </div>
-            
-            <div className="text-center space-y-3">
-              <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto">
-                <Users className="w-6 h-6 text-red-600" />
+            <div className="text-center group">
+              <div className="text-3xl sm:text-4xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
+                2024
               </div>
-              <h3 className="font-semibold text-gray-900">Community Driven</h3>
-              <p className="text-sm text-gray-600">Empowering citizens to report incidents</p>
+              <div className="text-sm text-gray-400 font-medium">Last Updated</div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-24 px-4 bg-black/20 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                Our Mission
+              </span>
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              REX exists to create transparency and accountability in law enforcement through 
+              comprehensive documentation and community empowerment.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold text-white">Why This Matters</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Police brutality cases often go undocumented or unreported, making it difficult 
+                to understand patterns and hold authorities accountable. Our platform bridges 
+                this gap by providing a comprehensive, transparent view of incidents across Kenya.
+              </p>
+              <div className="flex items-center space-x-3 text-red-400">
+                <Calendar className="w-5 h-5" />
+                <span className="font-medium">Real-time incident tracking</span>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-red-900/20 to-black/40 backdrop-blur-sm rounded-2xl p-8 border border-red-500/20">
+              <h4 className="text-xl font-bold text-white mb-4">Data-Driven Justice</h4>
+              <p className="text-gray-300 mb-6">
+                Every pin on our map represents a human story. By visualizing these incidents, 
+                we help communities, activists, and policymakers make informed decisions.
+              </p>
+              <Button 
+                onClick={handleEnterApp}
+                variant="outline" 
+                className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+              >
+                View Data Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                Platform Features
+              </span>
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: MapPin,
+                title: "Interactive Mapping",
+                description: "Precise geolocation of incidents with detailed filtering and search capabilities across all 47 counties.",
+                color: "from-red-500 to-orange-500"
+              },
+              {
+                icon: Eye,
+                title: "Transparency First",
+                description: "Open data approach ensuring all information is accessible, verifiable, and contributes to accountability.",
+                color: "from-blue-500 to-purple-500"
+              },
+              {
+                icon: Users,
+                title: "Community Driven",
+                description: "Empowering citizens to report incidents and contribute to a comprehensive database of events.",
+                color: "from-green-500 to-teal-500"
+              }
+            ].map((feature, index) => (
+              <div key={index} className="group">
+                <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
+                  <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                    <feature.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-4">{feature.title}</h3>
+                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Impact Section */}
+      <section id="impact" className="py-24 px-4 bg-gradient-to-r from-red-900/10 to-black/20 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl sm:text-5xl font-bold mb-8">
+            <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              Creating Real Impact
+            </span>
+          </h2>
+          <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+            Join thousands of Kenyans working together to build a more transparent 
+            and accountable society through data-driven advocacy.
+          </p>
+          
+          <Button
+            onClick={handleEnterApp}
+            size="lg"
+            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-12 py-6 text-xl font-bold rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
+          >
+            Start Exploring
+            <ArrowRight className="w-6 h-6 ml-3" />
+          </Button>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="absolute bottom-0 left-0 right-0 p-4 text-center">
-        <p className="text-xs text-gray-500">
-          © 2024 REX. Building a safer Kenya through transparency and accountability.
-        </p>
+      <footer className="py-12 px-4 border-t border-white/10 bg-black/40 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="flex items-center space-x-3 mb-4 md:mb-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center">
+                <AlertTriangle className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-lg font-bold">REX</span>
+            </div>
+            
+            <p className="text-gray-400 text-sm text-center md:text-right">
+              © 2024 REX. Building a safer Kenya through transparency and accountability.
+              <br className="md:hidden" />
+              <span className="hidden md:inline"> | </span>
+              Together for justice.
+            </p>
+          </div>
+        </div>
       </footer>
     </div>
   );

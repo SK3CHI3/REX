@@ -1,7 +1,8 @@
 
-import { Filter, Plus, MapPin, AlertTriangle } from 'lucide-react';
+import { Filter, Plus, MapPin, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onOpenFilters: () => void;
@@ -10,11 +11,23 @@ interface HeaderProps {
 }
 
 const Header = ({ onOpenFilters, onSubmitCase, caseCount }: HeaderProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="absolute top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
       <div className="flex items-center justify-between p-3 sm:p-4">
-        {/* Logo and title */}
+        {/* Back button and Logo */}
         <div className="flex items-center space-x-3 min-w-0 flex-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/')}
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all mr-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Home</span>
+          </Button>
+          
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
               <AlertTriangle className="w-5 h-5 text-white" />
@@ -26,7 +39,7 @@ const Header = ({ onOpenFilters, onSubmitCase, caseCount }: HeaderProps) => {
           </div>
         </div>
 
-        {/* Case counter - redesigned */}
+        {/* Case counter */}
         <div className="hidden sm:flex items-center mr-4">
           <Badge variant="secondary" className="bg-red-50 text-red-700 border-red-200 px-3 py-1">
             <MapPin className="w-3 h-3 mr-1" />
@@ -34,7 +47,7 @@ const Header = ({ onOpenFilters, onSubmitCase, caseCount }: HeaderProps) => {
           </Badge>
         </div>
 
-        {/* Action buttons - improved design */}
+        {/* Action buttons */}
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -57,7 +70,7 @@ const Header = ({ onOpenFilters, onSubmitCase, caseCount }: HeaderProps) => {
         </div>
       </div>
       
-      {/* Mobile subtitle and counter - improved */}
+      {/* Mobile subtitle and counter */}
       <div className="sm:hidden px-3 pb-3 flex items-center justify-between">
         <span className="text-xs text-gray-500">Kenya's Police Brutality Tracker</span>
         <Badge variant="secondary" className="bg-red-50 text-red-700 border-red-200 text-xs px-2 py-1">
