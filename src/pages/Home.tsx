@@ -29,16 +29,17 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
       {/* Floating Navigation Header */}
-      <nav className="fixed top-4 left-4 right-4 z-50 bg-black/40 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+      <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-black/40 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl max-w-7xl w-full">
+        <div className="px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
-                <AlertTriangle className="w-5 h-5 text-white" />
+                {/* Police shield with crack/slash SVG */}
+                <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight">REX</h1>
-                <p className="text-xs text-gray-300 hidden sm:block">Police Brutality Tracker</p>
+                <p className="text-xs text-gray-300 hidden sm:block">Justice through visibility</p>
               </div>
             </div>
             
@@ -75,7 +76,7 @@ const Home = () => {
       </nav>
 
       {/* Hero Section - Split Layout */}
-      <section className="relative min-h-screen flex items-center px-4 pt-24">
+      <section className="relative min-h-[80vh] flex items-center px-4 pt-24 pb-16">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -83,15 +84,15 @@ const Home = () => {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[600px]">
+        <div className="relative max-w-6xl mx-auto w-full">
+          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[60vh]">
             
             {/* Left Side - Main Content */}
             <div className="space-y-8 animate-fade-in flex flex-col justify-center h-full">
               {/* Badge */}
               <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium w-fit">
                 <Shield className="w-4 h-4" />
-                <span>Accountability Through Transparency</span>
+                <span>Brutality Marked On Map</span>
               </div>
               
               {/* Main Headline */}
@@ -101,10 +102,9 @@ const Home = () => {
                     Kenya's
                   </span>
                   <br />
-                  <span className="bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent block ml-4 sm:ml-6">
                     Justice
                   </span>
-                  <br />
                   <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
                     Tracker
                   </span>
@@ -136,8 +136,8 @@ const Home = () => {
                 </button>
               </div>
 
-              {/* Key Metrics - No background card */}
-              <div className="pt-8">
+              {/* Key Metrics - No background card, moved up */}
+              <div className="mt-6 mb-4">
                 <div className="grid grid-cols-2 gap-8">
                   <div className="flex flex-col items-start">
                     <div className="text-3xl font-bold text-white mb-1">24/7</div>
@@ -152,9 +152,9 @@ const Home = () => {
             </div>
 
             {/* Right Side - Data Visualization & Recent Cases - Full height card */}
-            <div className="animate-fade-in lg:pl-8 h-full min-h-[600px]">
+            <div className="animate-fade-in lg:pl-8 h-full min-h-[60vh] max-h-[70vh] flex items-stretch justify-center">
               {/* Live Stats Card - Full height */}
-              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl h-full flex flex-col">
+              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl h-full max-h-[70vh] flex flex-col w-[420px] md:w-[500px] lg:w-[540px]">
                 <div className="flex items-center space-x-3 mb-6">
                   <TrendingUp className="w-6 h-6 text-red-400" />
                   <h3 className="text-xl font-bold">Live Statistics</h3>
@@ -193,8 +193,8 @@ const Home = () => {
                     </Badge>
                   </div>
                   
-                  <div className="space-y-3 flex-1 overflow-y-auto">
-                    {recentCases.map((case_, index) => (
+                  <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
+                    {recentCases.slice(0, 3).map((case_, index) => (
                       <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
                         <div className="flex items-center space-x-3">
                           <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
@@ -354,12 +354,12 @@ const Home = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-white" />
+                  <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
                 </div>
                 <span className="text-xl font-bold">REX</span>
               </div>
               <p className="text-gray-400 text-sm">
-                Building a safer Kenya through transparency and accountability in law enforcement.
+                Justice through visibility
               </p>
             </div>
 

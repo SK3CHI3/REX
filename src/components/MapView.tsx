@@ -1,9 +1,9 @@
-
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip } from 'react-leaflet';
 import { Case } from '@/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { LatLngBoundsExpression } from 'leaflet';
 
 // Fix for default markers in React Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -29,8 +29,12 @@ interface MapViewProps {
 }
 
 const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
-  // Kenya's center coordinates
-  const kenyaCenter: [number, number] = [-1.2921, 36.8219];
+  // Kenya's bounding box (approximate southwest and northeast corners)
+  const kenyaBounds: LatLngBoundsExpression = [
+    [ -4.678, 33.909 ], // Southwest (near Lunga Lunga, Kwale)
+    [ 5.019, 41.899 ]   // Northeast (near Mandera)
+  ];
+  const mapRef = useRef(null);
 
   const getTypeLabel = (type: Case['type']) => {
     switch (type) {
@@ -54,13 +58,14 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
   };
 
   return (
-    <div className="absolute inset-0 pt-14 sm:pt-16 lg:pt-18">
+    <div className="absolute inset-0">
       <MapContainer
-        center={kenyaCenter}
-        zoom={6}
+        bounds={kenyaBounds}
+        boundsOptions={{ padding: [20, 20] }}
         className="w-full h-full z-10"
         zoomControl={true}
         preferCanvas={true}
+        ref={mapRef}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -76,8 +81,8 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
               click: () => onCaseSelect(caseItem)
             }}
           >
-            <Tooltip 
-              permanent={false}
+            <Tooltip
+              sticky={false}
               direction="top"
               offset={[0, -10]}
               className="custom-tooltip"
@@ -105,15 +110,6 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
                   <p className="mt-2">{caseItem.location}, {caseItem.county}</p>
                   <p>{new Date(caseItem.date).toLocaleDateString()}</p>
                 </div>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCaseSelect(caseItem);
-                  }}
-                  className="w-full text-sm bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition-colors font-medium"
-                >
-                  View Full Details
-                </button>
               </div>
             </Popup>
           </Marker>

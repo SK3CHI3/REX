@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import MapView from '@/components/MapView';
 import CaseModal from '@/components/CaseModal';
@@ -34,7 +33,7 @@ const MapPage = () => {
         caseCount={filteredCases.length}
       />
       
-      <div className="flex flex-1 pt-20">
+      <div className="flex flex-1">
         <DataSidebar
           selectedCase={selectedCase}
           filters={filters}
@@ -49,13 +48,6 @@ const MapPage = () => {
           />
         </div>
       </div>
-
-      {selectedCase && (
-        <CaseModal
-          case={selectedCase}
-          onClose={() => setSelectedCase(null)}
-        />
-      )}
 
       {isSubmitModalOpen && (
         <SubmitCaseModal

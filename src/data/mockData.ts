@@ -334,13 +334,6 @@ export const mockCases: Case[] = [
 ];
 
 // Generate remaining cases with proper Kenyan coordinates
-const kenyanCounties = [
-  'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Uasin Gishu', 'Kiambu', 
-  'Machakos', 'Nyeri', 'Kericho', 'Embu', 'Kitui', 'West Pokot',
-  'Bomet', 'Bungoma', 'Homa Bay', 'Migori', 'Narok', 'Baringo',
-  'Laikipia', 'Murang\'a', 'Nandi', 'Nyandarua'
-];
-
 const kenyanCities = [
   { name: 'Nairobi CBD', county: 'Nairobi', coords: [-1.2864, 36.8172] },
   { name: 'Westlands', county: 'Nairobi', coords: [-1.2676, 36.8078] },
@@ -373,26 +366,36 @@ const kenyanCities = [
 const types: Case['type'][] = ['assault', 'harassment', 'unlawful_arrest', 'death', 'other'];
 const statuses: Case['status'][] = ['verified', 'investigating'];
 
-// Add remaining cases up to 100 with proper Kenyan locations
+// Add remaining cases up to 100 with proper Kenyan locations and real Kenyan names
+const kenyanNames = [
+  'John Mwangi', 'Mary Atieno', 'Peter Otieno', 'Grace Wambui', 'Samuel Kiptoo',
+  'Esther Achieng', 'David Njoroge', 'Lucy Wanjiru', 'James Ouma', 'Janet Chebet',
+  'Joseph Mutua', 'Agnes Nyambura', 'Daniel Kiplangat', 'Rose Nyawira', 'Paul Kimani',
+  'Catherine Nekesa', 'George Ochieng', 'Beatrice Moraa', 'Francis Kiplagat', 'Emily Naliaka',
+  'Michael Kiprono', 'Hellen Wairimu', 'Charles Otieno', 'Diana Waceke', 'Patrick Kipruto',
+  'Ann Mwende', 'Brian Kipchumba', 'Susan Akinyi', 'Anthony Muriuki', 'Eunice Jepkemoi',
+  'Alex Njuguna', 'Martha Wanjiku', 'Felix Barasa', 'Naomi Chepkemoi', 'Kennedy Oduor',
+  'Lilian Chebet', 'Collins Kiprotich', 'Ruth Njeri', 'Eric Kipkoech', 'Monica Atieno',
+  'Dennis Kimutai', 'Vivian Wambua', 'Kevin Kipruto', 'Mercy Chebet', 'Allan Otieno',
+  'Faith Wairimu', 'Victor Kiprono', 'Caroline Achieng', 'Edwin Kiptoo', 'Irene Wanjiru'
+];
 for (let i = 26; i <= 100; i++) {
   const randomCity = kenyanCities[Math.floor(Math.random() * kenyanCities.length)];
   const randomType = types[Math.floor(Math.random() * types.length)];
   const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-  
-  // Add slight variation to coordinates for realistic spread within cities
-  const latVariation = (Math.random() - 0.5) * 0.02; // ~1km variation
+  const latVariation = (Math.random() - 0.5) * 0.02;
   const lngVariation = (Math.random() - 0.5) * 0.02;
-  
+  const name = kenyanNames[(i - 26) % kenyanNames.length];
   mockCases.push({
     id: i.toString(),
-    victimName: `Case ${i} Victim`,
+    victimName: name,
     age: 20 + Math.floor(Math.random() * 40),
     date: `2024-0${Math.floor(Math.random() * 3) + 1}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
     location: randomCity.name,
     county: randomCity.county,
     coordinates: [randomCity.coords[0] + latVariation, randomCity.coords[1] + lngVariation],
     type: randomType,
-    description: `Case ${i} description - incident details and circumstances involving ${randomType} in ${randomCity.name}.`,
+    description: `Incident involving ${name} (${randomType}) in ${randomCity.name}.`,
     status: randomStatus,
     source: 'Various Sources'
   });

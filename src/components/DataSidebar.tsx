@@ -1,4 +1,3 @@
-
 import { X, Filter, Search, Calendar, MapPin, AlertTriangle, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -8,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { FilterState, Case } from '@/types';
 import { kenyanCounties, caseTypes } from '@/data/mockData';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface DataSidebarProps {
   selectedCase: Case | null;
@@ -19,7 +18,13 @@ interface DataSidebarProps {
 
 const DataSidebar = ({ selectedCase, filters, onFiltersChange, filteredCasesCount }: DataSidebarProps) => {
   const [countySearch, setCountySearch] = useState('');
-  const [activeTab, setActiveTab] = useState<'details' | 'filters'>('details');
+  const [activeTab, setActiveTab] = useState<'details' | 'filters'>(selectedCase ? 'details' : 'filters');
+
+  // When a case is selected, switch to details tab
+  useEffect(() => {
+    if (selectedCase) setActiveTab('details');
+    else setActiveTab('filters');
+  }, [selectedCase]);
 
   const handleCountyChange = (county: string, checked: boolean) => {
     const newCounties = checked
@@ -78,7 +83,7 @@ const DataSidebar = ({ selectedCase, filters, onFiltersChange, filteredCasesCoun
   };
 
   return (
-    <div className="w-80 bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white border-r border-white/10 flex flex-col h-full">
+    <div className="w-80 bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white border-r border-white/10 flex flex-col h-full pt-20">
       {/* Header */}
       <div className="p-4 border-b border-white/10">
         <div className="flex items-center space-x-3 mb-4">
@@ -122,7 +127,7 @@ const DataSidebar = ({ selectedCase, filters, onFiltersChange, filteredCasesCoun
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 min-h-0">
         {activeTab === 'details' ? (
           <div className="p-4">
             {selectedCase ? (
@@ -155,12 +160,12 @@ const DataSidebar = ({ selectedCase, filters, onFiltersChange, filteredCasesCoun
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 bg-red-900/30 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <MapPin className="w-8 h-8 text-red-400" />
+              <div className="text-center py-4">
+                <div className="w-10 h-10 bg-red-900/30 rounded-xl flex items-center justify-center mx-auto mb-2">
+                  <MapPin className="w-5 h-5 text-red-400" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">Select a Case</h3>
-                <p className="text-gray-400 text-sm">Click on any pin on the map to view detailed information about that incident.</p>
+                <h3 className="text-base font-semibold mb-1 text-white">Select a Case</h3>
+                <p className="text-gray-400 text-xs">Click a pin on the map to view details.</p>
               </div>
             )}
 
