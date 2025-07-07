@@ -151,10 +151,10 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Right Side - Data Visualization & Recent Cases - Full height card */}
-            <div className="animate-fade-in lg:pl-8 h-full min-h-[60vw] max-h-[70vh] flex items-stretch justify-center">
+            {/* Right Side - Data Visualization & Recent Cases */}
+            <div className="animate-fade-in lg:pl-8 flex items-center justify-center">
               {/* Live Stats Card - Responsive width */}
-              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-4 sm:p-8 shadow-2xl h-full w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col">
+              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-4 sm:p-8 shadow-2xl w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col">
                 <div className="flex items-center space-x-3 mb-6">
                   <TrendingUp className="w-6 h-6 text-red-400" />
                   <h3 className="text-xl font-bold">Live Statistics</h3>

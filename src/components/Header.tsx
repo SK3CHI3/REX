@@ -35,12 +35,12 @@ const Header = ({ onOpenFilters, onSubmitCase, caseCount }: HeaderProps) => {
           </Button>
           
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
-              <AlertTriangle className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
             </div>
             <div>
               <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">REX</h1>
-              <p className="text-xs text-gray-400 hidden sm:block">Police Brutality Tracker</p>
+              <p className="text-xs text-gray-400 hidden sm:block">Justice through visibility</p>
             </div>
           </div>
         </div>
