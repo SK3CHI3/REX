@@ -1,9 +1,11 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip } from 'react-leaflet';
 import { Case } from '@/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { LatLngBoundsExpression } from 'leaflet';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useSidebar } from '@/components/ui/sidebar';
 
 // Fix for default markers in React Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -13,14 +15,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Custom red marker for police brutality cases
-const redIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [20, 32],
-  iconAnchor: [10, 32],
-  popupAnchor: [1, -28],
-  shadowSize: [32, 32]
+// Small red person/user icon SVG
+const personRedIcon = new L.Icon({
+  iconUrl: 'data:image/svg+xml;utf8,<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="5" r="3" fill="%23EF4444"/><rect x="2" y="9" width="10" height="4" rx="2" fill="%23EF4444"/></svg>',
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+  popupAnchor: [0, -7],
+  shadowUrl: undefined,
+  shadowSize: undefined,
+  shadowAnchor: undefined
 });
 
 interface MapViewProps {
@@ -34,7 +37,26 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
     [ -4.678, 33.909 ], // Southwest (near Lunga Lunga, Kwale)
     [ 5.019, 41.899 ]   // Northeast (near Mandera)
   ];
-  const mapRef = useRef(null);
+  // Tighter bounds for mobile (zoom in more)
+  const kenyaMobileBounds: LatLngBoundsExpression = [
+    [ -1.5, 36.6 ], // Southwest (just below Nairobi)
+    [ 1.5, 38.2 ]   // Northeast (just above Nairobi, toward Meru)
+  ];
+  const isMobile = useIsMobile();
+  const mapRef = useRef<any>(null);
+  const [selectedPin, setSelectedPin] = useState<string | null>(null);
+  const { isMobile: sidebarIsMobile, setOpenMobile } = useSidebar();
+
+  // Zoom to pin when selectedPin changes
+  useEffect(() => {
+    if (selectedPin && mapRef.current) {
+      const map = mapRef.current;
+      const pin = cases.find(c => c.id === selectedPin);
+      if (pin) {
+        map.flyTo(pin.coordinates, 15, { duration: 0.7 });
+      }
+    }
+  }, [selectedPin, cases]);
 
   const getTypeLabel = (type: Case['type']) => {
     switch (type) {
@@ -60,7 +82,7 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
   return (
     <div className="absolute inset-0">
       <MapContainer
-        bounds={kenyaBounds}
+        bounds={isMobile ? kenyaMobileBounds : kenyaBounds}
         boundsOptions={{ padding: [20, 20] }}
         className="w-full h-full z-10"
         zoomControl={true}
@@ -76,25 +98,20 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
           <Marker
             key={caseItem.id}
             position={caseItem.coordinates}
-            icon={redIcon}
+            icon={personRedIcon}
             eventHandlers={{
-              click: () => onCaseSelect(caseItem)
+              click: () => {
+                setSelectedPin(caseItem.id);
+                onCaseSelect(caseItem);
+              }
             }}
           >
-            <Tooltip
-              sticky={false}
-              direction="top"
-              offset={[0, -10]}
-              className="custom-tooltip"
-            >
-              <div className="text-xs font-medium">
-                <div className="font-semibold text-gray-900">{caseItem.victimName}</div>
-                <div className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${getTypeColor(caseItem.type)}`}>
-                  {getTypeLabel(caseItem.type)}
-                </div>
+            {/* Highlight effect for selected pin */}
+            {selectedPin === caseItem.id && (
+              <div className="leaflet-marker-selected" style={{ position: 'absolute', left: -10, top: -10, width: 34, height: 34, pointerEvents: 'none' }}>
+                <div style={{ width: 34, height: 34, borderRadius: '50%', border: '2px solid #EF4444', boxShadow: '0 0 8px 2px #EF4444', opacity: 0.5 }} />
               </div>
-            </Tooltip>
-            
+            )}
             <Popup 
               className="custom-popup"
               closeButton={true}
@@ -110,6 +127,17 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
                   <p className="mt-2">{caseItem.location}, {caseItem.county}</p>
                   <p>{new Date(caseItem.date).toLocaleDateString()}</p>
                 </div>
+                {/* See Details button for mobile */}
+                {isMobile && (
+                  <button
+                    className="mt-4 w-full bg-red-600 text-white rounded-lg py-2 font-semibold text-sm hover:bg-red-700 transition"
+                    onClick={() => {
+                      setOpenMobile(true);
+                    }}
+                  >
+                    See Details
+                  </button>
+                )}
               </div>
             </Popup>
           </Marker>

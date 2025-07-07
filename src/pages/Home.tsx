@@ -76,7 +76,7 @@ const Home = () => {
       </nav>
 
       {/* Hero Section - Split Layout */}
-      <section className="relative min-h-[80vh] flex items-center px-4 pt-24 pb-16">
+      <section className="relative min-h-[80vh] flex items-center px-2 sm:px-4 pt-24 pb-10 sm:pb-16">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -85,7 +85,7 @@ const Home = () => {
         </div>
 
         <div className="relative max-w-6xl mx-auto w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[60vh]">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center min-h-[60vh]">
             
             {/* Left Side - Main Content */}
             <div className="space-y-8 animate-fade-in flex flex-col justify-center h-full">
@@ -152,9 +152,9 @@ const Home = () => {
             </div>
 
             {/* Right Side - Data Visualization & Recent Cases - Full height card */}
-            <div className="animate-fade-in lg:pl-8 h-full min-h-[60vh] max-h-[70vh] flex items-stretch justify-center">
-              {/* Live Stats Card - Full height */}
-              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl h-full max-h-[70vh] flex flex-col w-[420px] md:w-[500px] lg:w-[540px]">
+            <div className="animate-fade-in lg:pl-8 h-full min-h-[60vw] max-h-[70vh] flex items-stretch justify-center">
+              {/* Live Stats Card - Responsive width */}
+              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-4 sm:p-8 shadow-2xl h-full w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col">
                 <div className="flex items-center space-x-3 mb-6">
                   <TrendingUp className="w-6 h-6 text-red-400" />
                   <h3 className="text-xl font-bold">Live Statistics</h3>

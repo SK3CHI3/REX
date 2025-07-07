@@ -1,4 +1,3 @@
-
 export interface Case {
   id: string;
   victimName: string;
@@ -14,6 +13,7 @@ export interface Case {
   videoLinks?: string[];
   source: string;
   reportedBy?: string;
+  justiceServed?: boolean;
 }
 
 export interface FilterState {

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import MapView from '@/components/MapView';
 import CaseModal from '@/components/CaseModal';
@@ -7,6 +6,7 @@ import Header from '@/components/Header';
 import SubmitCaseModal from '@/components/SubmitCaseModal';
 import { Case, FilterState } from '@/types';
 import { mockCases } from '@/data/mockData';
+import { SidebarProvider, Sidebar, SidebarTrigger } from '@/components/ui/sidebar';
 
 const Index = () => {
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
@@ -27,39 +27,52 @@ const Index = () => {
     return matchesCounty && matchesCaseType && matchesYear;
   });
 
+  const closeFilter = () => {
+    setIsFilterOpen(false);
+  };
+
   return (
-    <div className="relative h-screen w-full bg-background overflow-hidden">
-      <Header 
-        onOpenFilters={() => setIsFilterOpen(true)}
-        onSubmitCase={() => setIsSubmitModalOpen(true)}
-        caseCount={filteredCases.length}
-      />
-      
-      <MapView 
-        cases={filteredCases}
-        onCaseSelect={setSelectedCase}
-      />
+    <SidebarProvider>
+      {/* Mobile Hamburger Button */}
+      <div className="fixed top-4 left-4 z-50 md:hidden">
+        <SidebarTrigger />
+      </div>
+      <div className="flex">
+        <Sidebar>
+          <FilterSidebar
+            isOpen={isFilterOpen}
+            onClose={closeFilter}
+            filters={filters}
+            onFiltersChange={setFilters}
+          />
+        </Sidebar>
+        <div className="relative h-screen w-full bg-background overflow-hidden">
+          <Header 
+            onOpenFilters={() => setIsFilterOpen(true)}
+            onSubmitCase={() => setIsSubmitModalOpen(true)}
+            caseCount={filteredCases.length}
+          />
+          
+          <MapView 
+            cases={filteredCases}
+            onCaseSelect={setSelectedCase}
+          />
 
-      <FilterSidebar
-        isOpen={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
-        filters={filters}
-        onFiltersChange={setFilters}
-      />
+          {selectedCase && (
+            <CaseModal
+              case={selectedCase}
+              onClose={() => setSelectedCase(null)}
+            />
+          )}
 
-      {selectedCase && (
-        <CaseModal
-          case={selectedCase}
-          onClose={() => setSelectedCase(null)}
-        />
-      )}
-
-      {isSubmitModalOpen && (
-        <SubmitCaseModal
-          onClose={() => setIsSubmitModalOpen(false)}
-        />
-      )}
-    </div>
+          {isSubmitModalOpen && (
+            <SubmitCaseModal
+              onClose={() => setIsSubmitModalOpen(false)}
+            />
+          )}
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 

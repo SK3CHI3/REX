@@ -1,4 +1,3 @@
-
 import { X, Filter, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -58,7 +57,7 @@ const FilterSidebar = ({ isOpen, onClose, filters, onFiltersChange }: FilterSide
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-      <div className="absolute right-0 top-0 h-full w-full max-w-sm bg-white border-l border-gray-200 shadow-xl animate-in slide-in-from-right duration-300">
+      <div className="absolute right-0 top-0 h-full w-full max-w-sm bg-white border-l border-gray-200 shadow-xl animate-in slide-in-from-right duration-300 overflow-y-auto max-h-screen pb-8">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">

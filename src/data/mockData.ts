@@ -13,8 +13,10 @@ export const mockCases: Case[] = [
     description: 'Victim was assaulted during a peaceful protest. Multiple witnesses present.',
     status: 'verified',
     photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock1'],
     source: 'Daily Nation',
-    reportedBy: 'Human Rights Watch'
+    reportedBy: 'Human Rights Watch',
+    justiceServed: true
   },
   {
     id: '2',
@@ -27,7 +29,10 @@ export const mockCases: Case[] = [
     type: 'unlawful_arrest',
     description: 'Unlawful arrest during routine traffic stop. No charges filed.',
     status: 'investigating',
+    photos: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400'],
+    videoLinks: ['https://twitter.com/mockvideo2'],
     source: 'The Standard',
+    justiceServed: false
   },
   {
     id: '3',
@@ -41,7 +46,9 @@ export const mockCases: Case[] = [
     description: 'Fatal shooting during police operation. Family demands justice.',
     status: 'verified',
     photos: ['https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400'],
-    source: 'Kenya Human Rights Commission'
+    videoLinks: ['https://www.youtube.com/watch?v=mock3'],
+    source: 'Kenya Human Rights Commission',
+    justiceServed: false
   },
   {
     id: '4',
@@ -53,8 +60,11 @@ export const mockCases: Case[] = [
     coordinates: [-0.3031, 36.0800],
     type: 'harassment',
     description: 'Verbal harassment and intimidation at roadblock.',
-    status: 'verified',
-    source: 'Citizen Report'
+    status: 'dismissed',
+    photos: ['https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=400'],
+    videoLinks: ['https://www.facebook.com/mockvideo4'],
+    source: 'Citizen Report',
+    justiceServed: false
   },
   {
     id: '5',
@@ -66,8 +76,11 @@ export const mockCases: Case[] = [
     coordinates: [0.5143, 35.2698],
     type: 'assault',
     description: 'Beaten during arrest despite cooperation.',
-    status: 'investigating',
-    source: 'Local News'
+    status: 'verified',
+    photos: ['https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock5'],
+    source: 'Local News',
+    justiceServed: true
   },
   {
     id: '6',
@@ -79,8 +92,11 @@ export const mockCases: Case[] = [
     coordinates: [-1.0332, 37.0692],
     type: 'harassment',
     description: 'Harassment during night patrol stop.',
-    status: 'verified',
-    source: 'Citizen Report'
+    status: 'investigating',
+    photos: ['https://images.unsplash.com/photo-1465101178521-c1a9136a3b99?w=400'],
+    videoLinks: ['https://twitter.com/mockvideo6'],
+    source: 'Citizen Report',
+    justiceServed: false
   },
   {
     id: '7',
@@ -92,8 +108,11 @@ export const mockCases: Case[] = [
     coordinates: [-4.0435, 39.6682],
     type: 'assault',
     description: 'Physical assault during bar raid.',
-    status: 'investigating',
-    source: 'Coast Times'
+    status: 'verified',
+    photos: ['https://images.unsplash.com/photo-1465101046530-73398c7f28ca?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock7'],
+    source: 'Coast Times',
+    justiceServed: true
   },
   {
     id: '8',
@@ -105,8 +124,11 @@ export const mockCases: Case[] = [
     coordinates: [-1.5177, 37.2634],
     type: 'unlawful_arrest',
     description: 'Arrested without warrant during market operation.',
-    status: 'verified',
-    source: 'Eastern Standard'
+    status: 'investigating',
+    photos: ['https://images.unsplash.com/photo-1519125323398-675f0ddb6308?w=400'],
+    videoLinks: ['https://www.facebook.com/mockvideo8'],
+    source: 'Eastern Standard',
+    justiceServed: false
   },
   {
     id: '9',
@@ -118,8 +140,11 @@ export const mockCases: Case[] = [
     coordinates: [-0.1022, 34.7617],
     type: 'death',
     description: 'Death in custody under suspicious circumstances.',
-    status: 'investigating',
-    source: 'Lake Region Herald'
+    status: 'dismissed',
+    photos: ['https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock9'],
+    source: 'Lake Region Herald',
+    justiceServed: false
   },
   {
     id: '10',
@@ -132,7 +157,10 @@ export const mockCases: Case[] = [
     type: 'harassment',
     description: 'Verbal threats and intimidation.',
     status: 'verified',
-    source: 'Mountain Echo'
+    photos: ['https://images.unsplash.com/photo-1465101178521-c1a9136a3b99?w=400'],
+    videoLinks: ['https://twitter.com/mockvideo10'],
+    source: 'Mountain Echo',
+    justiceServed: true
   },
   {
     id: '11',
@@ -145,7 +173,10 @@ export const mockCases: Case[] = [
     type: 'assault',
     description: 'Beaten during tea plantation protest.',
     status: 'verified',
-    source: 'Highland Post'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock11'],
+    source: 'Highland Post',
+    justiceServed: true
   },
   {
     id: '12',
@@ -158,7 +189,10 @@ export const mockCases: Case[] = [
     type: 'unlawful_arrest',
     description: 'Detained without charge for 48 hours.',
     status: 'investigating',
-    source: 'Eastern Breeze'
+    photos: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400'],
+    videoLinks: ['https://twitter.com/mockvideo12'],
+    source: 'Eastern Breeze',
+    justiceServed: false
   },
   {
     id: '13',
@@ -171,7 +205,10 @@ export const mockCases: Case[] = [
     type: 'harassment',
     description: 'Harassment during market inspection.',
     status: 'verified',
-    source: 'Ukambani News'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock13'],
+    source: 'Ukambani News',
+    justiceServed: true
   },
   {
     id: '14',
@@ -184,7 +221,10 @@ export const mockCases: Case[] = [
     type: 'assault',
     description: 'Physical assault during cattle rustling operation.',
     status: 'investigating',
-    source: 'Northern Frontier'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock14'],
+    source: 'Northern Frontier',
+    justiceServed: false
   },
   {
     id: '15',
@@ -197,7 +237,10 @@ export const mockCases: Case[] = [
     type: 'death',
     description: 'Fatal shooting during disputed land eviction.',
     status: 'verified',
-    source: 'Rift Valley Standard'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock15'],
+    source: 'Rift Valley Standard',
+    justiceServed: true
   },
   {
     id: '16',
@@ -210,7 +253,10 @@ export const mockCases: Case[] = [
     type: 'harassment',
     description: 'Intimidation during political rally.',
     status: 'verified',
-    source: 'Western Mirror'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock16'],
+    source: 'Western Mirror',
+    justiceServed: true
   },
   {
     id: '17',
@@ -223,7 +269,10 @@ export const mockCases: Case[] = [
     type: 'unlawful_arrest',
     description: 'Arrest during fishing license dispute.',
     status: 'investigating',
-    source: 'Lake Tribune'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock17'],
+    source: 'Lake Tribune',
+    justiceServed: false
   },
   {
     id: '18',
@@ -236,7 +285,10 @@ export const mockCases: Case[] = [
     type: 'assault',
     description: 'Assault during border patrol operation.',
     status: 'verified',
-    source: 'Border Post'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock18'],
+    source: 'Border Post',
+    justiceServed: true
   },
   {
     id: '19',
@@ -249,7 +301,10 @@ export const mockCases: Case[] = [
     type: 'harassment',
     description: 'Harassment during Maasai Mara conservation dispute.',
     status: 'investigating',
-    source: 'Maasai Times'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock19'],
+    source: 'Maasai Times',
+    justiceServed: false
   },
   {
     id: '20',
@@ -262,9 +317,11 @@ export const mockCases: Case[] = [
     type: 'death',
     description: 'Death during communal land conflict intervention.',
     status: 'verified',
-    source: 'Rift Herald'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock20'],
+    source: 'Rift Herald',
+    justiceServed: true
   },
-  // Continue with more cases to reach 100...
   {
     id: '21',
     victimName: 'Stephen Maina',
@@ -276,7 +333,10 @@ export const mockCases: Case[] = [
     type: 'assault',
     description: 'Beaten during ranch invasion operation.',
     status: 'investigating',
-    source: 'Highland Times'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock21'],
+    source: 'Highland Times',
+    justiceServed: false
   },
   {
     id: '22',
@@ -289,7 +349,10 @@ export const mockCases: Case[] = [
     type: 'harassment',
     description: 'Intimidation during coffee farmer protests.',
     status: 'verified',
-    source: 'Central Mirror'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock22'],
+    source: 'Central Mirror',
+    justiceServed: true
   },
   {
     id: '23',
@@ -302,7 +365,10 @@ export const mockCases: Case[] = [
     type: 'unlawful_arrest',
     description: 'Detained during tea bonus dispute.',
     status: 'investigating',
-    source: 'Nandi Express'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock23'],
+    source: 'Nandi Express',
+    justiceServed: false
   },
   {
     id: '24',
@@ -315,7 +381,10 @@ export const mockCases: Case[] = [
     type: 'assault',
     description: 'Physical assault during potato farmer strike.',
     status: 'verified',
-    source: 'Aberdare Post'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock24'],
+    source: 'Aberdare Post',
+    justiceServed: true
   },
   {
     id: '25',
@@ -328,9 +397,11 @@ export const mockCases: Case[] = [
     type: 'death',
     description: 'Fatal shooting during bandit operation.',
     status: 'investigating',
-    source: 'Northern Star'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock25'],
+    source: 'Northern Star',
+    justiceServed: false
   }
-  // ... Adding 75 more cases would make the response too long, so I'll add a representative sample and note that more would be added in a real scenario
 ];
 
 // Generate remaining cases with proper Kenyan coordinates
@@ -397,7 +468,10 @@ for (let i = 26; i <= 100; i++) {
     type: randomType,
     description: `Incident involving ${name} (${randomType}) in ${randomCity.name}.`,
     status: randomStatus,
-    source: 'Various Sources'
+    photos: ['https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=400'],
+    videoLinks: ['https://www.youtube.com/watch?v=mock'],
+    source: 'Various Sources',
+    justiceServed: Math.random() < 0.5
   });
 }
 

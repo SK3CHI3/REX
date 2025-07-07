@@ -6,6 +6,7 @@ import SubmitCaseModal from '@/components/SubmitCaseModal';
 import DataSidebar from '@/components/DataSidebar';
 import { Case, FilterState } from '@/types';
 import { mockCases } from '@/data/mockData';
+import { SidebarProvider, Sidebar, SidebarTrigger } from '@/components/ui/sidebar';
 
 const MapPage = () => {
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
@@ -26,35 +27,36 @@ const MapPage = () => {
   });
 
   return (
-    <div className="h-screen w-full bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 overflow-hidden flex flex-col">
-      <Header 
-        onOpenFilters={() => {}} // Not needed with sidebar
-        onSubmitCase={() => setIsSubmitModalOpen(true)}
-        caseCount={filteredCases.length}
-      />
-      
-      <div className="flex flex-1">
-        <DataSidebar
-          selectedCase={selectedCase}
-          filters={filters}
-          onFiltersChange={setFilters}
-          filteredCasesCount={filteredCases.length}
+    <SidebarProvider>
+      <div className="h-screen w-full bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 overflow-hidden flex flex-col">
+        <Header 
+          onOpenFilters={() => {}} // Not needed with sidebar
+          onSubmitCase={() => setIsSubmitModalOpen(true)}
+          caseCount={filteredCases.length}
         />
-        
-        <div className="flex-1 relative">
-          <MapView 
-            cases={filteredCases}
-            onCaseSelect={setSelectedCase}
-          />
+        <div className="flex flex-1">
+          <Sidebar>
+            <DataSidebar
+              selectedCase={selectedCase}
+              filters={filters}
+              onFiltersChange={setFilters}
+              filteredCasesCount={filteredCases.length}
+            />
+          </Sidebar>
+          <div className="flex-1 relative">
+            <MapView 
+              cases={filteredCases}
+              onCaseSelect={setSelectedCase}
+            />
+          </div>
         </div>
+        {isSubmitModalOpen && (
+          <SubmitCaseModal
+            onClose={() => setIsSubmitModalOpen(false)}
+          />
+        )}
       </div>
-
-      {isSubmitModalOpen && (
-        <SubmitCaseModal
-          onClose={() => setIsSubmitModalOpen(false)}
-        />
-      )}
-    </div>
+    </SidebarProvider>
   );
 };
 

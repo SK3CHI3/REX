@@ -1,8 +1,8 @@
-
 import { Plus, MapPin, AlertTriangle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 interface HeaderProps {
   onOpenFilters: () => void;
@@ -18,6 +18,12 @@ const Header = ({ onOpenFilters, onSubmitCase, caseCount }: HeaderProps) => {
       <div className="flex items-center justify-between p-3 sm:p-4">
         {/* Back button and Logo */}
         <div className="flex items-center space-x-3 min-w-0 flex-1">
+          {/* Mobile Sidebar Hamburger */}
+          <div className="md:hidden mr-2">
+            <SidebarTrigger className="h-10 w-10 bg-white/90 text-gray-700 rounded-lg shadow-md border border-gray-200 flex items-center justify-center hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition-all duration-200">
+              <span className="sr-only">Open Sidebar</span>
+            </SidebarTrigger>
+          </div>
           <Button
             variant="ghost"
             size="sm"
