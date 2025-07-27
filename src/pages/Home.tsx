@@ -2,10 +2,35 @@ import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, Chevro
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import { mockCases } from '@/data/mockData';
+import { useCases } from '@/hooks/useCases';
+
+// Helper functions - defined outside component to avoid hoisting issues
+const formatRelativeDate = (dateString: string | null | undefined) => {
+  if (!dateString) return 'Unknown date';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Invalid date';
+
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 1) return '1 day ago';
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 14) return '1 week ago';
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+  return `${Math.floor(diffDays / 30)} months ago`;
+};
+
+const formatCaseType = (type: string | null | undefined) => {
+  if (!type) return 'Unknown';
+  return type.split('_').map(word =>
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' ');
+};
 
 const Home = () => {
   const navigate = useNavigate();
+  const { data: cases, isLoading, error } = useCases();
 
   const handleEnterApp = () => {
     navigate('/map');
@@ -16,15 +41,28 @@ const Home = () => {
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Recent cases data - updated with more realistic data
-  const recentCases = [
-    { location: 'Nairobi CBD', date: '2 days ago', type: 'Assault' },
-    { location: 'Mombasa Road', date: '4 days ago', type: 'Unlawful Arrest' },
-    { location: 'Kisumu Central', date: '1 week ago', type: 'Harassment' },
-    { location: 'Nakuru Town', date: '1 week ago', type: 'Death' },
-    { location: 'Eldoret Market', date: '2 weeks ago', type: 'Assault' },
-    { location: 'Thika Town', date: '2 weeks ago', type: 'Harassment' },
-  ];
+  // Calculate statistics from real data
+  const totalCases = cases?.length || 0;
+  const thisMonthCases = cases?.filter(c => {
+    const caseDate = new Date(c.incident_date);
+    const now = new Date();
+    return caseDate.getMonth() === now.getMonth() && caseDate.getFullYear() === now.getFullYear();
+  }).length || 0;
+
+  // Show error state if data fails to load
+  if (error) {
+    console.error('Error loading cases:', error);
+  }
+
+  // Get recent cases from real data
+  const recentCases = cases
+    ?.sort((a, b) => new Date(b.incident_date || '').getTime() - new Date(a.incident_date || '').getTime())
+    .slice(0, 6)
+    .map(case_ => ({
+      location: case_.location || 'Unknown location',
+      date: formatRelativeDate(case_.incident_date),
+      type: formatCaseType(case_.case_type)
+    })) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
@@ -169,13 +207,13 @@ const Home = () => {
                   </div>
                   <div className="text-center group">
                     <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      {mockCases.length}
+                      {isLoading ? '...' : error ? '--' : totalCases}
                     </div>
                     <div className="text-sm text-gray-400 font-medium">Total Cases</div>
                   </div>
                   <div className="text-center group">
                     <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      {mockCases.filter(c => new Date(c.date).getMonth() === new Date().getMonth()).length}
+                      {isLoading ? '...' : error ? '--' : thisMonthCases}
                     </div>
                     <div className="text-sm text-gray-400 font-medium">This Month</div>
                   </div>
@@ -194,18 +232,26 @@ const Home = () => {
                   </div>
                   
                   <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
-                    {recentCases.slice(0, 3).map((case_, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
-                          <div>
-                            <p className="text-sm font-medium text-white">{case_.location}</p>
-                            <p className="text-xs text-gray-400">{case_.type}</p>
+                    {isLoading ? (
+                      <div className="text-center text-gray-400 py-4">Loading recent cases...</div>
+                    ) : error ? (
+                      <div className="text-center text-gray-400 py-4">Unable to load cases</div>
+                    ) : recentCases.length === 0 ? (
+                      <div className="text-center text-gray-400 py-4">No cases found</div>
+                    ) : (
+                      recentCases.slice(0, 3).map((case_, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                            <div>
+                              <p className="text-sm font-medium text-white">{case_.location}</p>
+                              <p className="text-xs text-gray-400">{case_.type}</p>
+                            </div>
                           </div>
+                          <span className="text-xs text-gray-500">{case_.date}</span>
                         </div>
-                        <span className="text-xs text-gray-500">{case_.date}</span>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -322,7 +368,7 @@ const Home = () => {
           
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-3xl font-bold text-red-400 mb-2">{mockCases.length}</div>
+              <div className="text-3xl font-bold text-red-400 mb-2">{isLoading ? '...' : error ? '--' : totalCases}</div>
               <div className="text-gray-300">Cases Documented</div>
             </div>
             <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
@@ -383,7 +429,7 @@ const Home = () => {
             <div className="space-y-4">
               <h4 className="font-semibold text-white">Data</h4>
               <div className="space-y-2">
-                <div className="text-gray-400 text-sm">Total Cases: {mockCases.length}</div>
+                <div className="text-gray-400 text-sm">Total Cases: {isLoading ? '...' : error ? '--' : totalCases}</div>
                 <div className="text-gray-400 text-sm">Counties: 47</div>
                 <div className="text-gray-400 text-sm">Last Updated: Today</div>
               </div>

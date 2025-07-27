@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { X, Upload, Plus, Trash2 } from 'lucide-react';
+import { X, Upload, Plus, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { SubmitCaseData } from '@/types';
-import { kenyanCounties, caseTypes } from '@/data/mockData';
+import { useSubmitCase, useCounties } from '@/hooks/useCases';
+
+// Case types for the form
+const caseTypes = [
+  { value: 'death', label: 'Death' },
+  { value: 'assault', label: 'Physical Assault' },
+  { value: 'harassment', label: 'Harassment' },
+  { value: 'unlawful_arrest', label: 'Unlawful Arrest' },
+  { value: 'other', label: 'Other' }
+];
 
 interface SubmitCaseModalProps {
   onClose: () => void;
@@ -22,11 +31,15 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
   });
   const [newVideoLink, setNewVideoLink] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Use hooks for API calls
+  const submitCaseMutation = useSubmitCase();
+  const { data: counties = [], isLoading: countiesLoading } = useCounties();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Basic validation
-    if (!formData.victimName || !formData.date || !formData.location || !formData.county || 
+    if (!formData.victimName || !formData.date || !formData.location || !formData.county ||
         !formData.type || !formData.description || !formData.reporterName || !formData.reporterContact) {
       toast({
         title: "Incomplete Information",
@@ -36,15 +49,13 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
       return;
     }
 
-    // In a real app, this would submit to the backend
-    console.log('Submitting case:', formData);
-    
-    toast({
-      title: "Case Submitted",
-      description: "Your case has been submitted for review. You will be notified once it's approved.",
-    });
-    
-    onClose();
+    try {
+      await submitCaseMutation.mutateAsync(formData as SubmitCaseData);
+      onClose();
+    } catch (error) {
+      // Error is handled by the mutation hook
+      console.error('Error submitting case:', error);
+    }
   };
 
   const addVideoLink = () => {
@@ -161,11 +172,15 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
                       <SelectValue placeholder="Select county" />
                     </SelectTrigger>
                     <SelectContent>
-                      {kenyanCounties.map((county) => (
-                        <SelectItem key={county} value={county}>
-                          {county}
-                        </SelectItem>
-                      ))}
+                      {countiesLoading ? (
+                        <SelectItem value="" disabled>Loading counties...</SelectItem>
+                      ) : (
+                        counties.map((county) => (
+                          <SelectItem key={county} value={county}>
+                            {county}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -283,11 +298,18 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1" disabled={submitCaseMutation.isPending}>
                 Cancel
               </Button>
-              <Button type="submit" className="flex-1 bg-primary hover:bg-primary/90">
-                Submit Case for Review
+              <Button type="submit" className="flex-1 bg-primary hover:bg-primary/90" disabled={submitCaseMutation.isPending}>
+                {submitCaseMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit Case for Review'
+                )}
               </Button>
             </div>
           </form>

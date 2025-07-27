@@ -5,7 +5,7 @@ import FilterSidebar from '@/components/FilterSidebar';
 import Header from '@/components/Header';
 import SubmitCaseModal from '@/components/SubmitCaseModal';
 import { Case, FilterState } from '@/types';
-import { mockCases } from '@/data/mockData';
+import { useCases } from '@/hooks/useCases';
 import { SidebarProvider, Sidebar, SidebarTrigger } from '@/components/ui/sidebar';
 
 const Index = () => {
@@ -18,18 +18,53 @@ const Index = () => {
     yearRange: [2020, 2024]
   });
 
-  const filteredCases = mockCases.filter(caseItem => {
+  // Fetch real cases from Supabase
+  const { data: cases, isLoading, error } = useCases();
+
+  // Filter cases based on current filters
+  const filteredCases = (cases || []).filter(caseItem => {
     const matchesCounty = filters.counties.length === 0 || filters.counties.includes(caseItem.county);
-    const matchesCaseType = filters.caseTypes.length === 0 || filters.caseTypes.includes(caseItem.type);
-    const caseYear = new Date(caseItem.date).getFullYear();
+    const matchesCaseType = filters.caseTypes.length === 0 || filters.caseTypes.includes(caseItem.case_type);
+    const caseYear = new Date(caseItem.incident_date).getFullYear();
     const matchesYear = caseYear >= filters.yearRange[0] && caseYear <= filters.yearRange[1];
-    
+
     return matchesCounty && matchesCaseType && matchesYear;
   });
 
   const closeFilter = () => {
     setIsFilterOpen(false);
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading cases...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="text-center">
+          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold mb-2">Failed to load cases</h2>
+          <p className="text-muted-foreground mb-4">Please check your connection and try again.</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
