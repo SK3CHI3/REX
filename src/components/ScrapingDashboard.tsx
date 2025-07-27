@@ -24,6 +24,11 @@ import {
   useApproveScrapedCase,
   useRejectScrapedCase
 } from '@/hooks/useScraping';
+import {
+  usePendingSubmissions,
+  useApproveSubmission,
+  useRejectSubmission
+} from '@/hooks/useCases';
 import { testScrapingSetup } from '@/lib/scraping-api';
 
 const ScrapingDashboard: React.FC = () => {
@@ -33,11 +38,14 @@ const ScrapingDashboard: React.FC = () => {
   const scrapingStatus = useScrapingStatus();
   const scrapingSources = useScrapingSources();
   const pendingCases = usePendingScrapedCases();
+  const pendingSubmissions = usePendingSubmissions();
 
   const startManualScraping = useStartManualScraping();
   const startSourceScraping = useStartSourceScraping();
   const approveCase = useApproveScrapedCase();
   const rejectCase = useRejectScrapedCase();
+  const approveSubmission = useApproveSubmission();
+  const rejectSubmission = useRejectSubmission();
 
   const handleTestSetup = async () => {
     const result = await testScrapingSetup();
@@ -148,10 +156,10 @@ const ScrapingDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {pendingCases.data?.length || 0}
+              {(pendingCases.data?.length || 0) + (pendingSubmissions.data?.length || 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Cases awaiting approval
+              Cases awaiting approval ({pendingSubmissions.data?.length || 0} manual, {pendingCases.data?.length || 0} scraped)
             </p>
           </CardContent>
         </Card>
@@ -193,7 +201,8 @@ const ScrapingDashboard: React.FC = () => {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="sources">Sources</TabsTrigger>
           <TabsTrigger value="jobs">Recent Jobs</TabsTrigger>
-          <TabsTrigger value="pending">Pending Cases</TabsTrigger>
+          <TabsTrigger value="pending">Scraped Cases</TabsTrigger>
+          <TabsTrigger value="submissions">Manual Submissions</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -314,7 +323,7 @@ const ScrapingDashboard: React.FC = () => {
         <TabsContent value="pending" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Pending Case Reviews</CardTitle>
+              <CardTitle>Pending Scraped Case Reviews</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -360,6 +369,71 @@ const ScrapingDashboard: React.FC = () => {
                 {pendingCases.data?.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">
                     No pending cases to review
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="submissions" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Manual Case Submissions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {pendingSubmissions.data?.map((submission) => (
+                  <div key={submission.id} className="p-4 border rounded space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <h3 className="font-medium">{submission.victim_name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {submission.case_type.replace('_', ' ')} • {submission.location}, {submission.county}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Incident Date: {new Date(submission.incident_date).toLocaleDateString()}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Submitted: {new Date(submission.created_at).toLocaleDateString()}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Reporter: {submission.reporter_name} ({submission.reporter_contact})
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm"><strong>Description:</strong></p>
+                      <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                        {submission.description}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => approveSubmission.mutate(submission.id)}
+                        disabled={approveSubmission.isPending}
+                        className="flex items-center gap-1"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Approve & Publish
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => rejectSubmission.mutate({ submissionId: submission.id })}
+                        disabled={rejectSubmission.isPending}
+                        className="flex items-center gap-1"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        Reject
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                {pendingSubmissions.data?.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">
+                    No pending manual submissions to review
                   </p>
                 )}
               </div>

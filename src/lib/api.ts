@@ -152,6 +152,107 @@ export async function submitCase(caseData: SubmitCaseData): Promise<string> {
   }
 }
 
+// Fetch pending case submissions
+export async function fetchPendingSubmissions(): Promise<DatabaseCaseSubmission[]> {
+  try {
+    const { data, error } = await supabase
+      .from('case_submissions')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching pending submissions:', error)
+      throw error
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Error in fetchPendingSubmissions:', error)
+    throw error
+  }
+}
+
+// Approve a case submission
+export async function approveSubmission(submissionId: string): Promise<void> {
+  try {
+    // First, get the submission data
+    const { data: submission, error: fetchError } = await supabase
+      .from('case_submissions')
+      .select('*')
+      .eq('id', submissionId)
+      .single()
+
+    if (fetchError) {
+      console.error('Error fetching submission:', fetchError)
+      throw fetchError
+    }
+
+    // Create a new case in the main cases table
+    const { error: insertError } = await supabase
+      .from('cases')
+      .insert({
+        victim_name: submission.victim_name,
+        age: submission.age,
+        incident_date: submission.incident_date,
+        location: submission.location,
+        county: submission.county,
+        latitude: 0, // Default coordinates - admin can update later
+        longitude: 0,
+        case_type: submission.case_type,
+        description: submission.description,
+        status: 'investigating',
+        source: 'user_submission',
+        reported_by: submission.reporter_name,
+        justice_served: false
+      })
+
+    if (insertError) {
+      console.error('Error creating approved case:', insertError)
+      throw insertError
+    }
+
+    // Update submission status to approved
+    const { error: updateError } = await supabase
+      .from('case_submissions')
+      .update({
+        status: 'approved',
+        reviewed_at: new Date().toISOString()
+      })
+      .eq('id', submissionId)
+
+    if (updateError) {
+      console.error('Error updating submission status:', updateError)
+      throw updateError
+    }
+  } catch (error) {
+    console.error('Error in approveSubmission:', error)
+    throw error
+  }
+}
+
+// Reject a case submission
+export async function rejectSubmission(submissionId: string, reason?: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('case_submissions')
+      .update({
+        status: 'rejected',
+        review_notes: reason,
+        reviewed_at: new Date().toISOString()
+      })
+      .eq('id', submissionId)
+
+    if (error) {
+      console.error('Error rejecting submission:', error)
+      throw error
+    }
+  } catch (error) {
+    console.error('Error in rejectSubmission:', error)
+    throw error
+  }
+}
+
 // Fetch counties
 export async function fetchCounties(): Promise<string[]> {
   try {

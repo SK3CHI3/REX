@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { fetchCases, fetchCaseById, submitCase, fetchCounties } from '@/lib/api'
+import { fetchCases, fetchCaseById, submitCase, fetchCounties, fetchPendingSubmissions, approveSubmission, rejectSubmission } from '@/lib/api'
 import { SubmitCaseData } from '@/types'
 import { toast } from '@/components/ui/sonner'
 
@@ -47,6 +47,53 @@ export function useSubmitCase() {
     onError: (error) => {
       console.error('Error submitting case:', error)
       toast.error('Failed to submit case. Please try again.')
+    },
+  })
+}
+
+// Hook to fetch pending case submissions
+export function usePendingSubmissions() {
+  return useQuery({
+    queryKey: ['pending-submissions'],
+    queryFn: fetchPendingSubmissions,
+    staleTime: 30 * 1000, // 30 seconds
+  })
+}
+
+// Hook to approve a case submission
+export function useApproveSubmission() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: approveSubmission,
+    onSuccess: () => {
+      // Invalidate and refetch both pending submissions and cases
+      queryClient.invalidateQueries({ queryKey: ['pending-submissions'] })
+      queryClient.invalidateQueries({ queryKey: ['cases'] })
+      toast.success('Case approved and published successfully!')
+    },
+    onError: (error) => {
+      console.error('Error approving submission:', error)
+      toast.error('Failed to approve case. Please try again.')
+    },
+  })
+}
+
+// Hook to reject a case submission
+export function useRejectSubmission() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ submissionId, reason }: { submissionId: string; reason?: string }) =>
+      rejectSubmission(submissionId, reason),
+    onSuccess: () => {
+      // Invalidate and refetch pending submissions
+      queryClient.invalidateQueries({ queryKey: ['pending-submissions'] })
+      toast.success('Case submission rejected.')
+    },
+    onError: (error) => {
+      console.error('Error rejecting submission:', error)
+      toast.error('Failed to reject case. Please try again.')
     },
   })
 }

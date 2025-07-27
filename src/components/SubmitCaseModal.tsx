@@ -173,7 +173,7 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
                     </SelectTrigger>
                     <SelectContent>
                       {countiesLoading ? (
-                        <SelectItem value="" disabled>Loading counties...</SelectItem>
+                        <SelectItem value="loading" disabled>Loading counties...</SelectItem>
                       ) : (
                         counties.map((county) => (
                           <SelectItem key={county} value={county}>
