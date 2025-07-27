@@ -272,3 +272,91 @@ export async function fetchCounties(): Promise<string[]> {
     throw error
   }
 }
+
+// User Analytics Functions
+export interface UserAnalytics {
+  totalVisitors: number;
+  activeToday: number;
+  averageSessionMinutes: number;
+  totalPageViews: number;
+}
+
+export async function fetchUserAnalytics(): Promise<UserAnalytics> {
+  try {
+    // Get total unique visitors
+    const { count: totalVisitors, error: totalError } = await supabase
+      .from('site_users')
+      .select('*', { count: 'exact', head: true });
+
+    if (totalError) throw totalError;
+
+    // Get active users today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const { count: activeToday, error: activeError } = await supabase
+      .from('site_users')
+      .select('*', { count: 'exact', head: true })
+      .gte('last_visit', today.toISOString());
+
+    if (activeError) throw activeError;
+
+    // Get average session time and total page views
+    const { data: sessionData, error: sessionError } = await supabase
+      .from('site_users')
+      .select('time_spent_seconds, page_views');
+
+    if (sessionError) throw sessionError;
+
+    const totalPageViews = sessionData?.reduce((sum, user) => sum + (user.page_views || 0), 0) || 0;
+    const averageSessionSeconds = sessionData?.length > 0
+      ? sessionData.reduce((sum, user) => sum + (user.time_spent_seconds || 0), 0) / sessionData.length
+      : 0;
+
+    return {
+      totalVisitors: totalVisitors || 0,
+      activeToday: activeToday || 0,
+      averageSessionMinutes: Math.round(averageSessionSeconds / 60),
+      totalPageViews
+    };
+  } catch (error) {
+    console.error('Error fetching user analytics:', error);
+    return {
+      totalVisitors: 0,
+      activeToday: 0,
+      averageSessionMinutes: 0,
+      totalPageViews: 0
+    };
+  }
+}
+
+export interface RecentActivity {
+  id: string;
+  type: 'visit' | 'submission' | 'interaction';
+  description: string;
+  location: string;
+  timestamp: string;
+}
+
+export async function fetchRecentActivity(): Promise<RecentActivity[]> {
+  try {
+    const { data, error } = await supabase
+      .from('site_users')
+      .select('id, city, last_visit, page_views')
+      .order('last_visit', { ascending: false })
+      .limit(5);
+
+    if (error) throw error;
+
+    return data?.map(user => ({
+      id: user.id,
+      type: 'visit' as const,
+      description: `New visitor from ${user.city || 'Unknown location'}`,
+      location: user.city || 'Unknown',
+      timestamp: user.last_visit
+    })) || [];
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    return [];
+  }
+}

@@ -1,3 +1,4 @@
+import React, { useState, useRef } from 'react';
 import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown, TrendingUp, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,8 +33,33 @@ const Home = () => {
   const navigate = useNavigate();
   const { data: cases, isLoading, error } = useCases();
 
+  // Secret admin access state
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const handleEnterApp = () => {
     navigate('/map');
+  };
+
+  // Secret admin access handler
+  const handleLiveIndicatorClick = () => {
+    setTapCount(prev => prev + 1);
+
+    // Clear existing timeout
+    if (tapTimeoutRef.current) {
+      clearTimeout(tapTimeoutRef.current);
+    }
+
+    // Set new timeout to reset tap count
+    tapTimeoutRef.current = setTimeout(() => {
+      setTapCount(0);
+    }, 500); // Reset after 500ms
+
+    // Check for double tap
+    if (tapCount + 1 >= 2) {
+      setTapCount(0);
+      navigate('/admin/login');
+    }
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -450,12 +476,17 @@ const Home = () => {
           <div className="pt-8 border-t border-white/10">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <p className="text-gray-400 text-sm text-center md:text-left mb-4 md:mb-0">
-                © 2024 REX. Building a safer Kenya through transparency and accountability.
+                © {new Date().getFullYear()} REX. Building a safer Kenya through transparency and accountability.
               </p>
               <div className="flex items-center space-x-6">
                 <span className="text-gray-400 text-sm">Together for justice</span>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <span className="text-green-400 text-sm font-medium">Live</span>
+                <button
+                  onClick={handleLiveIndicatorClick}
+                  className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
+                >
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-green-400 text-sm font-medium">Live</span>
+                </button>
               </div>
             </div>
           </div>
