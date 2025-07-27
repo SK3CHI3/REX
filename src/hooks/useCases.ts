@@ -8,7 +8,7 @@ export function useCases() {
   return useQuery({
     queryKey: ['cases'],
     queryFn: fetchCases,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 30 * 1000, // 30 seconds - reduced from 5 minutes for better real-time updates
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
@@ -66,10 +66,17 @@ export function useApproveSubmission() {
 
   return useMutation({
     mutationFn: approveSubmission,
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Small delay to ensure database operation completes
+      await new Promise(resolve => setTimeout(resolve, 500))
+
       // Invalidate and refetch both pending submissions and cases
       queryClient.invalidateQueries({ queryKey: ['pending-submissions'] })
       queryClient.invalidateQueries({ queryKey: ['cases'] })
+      // Remove cached data and force immediate refetch
+      queryClient.removeQueries({ queryKey: ['cases'] })
+      await queryClient.refetchQueries({ queryKey: ['cases'] })
+      console.log('Case approved - cache invalidated and refetched')
       toast.success('Case approved and published successfully!')
     },
     onError: (error) => {

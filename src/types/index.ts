@@ -28,6 +28,8 @@ export interface SubmitCaseData {
   date: string;
   location: string;
   county: string;
+  latitude: number;
+  longitude: number;
   type: Case['type'];
   description: string;
   photos?: File[];

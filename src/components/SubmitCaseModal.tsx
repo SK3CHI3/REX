@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { X, Upload, Plus, Trash2, Loader2 } from 'lucide-react';
+import { X, Upload, Plus, Trash2, Loader2, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { SubmitCaseData } from '@/types';
-import { useSubmitCase, useCounties } from '@/hooks/useCases';
+import { useSubmitCase } from '@/hooks/useCases';
+import LocationPickerModal from '@/components/LocationPickerModal';
 
 // Case types for the form
 const caseTypes = [
@@ -19,6 +20,13 @@ const caseTypes = [
   { value: 'unlawful_arrest', label: 'Unlawful Arrest' },
   { value: 'other', label: 'Other' }
 ];
+
+interface LocationData {
+  latitude: number;
+  longitude: number;
+  location: string;
+  county: string;
+}
 
 interface SubmitCaseModalProps {
   onClose: () => void;
@@ -30,27 +38,37 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
     videoLinks: []
   });
   const [newVideoLink, setNewVideoLink] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
+  const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
 
   // Use hooks for API calls
   const submitCaseMutation = useSubmitCase();
-  const { data: counties = [], isLoading: countiesLoading } = useCounties();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Basic validation
-    if (!formData.victimName || !formData.date || !formData.location || !formData.county ||
+    if (!formData.victimName || !formData.date || !selectedLocation ||
         !formData.type || !formData.description || !formData.reporterName || !formData.reporterContact) {
       toast({
         title: "Incomplete Information",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields including location.",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      await submitCaseMutation.mutateAsync(formData as SubmitCaseData);
+      // Combine form data with location data
+      const submitData: SubmitCaseData = {
+        ...formData as SubmitCaseData,
+        location: selectedLocation.location,
+        county: selectedLocation.county,
+        latitude: selectedLocation.latitude,
+        longitude: selectedLocation.longitude,
+      };
+
+      await submitCaseMutation.mutateAsync(submitData);
       onClose();
     } catch (error) {
       // Error is handled by the mutation hook
@@ -154,35 +172,44 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="location">Location *</Label>
-                  <Input
-                    id="location"
-                    value={formData.location || ''}
-                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    placeholder="Specific location (e.g., Kibera, Nairobi)"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="county">County *</Label>
-                  <Select onValueChange={(value) => setFormData({ ...formData, county: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select county" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countiesLoading ? (
-                        <SelectItem value="loading" disabled>Loading counties...</SelectItem>
-                      ) : (
-                        counties.map((county) => (
-                          <SelectItem key={county} value={county}>
-                            {county}
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
+              <div>
+                <Label>Incident Location *</Label>
+                <div className="mt-2">
+                  {selectedLocation ? (
+                    <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-3">
+                          <MapPin className="w-5 h-5 text-green-600 mt-0.5" />
+                          <div>
+                            <p className="font-medium text-green-900">{selectedLocation.location}</p>
+                            <p className="text-sm text-green-700">{selectedLocation.county} County</p>
+                            <p className="text-xs text-green-600 mt-1">
+                              {selectedLocation.latitude.toFixed(6)}, {selectedLocation.longitude.toFixed(6)}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setIsLocationPickerOpen(true)}
+                          className="text-green-700 border-green-300 hover:bg-green-100"
+                        >
+                          Change
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsLocationPickerOpen(true)}
+                      className="w-full h-12 border-dashed border-2 border-gray-300 hover:border-red-400 hover:bg-red-50 transition-colors"
+                    >
+                      <MapPin className="w-5 h-5 mr-2 text-gray-500" />
+                      <span className="text-gray-700">Click to select location on map</span>
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -315,6 +342,18 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
           </form>
         </CardContent>
       </Card>
+
+      {/* Location Picker Modal */}
+      {isLocationPickerOpen && (
+        <LocationPickerModal
+          onClose={() => setIsLocationPickerOpen(false)}
+          onLocationSelect={(locationData) => {
+            setSelectedLocation(locationData);
+            setIsLocationPickerOpen(false);
+          }}
+          initialLocation={selectedLocation || undefined}
+        />
+      )}
     </div>
   );
 };
