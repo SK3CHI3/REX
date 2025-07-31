@@ -12,6 +12,7 @@ export function transformDatabaseCase(
     victimName: dbCase.victim_name,
     age: dbCase.age,
     date: dbCase.incident_date,
+    time: dbCase.incident_time,
     location: dbCase.location,
     county: dbCase.county,
     coordinates: [dbCase.latitude, dbCase.longitude],
@@ -22,7 +23,9 @@ export function transformDatabaseCase(
     videoLinks: videos.map(v => v.video_url),
     source: dbCase.source,
     reportedBy: dbCase.reported_by,
-    justiceServed: dbCase.justice_served
+    justiceServed: dbCase.justice_served,
+    officersInvolved: dbCase.officer_names?.map(name => ({ name })) || [],
+    witnesses: dbCase.witnesses || []
   }
 }
 
@@ -130,12 +133,16 @@ export async function submitCase(caseData: SubmitCaseData): Promise<string> {
         victim_name: caseData.victimName,
         age: caseData.age,
         incident_date: caseData.date,
+        incident_time: caseData.time,
         location: caseData.location,
         county: caseData.county,
         latitude: caseData.latitude,
         longitude: caseData.longitude,
         case_type: caseData.type,
         description: caseData.description,
+        justice_served: caseData.justiceServed,
+        officer_names: caseData.officerNames || [],
+        witnesses: caseData.witnesses || [],
         reporter_name: caseData.reporterName,
         reporter_contact: caseData.reporterContact
       })

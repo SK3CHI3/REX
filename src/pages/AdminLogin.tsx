@@ -10,7 +10,7 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { login, isLoading } = useAuth();
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -19,15 +19,15 @@ const AdminLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.username || !formData.password) {
+    if (!formData.email || !formData.password) {
       toast.error('Please fill in all fields');
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      const success = await login(formData.username, formData.password);
+      const success = await login(formData.email, formData.password);
       
       if (success) {
         toast.success('Login successful!');
@@ -79,20 +79,20 @@ const AdminLogin = () => {
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Username Field */}
+            {/* Email Field */}
             <div className="space-y-2">
-              <label htmlFor="username" className="text-sm font-medium text-gray-300">
-                Username
+              <label htmlFor="email" className="text-sm font-medium text-gray-300">
+                Email
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  value={formData.username}
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
                   onChange={handleInputChange}
-                  placeholder="Enter your username"
+                  placeholder="Enter your email"
                   className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
                   disabled={isSubmitting}
                 />

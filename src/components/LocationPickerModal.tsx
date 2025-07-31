@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import { X, MapPin, Check } from 'lucide-react';
+import { X, MapPin, Check, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -55,17 +56,29 @@ const LocationPickerModal = ({ onClose, onLocationSelect, initialLocation }: Loc
   const [locationName, setLocationName] = useState(initialLocation?.location || '');
   const [countyName, setCountyName] = useState(initialLocation?.county || '');
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const { toast } = useToast();
 
-  // Kenya's center coordinates (Nairobi area)
-  const kenyaCenter: [number, number] = [-1.2921, 36.8219];
-  
-  // Kenya's bounding box
+  // Nairobi center coordinates (more precise)
+  const nairobCenter: [number, number] = [-1.2921, 36.8219];
+
+  // Kenya's bounding box (for reference, but we'll make it less restrictive)
   const kenyaBounds: [[number, number], [number, number]] = [
-    [-4.678, 33.909], // Southwest
-    [5.019, 41.899]   // Northeast
+    [-5.0, 33.0], // Southwest (expanded)
+    [6.0, 42.0]   // Northeast (expanded)
   ];
 
   const handleMapClick = async (lat: number, lng: number) => {
+    // Validate coordinates are within Kenya bounds
+    if (lat < -4.7 || lat > 5.0 || lng < 33.9 || lng > 41.9) {
+      toast({
+        variant: "destructive",
+        title: "Location Outside Kenya",
+        description: "Please select a location within Kenya borders. You can pan the map freely, but incident locations must be within Kenya.",
+        duration: 5000,
+      });
+      return;
+    }
+
     setSelectedPosition([lat, lng]);
     setIsGeocoding(true);
     
@@ -123,7 +136,7 @@ const LocationPickerModal = ({ onClose, onLocationSelect, initialLocation }: Loc
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Click on the map to select the exact location of the incident. You can adjust the location name and county if needed.
+              Click on the map to select the exact location of the incident. You can pan and zoom freely, but only locations within Kenya can be selected. You can adjust the location name and county if needed.
             </p>
           </CardHeader>
         
@@ -132,13 +145,17 @@ const LocationPickerModal = ({ onClose, onLocationSelect, initialLocation }: Loc
             {/* Map */}
             <div className="lg:col-span-2 relative">
               <MapContainer
-                center={selectedPosition || kenyaCenter}
-                zoom={selectedPosition ? 12 : 7}
+                center={selectedPosition || nairobCenter}
+                zoom={selectedPosition ? 14 : 10}
                 className="w-full h-full"
-                bounds={selectedPosition ? undefined : kenyaBounds}
-                boundsOptions={selectedPosition ? undefined : { padding: [20, 20] }}
-                maxBounds={kenyaBounds}
-                maxBoundsViscosity={1.0}
+                scrollWheelZoom={true}
+                dragging={true}
+                touchZoom={true}
+                doubleClickZoom={true}
+                zoomControl={true}
+                attributionControl={true}
+                maxZoom={18}
+                minZoom={2}
               >
                 <TileLayer
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

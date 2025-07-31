@@ -15,6 +15,7 @@ export interface DatabaseCase {
   victim_name: string
   age?: number
   incident_date: string
+  incident_time?: string
   location: string
   county: string
   latitude: number
@@ -25,6 +26,8 @@ export interface DatabaseCase {
   source?: string
   reported_by?: string
   justice_served: boolean
+  officer_names?: string[]
+  witnesses?: string[]
   created_at: string
   updated_at: string
 }
@@ -51,10 +54,14 @@ export interface DatabaseCaseSubmission {
   victim_name: string
   age?: number
   incident_date: string
+  incident_time?: string
   location: string
   county: string
   case_type: 'death' | 'assault' | 'harassment' | 'unlawful_arrest' | 'other'
   description: string
+  justice_served?: boolean
+  officer_names?: string[]
+  witnesses?: string[]
   reporter_name: string
   reporter_contact: string
   status: 'pending' | 'approved' | 'rejected'

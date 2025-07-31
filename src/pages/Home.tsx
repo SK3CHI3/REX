@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useCases } from '@/hooks/useCases';
+import { useRecentScrapedArticles } from '@/hooks/useScraping';
 
 // Helper functions - defined outside component to avoid hoisting issues
 const formatRelativeDate = (dateString: string | null | undefined) => {
@@ -29,9 +30,82 @@ const formatCaseType = (type: string | null | undefined) => {
   ).join(' ');
 };
 
+const formatArticleForNews = (article: any) => {
+  const extractedData = article.extracted_data || {};
+  const sourceName = article.scraping_sources?.name || 'Unknown Source';
+
+  // Determine category based on case type
+  const getCategoryFromCaseType = (caseType: string) => {
+    switch (caseType) {
+      case 'death': return 'Fatal Incident';
+      case 'assault': return 'Assault';
+      case 'harassment': return 'Harassment';
+      case 'unlawful_arrest': return 'Arrest';
+      default: return 'Investigation';
+    }
+  };
+
+  // Create excerpt from content or description
+  const createExcerpt = (content: string, description: string) => {
+    const text = description || content || '';
+    return text.length > 150 ? text.substring(0, 150) + '...' : text;
+  };
+
+  return {
+    title: article.title || extractedData.victim_name ?
+      `Police Incident: ${extractedData.victim_name || 'Victim'}` :
+      'Police Brutality Incident Reported',
+    excerpt: createExcerpt(article.content, extractedData.description),
+    source: sourceName,
+    date: formatRelativeDate(article.created_at),
+    category: getCategoryFromCaseType(extractedData.case_type),
+    url: article.url || '#', // Use actual article URL or fallback
+    location: extractedData.location || 'Kenya',
+    image: getImageForCategory(extractedData.case_type)
+  };
+};
+
+const getImageForCategory = (caseType: string) => {
+  // Use a more appropriate fallback image for news articles
+  const fallbackImage = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=250&fit=crop&q=80'; // News/journalism image
+
+  switch (caseType) {
+    case 'death':
+      return 'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=400&h=250&fit=crop&q=80';
+    case 'assault':
+      return 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=400&h=250&fit=crop&q=80';
+    case 'harassment':
+      return 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80';
+    case 'unlawful_arrest':
+      return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop&q=80';
+    default:
+      return fallbackImage;
+  }
+};
+
+const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const target = e.target as HTMLImageElement;
+  const parent = target.parentElement;
+
+  if (parent) {
+    // Replace image with a styled placeholder
+    parent.innerHTML = `
+      <div class="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
+        <div class="text-center text-gray-300">
+          <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+          </svg>
+          <p class="text-xs">News Article</p>
+        </div>
+      </div>
+    `;
+  }
+};
+
 const Home = () => {
   const navigate = useNavigate();
   const { data: cases, isLoading, error } = useCases();
+  const { data: scrapedArticles, isLoading: articlesLoading } = useRecentScrapedArticles(3);
 
   // Secret admin access state
   const [tapCount, setTapCount] = useState(0);
@@ -333,48 +407,134 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-24 px-4">
+      {/* News Section */}
+      <section id="news" className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold mb-6">
               <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Platform Features
+                Latest News & Reports
               </span>
             </h2>
+            <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+              Stay informed with the latest developments in police accountability and human rights in Kenya
+            </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: MapPin,
-                title: "Interactive Mapping",
-                description: "Precise geolocation of incidents with detailed filtering and search capabilities across all 47 counties.",
-                color: "from-red-500 to-orange-500"
-              },
-              {
-                icon: Eye,
-                title: "Transparency First",
-                description: "Open data approach ensuring all information is accessible, verifiable, and contributes to accountability.",
-                color: "from-blue-500 to-purple-500"
-              },
-              {
-                icon: Users,
-                title: "Community Driven",
-                description: "Empowering citizens to report incidents and contribute to a comprehensive database of events.",
-                color: "from-green-500 to-teal-500"
-              }
-            ].map((feature, index) => (
-              <div key={index} className="group">
-                <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
-                  <div className={`w-16 h-16 bg-gradient-to-r ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                    <feature.icon className="w-8 h-8 text-white" />
+            {articlesLoading ? (
+              // Loading state
+              Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="group">
+                  <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 animate-pulse">
+                    <div className="h-48 bg-gray-700"></div>
+                    <div className="p-6">
+                      <div className="h-4 bg-gray-700 rounded mb-3"></div>
+                      <div className="h-6 bg-gray-700 rounded mb-3"></div>
+                      <div className="h-16 bg-gray-700 rounded mb-4"></div>
+                      <div className="h-4 bg-gray-700 rounded w-20"></div>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4">{feature.title}</h3>
-                  <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                </div>
+              ))
+            ) : scrapedArticles && scrapedArticles.length > 0 ? (
+              // Real scraped articles
+              scrapedArticles.map((rawArticle, index) => {
+                const article = formatArticleForNews(rawArticle);
+                return (
+              <div key={index} className="group">
+                <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      onError={handleImageError}
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-red-500/90 text-white text-xs font-medium px-3 py-1 rounded-full">
+                        {article.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
+                      <span>{article.source}</span>
+                      <span>{article.date}</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-white mb-3 line-clamp-2">{article.title}</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-4">{article.excerpt}</p>
+                    {article.url && article.url !== '#' ? (
+                      <a
+                        href={article.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
+                      >
+                        Read More
+                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </a>
+                    ) : (
+                      <span className="inline-flex items-center text-gray-500 text-sm font-medium">
+                        Source Unavailable
+                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            ))}
+                );
+              })
+            ) : (
+              // Fallback when no scraped articles available
+              [
+                {
+                  title: "No Recent Articles Available",
+                  excerpt: "We're currently scraping news sources for the latest police brutality incidents. Check back soon for updates.",
+                  source: "System",
+                  date: "Now",
+                  category: "Info",
+                  url: "#",
+                  image: "https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=400&h=250&fit=crop"
+                }
+              ].map((article, index) => (
+                <div key={index} className="group col-span-full max-w-md mx-auto">
+                  <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                        className="w-full h-full object-cover opacity-50"
+                        onError={handleImageError}
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-blue-500/90 text-white text-xs font-medium px-3 py-1 rounded-full">
+                          {article.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-6 text-center">
+                      <h3 className="text-lg font-bold text-white mb-3">{article.title}</h3>
+                      <p className="text-gray-300 text-sm leading-relaxed mb-4">{article.excerpt}</p>
+                      <p className="text-gray-400 text-xs">Scraping system is actively collecting incident data...</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="text-center mt-12">
+            <button
+              onClick={handleEnterApp}
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
+            >
+              View All Cases & Reports
+            </button>
           </div>
         </div>
       </section>
@@ -445,8 +605,8 @@ const Home = () => {
                 <button onClick={() => scrollToSection('about')} className="block text-gray-400 hover:text-white text-sm transition-colors">
                   About
                 </button>
-                <button onClick={() => scrollToSection('features')} className="block text-gray-400 hover:text-white text-sm transition-colors">
-                  Features
+                <button onClick={() => scrollToSection('news')} className="block text-gray-400 hover:text-white text-sm transition-colors">
+                  News
                 </button>
               </div>
             </div>

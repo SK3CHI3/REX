@@ -6,6 +6,7 @@ import {
   getScrapingStats,
   getSchedulerStatus,
   getPendingScrapedCases,
+  getRecentScrapedArticles,
   startManualScraping,
   startSourceScraping,
   approveScrapedCase,
@@ -66,6 +67,17 @@ export function usePendingScrapedCases() {
     queryKey: ['pending-scraped-cases'],
     queryFn: getPendingScrapedCases,
     staleTime: 30 * 1000, // 30 seconds
+  });
+}
+
+/**
+ * Hook to fetch recent scraped articles for news display
+ */
+export function useRecentScrapedArticles(limit: number = 6) {
+  return useQuery({
+    queryKey: ['recent-scraped-articles', limit],
+    queryFn: () => getRecentScrapedArticles(limit),
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }
 

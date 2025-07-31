@@ -1,33 +1,41 @@
 import { useState } from 'react';
 import MapView from '@/components/MapView';
-import CaseModal from '@/components/CaseModal';
 import Header from '@/components/Header';
 import SubmitCaseModal from '@/components/SubmitCaseModal';
 import DataSidebar from '@/components/DataSidebar';
+import IncidentDetailModal from '@/components/IncidentDetailModal';
+
 import { Case, FilterState } from '@/types';
 import { useCases } from '@/hooks/useCases';
 import { SidebarProvider, Sidebar, SidebarTrigger } from '@/components/ui/sidebar';
 import { Loader2 } from 'lucide-react';
 
 const MapPage = () => {
-  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [filters, setFilters] = useState<FilterState>({
+    search: '',
     counties: [],
     caseTypes: [],
-    yearRange: [2020, 2024]
+    dateRange: { start: '', end: '' }
   });
 
   // Fetch cases from Supabase
   const { data: cases = [], isLoading, error } = useCases();
 
   const filteredCases = cases.filter(caseItem => {
+    const matchesSearch = !filters.search ||
+      caseItem.victimName?.toLowerCase().includes(filters.search.toLowerCase()) ||
+      caseItem.location?.toLowerCase().includes(filters.search.toLowerCase()) ||
+      caseItem.description?.toLowerCase().includes(filters.search.toLowerCase());
+
     const matchesCounty = filters.counties.length === 0 || filters.counties.includes(caseItem.county);
     const matchesCaseType = filters.caseTypes.length === 0 || filters.caseTypes.includes(caseItem.type);
-    const caseYear = new Date(caseItem.date).getFullYear();
-    const matchesYear = caseYear >= filters.yearRange[0] && caseYear <= filters.yearRange[1];
 
-    return matchesCounty && matchesCaseType && matchesYear;
+    const matchesDateRange = (!filters.dateRange.start || caseItem.date >= filters.dateRange.start) &&
+                            (!filters.dateRange.end || caseItem.date <= filters.dateRange.end);
+
+    return matchesSearch && matchesCounty && matchesCaseType && matchesDateRange;
   });
 
   // Show loading state
@@ -71,19 +79,31 @@ const MapPage = () => {
         <div className="flex flex-1">
           <Sidebar>
             <DataSidebar
-              selectedCase={selectedCase}
               filters={filters}
               onFiltersChange={setFilters}
               filteredCasesCount={filteredCases.length}
+              totalCasesCount={cases.length}
             />
           </Sidebar>
           <div className="flex-1 relative">
-            <MapView 
+            <MapView
               cases={filteredCases}
-              onCaseSelect={setSelectedCase}
+              onViewDetails={(caseItem) => setSelectedCase(caseItem)}
             />
+
+
           </div>
         </div>
+
+
+        {/* Detail Modal */}
+        {selectedCase && (
+          <IncidentDetailModal
+            case={selectedCase}
+            onClose={() => setSelectedCase(null)}
+          />
+        )}
+
         {isSubmitModalOpen && (
           <SubmitCaseModal
             onClose={() => setIsSubmitModalOpen(false)}

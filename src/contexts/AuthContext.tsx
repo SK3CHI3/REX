@@ -1,20 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
-
-interface AdminUser {
-  id: string;
-  username: string;
-  email: string;
-  full_name: string;
-  role: string;
-  is_active: boolean;
-  last_login: string;
-}
+import type { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
-  user: AdminUser | null;
+  user: User | null;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -34,109 +25,47 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<AdminUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check for existing session on mount
   useEffect(() => {
-    checkSession();
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const checkSession = async () => {
-    try {
-      const sessionToken = localStorage.getItem('admin_session_token');
-      if (!sessionToken) {
-        setIsLoading(false);
-        return;
-      }
-
-      // Verify session with database
-      const { data: session, error } = await supabase
-        .from('admin_sessions')
-        .select(`
-          *,
-          admin_users (
-            id,
-            username,
-            email,
-            full_name,
-            role,
-            is_active,
-            last_login
-          )
-        `)
-        .eq('session_token', sessionToken)
-        .gt('expires_at', new Date().toISOString())
-        .single();
-
-      if (error || !session || !session.admin_users) {
-        localStorage.removeItem('admin_session_token');
-        setIsLoading(false);
-        return;
-      }
-
-      setUser(session.admin_users as AdminUser);
-    } catch (error) {
-      console.error('Session check error:', error);
-      localStorage.removeItem('admin_session_token');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
 
-      // For demo purposes, we'll use simple password check
-      // In production, you'd want proper password hashing
-      const { data: adminUser, error } = await supabase
-        .from('admin_users')
-        .select('*')
-        .eq('username', username)
-        .eq('is_active', true)
-        .single();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-      if (error || !adminUser) {
+      if (error) {
+        console.error('Login error:', error.message);
         return false;
       }
 
-      // Simple password check (in production, use bcrypt)
-      if (password !== 'rex2024!') {
-        return false;
+      if (data.user) {
+        setUser(data.user);
+        return true;
       }
 
-      // Create session
-      const sessionToken = generateSessionToken();
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 24); // 24 hour session
-
-      const { error: sessionError } = await supabase
-        .from('admin_sessions')
-        .insert({
-          admin_user_id: adminUser.id,
-          session_token: sessionToken,
-          expires_at: expiresAt.toISOString(),
-          ip_address: '127.0.0.1', // In production, get real IP
-          user_agent: navigator.userAgent
-        });
-
-      if (sessionError) {
-        console.error('Session creation error:', sessionError);
-        return false;
-      }
-
-      // Update last login
-      await supabase
-        .from('admin_users')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', adminUser.id);
-
-      // Store session token
-      localStorage.setItem('admin_session_token', sessionToken);
-      setUser(adminUser);
-      return true;
-
+      return false;
     } catch (error) {
       console.error('Login error:', error);
       return false;
@@ -147,26 +76,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      const sessionToken = localStorage.getItem('admin_session_token');
-      if (sessionToken) {
-        // Delete session from database
-        await supabase
-          .from('admin_sessions')
-          .delete()
-          .eq('session_token', sessionToken);
-      }
+      await supabase.auth.signOut();
+      setUser(null);
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
-      localStorage.removeItem('admin_session_token');
-      setUser(null);
     }
-  };
-
-  const generateSessionToken = (): string => {
-    return Array.from(crypto.getRandomValues(new Uint8Array(32)))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
   };
 
   const value: AuthContextType = {

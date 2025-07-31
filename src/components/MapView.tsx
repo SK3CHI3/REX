@@ -39,16 +39,23 @@ const personRedIconDesktop = new L.Icon({
 
 interface MapViewProps {
   cases: Case[];
-  onCaseSelect: (caseItem: Case) => void;
+  onCaseHover?: (caseItem: Case, position: { x: number; y: number }) => void;
+  onCaseLeave?: () => void;
+  onCaseClick?: (caseItem: Case, position: { x: number; y: number }) => void;
+  onCaseSelect?: (caseItem: Case) => void; // Keep for backward compatibility
+  onViewDetails?: (caseItem: Case) => void;
 }
 
-const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
-  // Kenya's bounding box (approximate southwest and northeast corners)
+const MapView = ({ cases, onCaseHover, onCaseLeave, onCaseClick, onCaseSelect, onViewDetails }: MapViewProps) => {
+  // Kenya's center point (geographical center of Kenya)
+  const kenyaCenter: [number, number] = [-0.0236, 37.9062];
+
+  // Kenya's bounding box (properly fitted to Kenya borders)
   const kenyaBounds: LatLngBoundsExpression = [
-    [ -4.678, 33.909 ], // Southwest (near Lunga Lunga, Kwale)
-    [ 5.019, 41.899 ]   // Northeast (near Mandera)
+    [ -4.7, 33.9 ], // Southwest (Lunga Lunga, Kwale)
+    [ 5.0, 41.9 ]   // Northeast (Mandera)
   ];
-  // Tighter bounds for mobile (zoom in more)
+  // Tighter bounds for mobile (zoom in more to Nairobi area)
   const kenyaMobileBounds: LatLngBoundsExpression = [
     [ -1.5, 36.6 ], // Southwest (just below Nairobi)
     [ 1.5, 38.2 ]   // Northeast (just above Nairobi, toward Meru)
@@ -56,18 +63,19 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
   const isMobile = useIsMobile();
   const mapRef = useRef<any>(null);
   const [selectedPin, setSelectedPin] = useState<string | null>(null);
+  const [clickedPin, setClickedPin] = useState<string | null>(null);
   const { isMobile: sidebarIsMobile, setOpenMobile } = useSidebar();
 
-  // Zoom to pin when selectedPin changes
+  // Zoom to pin when clicked (not on hover)
   useEffect(() => {
-    if (selectedPin && mapRef.current) {
+    if (clickedPin && mapRef.current) {
       const map = mapRef.current;
-      const pin = cases.find(c => c.id === selectedPin);
+      const pin = cases.find(c => c.id === clickedPin);
       if (pin) {
         map.flyTo(pin.coordinates, 15, { duration: 0.7 });
       }
     }
-  }, [selectedPin, cases]);
+  }, [clickedPin, cases]);
 
   const getTypeLabel = (type: Case['type']) => {
     switch (type) {
@@ -94,11 +102,13 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
     <div className="absolute inset-0">
       <MapContainer
         bounds={isMobile ? kenyaMobileBounds : kenyaBounds}
-        boundsOptions={{ padding: [20, 20] }}
+        boundsOptions={{ padding: isMobile ? [10, 10] : [50, 50] }}
         className="w-full h-full z-10"
         zoomControl={true}
         preferCanvas={true}
         ref={mapRef}
+        minZoom={5}
+        maxZoom={18}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -111,9 +121,28 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
             position={caseItem.coordinates}
             icon={isMobile ? personRedIconMobile : personRedIconDesktop}
             eventHandlers={{
-              click: () => {
+              mouseover: (e) => {
+                if (!isMobile && !clickedPin) {
+                  setSelectedPin(caseItem.id);
+                  // Open popup on hover only if nothing is clicked
+                  e.target.openPopup();
+                }
+              },
+              mouseout: (e) => {
+                if (!isMobile && !clickedPin) {
+                  setSelectedPin(null);
+                  // Close popup on mouse leave only if nothing is clicked
+                  e.target.closePopup();
+                }
+              },
+              click: (e) => {
+                // Clear any previous selections
+                setSelectedPin(null);
+
+                // Set as clicked pin to keep popup open
+                setClickedPin(caseItem.id);
                 setSelectedPin(caseItem.id);
-                onCaseSelect(caseItem);
+                e.target.openPopup();
               }
             }}
           >
@@ -123,11 +152,12 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
                 <div style={{ width: 34, height: 34, borderRadius: '50%', border: '2px solid #EF4444', boxShadow: '0 0 8px 2px #EF4444', opacity: 0.5 }} />
               </div>
             )}
-            <Popup 
+            <Popup
               className="custom-popup"
-              closeButton={true}
-              autoClose={false}
+              closeButton={false}
+              autoClose={true}
               closeOnEscapeKey={true}
+              autoPan={false}
             >
               <div className="min-w-[250px] max-w-[300px] p-2">
                 <h3 className="font-semibold text-base mb-2 text-gray-900">{caseItem.victimName}</h3>
@@ -138,16 +168,45 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
                   <p className="mt-2">{caseItem.location}, {caseItem.county}</p>
                   <p>{new Date(caseItem.date).toLocaleDateString()}</p>
                 </div>
-                {/* See Details button for mobile */}
-                {isMobile && (
-                  <button
-                    className="mt-4 w-full bg-red-600 text-white rounded-lg py-2 font-semibold text-sm hover:bg-red-700 transition"
-                    onClick={() => {
-                      setOpenMobile(true);
-                    }}
-                  >
-                    See Details
-                  </button>
+
+                {/* Show "See More Details" button when clicked or on mobile */}
+                {(clickedPin === caseItem.id || isMobile) && (
+                  <div className="mt-3 space-y-2">
+                    <button
+                      className="w-full bg-red-600 text-white rounded-lg py-2 font-semibold text-sm hover:bg-red-700 transition"
+                      onClick={() => {
+                        if (isMobile) {
+                          setOpenMobile(true);
+                        } else {
+                          // Open detailed modal
+                          if (onViewDetails) {
+                            onViewDetails(caseItem);
+                          }
+                        }
+                      }}
+                    >
+                      See More Details
+                    </button>
+
+                    {/* Close button for clicked state */}
+                    {clickedPin === caseItem.id && !isMobile && (
+                      <button
+                        className="w-full bg-gray-200 text-gray-700 rounded-lg py-1 text-xs hover:bg-gray-300 transition"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setClickedPin(null);
+                          setSelectedPin(null);
+                          // Close the popup by finding the marker
+                          const popup = e.target.closest('.leaflet-popup');
+                          if (popup && popup._source) {
+                            popup._source.closePopup();
+                          }
+                        }}
+                      >
+                        Close
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             </Popup>
@@ -170,17 +229,7 @@ const MapView = ({ cases, onCaseSelect }: MapViewProps) => {
         </div>
       )}
 
-      {/* Compact legend - mobile optimized */}
-      {cases.length > 0 && (
-        <div className="absolute bottom-4 left-4 pointer-events-none z-20">
-          <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-3">
-            <div className="flex items-center space-x-2 text-xs">
-              <div className="w-3 h-3 bg-red-600 rounded-full flex-shrink-0"></div>
-              <span className="text-gray-700 font-medium">{cases.length} incidents</span>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Mobile attribution */}
       <div className="absolute bottom-1 right-1 text-xs text-gray-500 bg-white/80 px-2 py-1 rounded pointer-events-none z-20">

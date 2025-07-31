@@ -71,7 +71,7 @@ BEGIN
     'pending_reviews', (SELECT COUNT(*) FROM case_submissions WHERE status = 'pending' AND reporter_name = 'Automated Scraper'),
     'last_job_time', (SELECT MAX(created_at) FROM scraping_jobs),
     'sources_status', (
-      SELECT json_agg(
+      SELECT COALESCE(json_agg(
         json_build_object(
           'source_id', id,
           'source_name', name,
@@ -79,11 +79,11 @@ BEGIN
           'last_scraped', last_scraped,
           'base_url', base_url
         )
-      )
+      ), '[]'::json)
       FROM scraping_sources
     )
   ) INTO stats;
-  
+
   RETURN stats;
 END;
 $$;
