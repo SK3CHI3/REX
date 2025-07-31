@@ -1,4 +1,4 @@
-import { Filter, Search, Calendar, BarChart3, TrendingUp, MapPin, AlertTriangle, Sliders } from 'lucide-react';
+import { Filter, Search, Calendar, BarChart3, TrendingUp, MapPin, AlertTriangle, Sliders, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
@@ -9,6 +9,7 @@ import { FilterState } from '@/types';
 import { kenyanCounties, caseTypes } from '@/data/mockData';
 import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSidebar } from '@/components/ui/sidebar';
 
 interface DataSidebarProps {
   filters: FilterState;
@@ -20,6 +21,7 @@ interface DataSidebarProps {
 const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesCount }: DataSidebarProps) => {
   const [countySearch, setCountySearch] = useState('');
   const isMobile = useIsMobile();
+  const { setOpenMobile } = useSidebar();
 
   const handleCountyChange = (county: string, checked: boolean) => {
     const newCounties = checked
@@ -66,11 +68,24 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
             <Sliders className="w-5 h-5 mr-2 text-red-400" />
             Filters & Analytics
           </h2>
-          {activeFiltersCount > 0 && (
-            <Badge className="bg-red-600 text-white">
-              {activeFiltersCount} active
-            </Badge>
-          )}
+          <div className="flex items-center space-x-2">
+            {activeFiltersCount > 0 && (
+              <Badge className="bg-red-600 text-white">
+                {activeFiltersCount} active
+              </Badge>
+            )}
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setOpenMobile(false)}
+                className="h-8 w-8 p-0 text-white hover:bg-white/10 rounded-full"
+                aria-label="Close sidebar"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Quick Stats */}

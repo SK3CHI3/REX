@@ -6,7 +6,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { FilterState } from '@/types';
 import { kenyanCounties, caseTypes } from '@/data/mockData';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface FilterSidebarProps {
   isOpen: boolean;
@@ -17,6 +18,34 @@ interface FilterSidebarProps {
 
 const FilterSidebar = ({ isOpen, onClose, filters, onFiltersChange }: FilterSidebarProps) => {
   const [countySearch, setCountySearch] = useState('');
+  const isMobile = useIsMobile();
+
+  // Handle backdrop click to close on mobile
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  // Handle escape key to close
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
 
   const handleCountyChange = (county: string, checked: boolean) => {
     const newCounties = checked
@@ -56,10 +85,15 @@ const FilterSidebar = ({ isOpen, onClose, filters, onFiltersChange }: FilterSide
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-      <div className="absolute right-0 top-0 h-full w-full max-w-sm bg-white border-l border-gray-200 shadow-xl animate-in slide-in-from-right duration-300 overflow-y-auto max-h-screen pb-8">
+    <div
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+      onClick={handleBackdropClick}
+    >
+      <div className={`absolute right-0 top-0 h-full bg-white border-l border-gray-200 shadow-xl animate-in slide-in-from-right duration-300 overflow-y-auto max-h-screen pb-8 ${
+        isMobile ? 'w-full' : 'w-full max-w-sm'
+      }`}>
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
               <Filter className="w-4 h-4 text-red-600" />
@@ -71,8 +105,14 @@ const FilterSidebar = ({ isOpen, onClose, filters, onFiltersChange }: FilterSide
               )}
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
-            <X className="w-4 h-4" />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="h-10 w-10 p-0 hover:bg-gray-100 rounded-full flex-shrink-0"
+            aria-label="Close filters"
+          >
+            <X className="w-5 h-5" />
           </Button>
         </div>
 
@@ -178,6 +218,18 @@ const FilterSidebar = ({ isOpen, onClose, filters, onFiltersChange }: FilterSide
               )}
             </div>
           </div>
+
+          {/* Mobile Close Button at Bottom */}
+          {isMobile && (
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4 mt-6">
+              <Button
+                onClick={onClose}
+                className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-base font-medium"
+              >
+                Close Filters
+              </Button>
+            </div>
+          )}
         </ScrollArea>
       </div>
     </div>

@@ -8,6 +8,7 @@ import IncidentDetailModal from '@/components/IncidentDetailModal';
 import { Case, FilterState } from '@/types';
 import { useCases } from '@/hooks/useCases';
 import { useVisitorTracking } from '@/hooks/useVisitorTracking';
+import { normalizeCountyName } from '@/utils/countyNormalization';
 import { SidebarProvider, Sidebar, SidebarTrigger } from '@/components/ui/sidebar';
 import { Loader2 } from 'lucide-react';
 
@@ -33,7 +34,8 @@ const MapPage = () => {
       caseItem.location?.toLowerCase().includes(filters.search.toLowerCase()) ||
       caseItem.description?.toLowerCase().includes(filters.search.toLowerCase());
 
-    const matchesCounty = filters.counties.length === 0 || filters.counties.includes(caseItem.county);
+    const normalizedCounty = normalizeCountyName(caseItem.county);
+    const matchesCounty = filters.counties.length === 0 || filters.counties.includes(normalizedCounty);
     const matchesCaseType = filters.caseTypes.length === 0 || filters.caseTypes.includes(caseItem.type);
 
     const matchesDateRange = (!filters.dateRange.start || caseItem.date >= filters.dateRange.start) &&
@@ -74,8 +76,12 @@ const MapPage = () => {
 
   return (
     <SidebarProvider>
+      {/* Mobile Sidebar Trigger */}
+      <div className="fixed top-4 left-4 z-50 md:hidden">
+        <SidebarTrigger />
+      </div>
       <div className="h-screen w-full bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 overflow-hidden flex flex-col">
-        <Header 
+        <Header
           onOpenFilters={() => {}} // Not needed with sidebar
           onSubmitCase={() => setIsSubmitModalOpen(true)}
           caseCount={filteredCases.length}

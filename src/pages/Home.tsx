@@ -8,6 +8,7 @@ import { useRecentScrapedArticles } from '@/hooks/useScraping';
 import { useVisitorTracking } from '@/hooks/useVisitorTracking';
 import { useRecentNews } from '@/hooks/useNews';
 import NewsDetailModal from '@/components/NewsDetailModal';
+import { getTopCounties } from '@/utils/countyNormalization';
 
 // Helper functions - defined outside component to avoid hoisting issues
 const formatRelativeDate = (dateString: string | null | undefined) => {
@@ -69,18 +70,18 @@ const formatArticleForNews = (article: any) => {
 };
 
 const getImageForCategory = (caseType: string) => {
-  // Use a more appropriate fallback image for news articles
-  const fallbackImage = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=250&fit=crop&q=80'; // News/journalism image
+  // Use police brutality/justice related fallback image for news articles
+  const fallbackImage = 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80'; // Justice/protest image
 
   switch (caseType) {
     case 'death':
-      return 'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=400&h=250&fit=crop&q=80';
+      return 'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=400&h=250&fit=crop&q=80'; // Memorial/candles
     case 'assault':
-      return 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=400&h=250&fit=crop&q=80';
+      return 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop&q=80'; // Justice scales
     case 'harassment':
-      return 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80';
+      return 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80'; // Protest/justice
     case 'unlawful_arrest':
-      return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop&q=80';
+      return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop&q=80'; // Police/law enforcement
     default:
       return fallbackImage;
   }
@@ -91,14 +92,14 @@ const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
   const parent = target.parentElement;
 
   if (parent) {
-    // Replace image with a styled placeholder
+    // Replace image with a styled placeholder related to justice/police brutality
     parent.innerHTML = `
-      <div class="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
-        <div class="text-center text-gray-300">
-          <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+      <div class="w-full h-full bg-gradient-to-br from-red-900 to-red-800 flex items-center justify-center">
+        <div class="text-center text-red-200">
+          <svg class="w-12 h-12 mx-auto mb-2 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
           </svg>
-          <p class="text-xs">News Article</p>
+          <p class="text-xs">Justice Report</p>
         </div>
       </div>
     `;
@@ -161,26 +162,48 @@ const Home = () => {
 
   // Calculate statistics from real data
   const totalCases = cases?.length || 0;
+
+  // Calculate this month's cases with better error handling and timezone awareness
   const thisMonthCases = cases?.filter(c => {
-    const caseDate = new Date(c.incident_date);
-    const now = new Date();
-    return caseDate.getMonth() === now.getMonth() && caseDate.getFullYear() === now.getFullYear();
+    if (!c.date) return false;
+
+    try {
+      // Parse the date string (should be in YYYY-MM-DD format)
+      const caseDate = new Date(c.date + 'T00:00:00'); // Add time to avoid timezone issues
+      const now = new Date();
+
+      // Check if date is valid
+      if (isNaN(caseDate.getTime())) {
+        console.warn('Invalid date found in case:', c.id, c.date);
+        return false;
+      }
+
+      // Compare month and year
+      const isThisMonth = caseDate.getMonth() === now.getMonth() &&
+                         caseDate.getFullYear() === now.getFullYear();
+
+      return isThisMonth;
+    } catch (error) {
+      console.warn('Error parsing date for case:', c.id, c.date, error);
+      return false;
+    }
   }).length || 0;
+
+  // Debug logging (remove in production)
+  if (process.env.NODE_ENV === 'development' && cases && cases.length > 0) {
+    console.log('Total cases:', totalCases);
+    console.log('This month cases:', thisMonthCases);
+    console.log('Current month/year:', new Date().getMonth(), new Date().getFullYear());
+    console.log('Sample case dates:', cases.slice(0, 3).map(c => ({ id: c.id, date: c.date })));
+  }
 
   // Show error state if data fails to load
   if (error) {
     console.error('Error loading cases:', error);
   }
 
-  // Get recent cases from real data
-  const recentCases = cases
-    ?.sort((a, b) => new Date(b.incident_date || '').getTime() - new Date(a.incident_date || '').getTime())
-    .slice(0, 6)
-    .map(case_ => ({
-      location: case_.location || 'Unknown location',
-      date: formatRelativeDate(case_.incident_date),
-      type: formatCaseType(case_.case_type)
-    })) || [];
+  // Get top counties using the utility function
+  const topCounties = getTopCounties(cases || [], 3);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
@@ -232,7 +255,7 @@ const Home = () => {
       </nav>
 
       {/* Hero Section - Split Layout */}
-      <section className="relative min-h-[80vh] flex items-center px-2 sm:px-4 pt-24 pb-10 sm:pb-16">
+      <section className="relative min-h-[80vh] flex items-center px-4 sm:px-6 lg:px-8 pt-24 pb-10 sm:pb-16">
         {/* Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -242,11 +265,11 @@ const Home = () => {
 
         <div className="relative max-w-6xl mx-auto w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center min-h-[60vh]">
-            
+
             {/* Left Side - Main Content */}
-            <div className="space-y-8 animate-fade-in flex flex-col justify-center h-full">
+            <div className="space-y-8 animate-fade-in flex flex-col justify-center h-full text-center lg:text-left">
               {/* Badge */}
-              <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium w-fit">
+              <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium w-fit mx-auto lg:mx-0">
                 <Shield className="w-4 h-4" />
                 <span>Brutality Marked On Map</span>
               </div>
@@ -273,7 +296,7 @@ const Home = () => {
               </div>
 
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6">
+              <div className="flex flex-col sm:flex-row items-center lg:items-start space-y-4 sm:space-y-0 sm:space-x-6">
                 <Button
                   onClick={handleEnterApp}
                   size="lg"
@@ -294,12 +317,12 @@ const Home = () => {
 
               {/* Key Metrics - No background card, moved up */}
               <div className="mt-6 mb-4">
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="flex flex-col items-start">
+                <div className="grid grid-cols-2 gap-8 justify-items-center lg:justify-items-start">
+                  <div className="flex flex-col items-center lg:items-start">
                     <div className="text-3xl font-bold text-white mb-1">24/7</div>
                     <div className="text-sm text-gray-400">Live Monitoring</div>
                   </div>
-                  <div className="flex flex-col items-start">
+                  <div className="flex flex-col items-center lg:items-start">
                     <div className="text-3xl font-bold text-white mb-1">100%</div>
                     <div className="text-sm text-gray-400">Data Transparency</div>
                   </div>
@@ -337,36 +360,47 @@ const Home = () => {
                   </div>
                 </div>
 
-                {/* Recent Cases */}
+                {/* Top Counties by Incidents */}
                 <div className="space-y-4 flex-1 flex flex-col">
                   <div className="flex items-center justify-between">
                     <h4 className="text-lg font-semibold flex items-center">
-                      <Clock className="w-4 h-4 mr-2 text-gray-400" />
-                      Recent Cases
+                      <TrendingUp className="w-4 h-4 mr-2 text-gray-400" />
+                      Top Counties
                     </h4>
                     <Badge variant="secondary" className="bg-red-900/50 text-red-300 border-red-500/30">
-                      Live Updates
+                      Most Incidents
                     </Badge>
                   </div>
-                  
+
                   <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
                     {isLoading ? (
-                      <div className="text-center text-gray-400 py-4">Loading recent cases...</div>
+                      <div className="text-center text-gray-400 py-4">Loading county data...</div>
                     ) : error ? (
-                      <div className="text-center text-gray-400 py-4">Unable to load cases</div>
-                    ) : recentCases.length === 0 ? (
-                      <div className="text-center text-gray-400 py-4">No cases found</div>
+                      <div className="text-center text-gray-400 py-4">Unable to load data</div>
+                    ) : topCounties.length === 0 ? (
+                      <div className="text-center text-gray-400 py-4">No data available</div>
                     ) : (
-                      recentCases.slice(0, 3).map((case_, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
+                      topCounties.map((county, index) => (
+                        <div key={county.county} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors group">
                           <div className="flex items-center space-x-3">
-                            <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                              index === 0 ? 'bg-yellow-500/20 text-yellow-400' :
+                              index === 1 ? 'bg-gray-400/20 text-gray-300' :
+                              'bg-orange-500/20 text-orange-400'
+                            }`}>
+                              #{county.rank}
+                            </div>
                             <div>
-                              <p className="text-sm font-medium text-white">{case_.location}</p>
-                              <p className="text-xs text-gray-400">{case_.type}</p>
+                              <p className="text-sm font-medium text-white group-hover:text-red-300 transition-colors">
+                                {county.county}
+                              </p>
+                              <p className="text-xs text-gray-400">{county.count} incidents</p>
                             </div>
                           </div>
-                          <span className="text-xs text-gray-500">{case_.date}</span>
+                          <div className="text-right">
+                            <span className="text-sm font-semibold text-red-400">{county.percentage}%</span>
+                            <p className="text-xs text-gray-500">of total</p>
+                          </div>
                         </div>
                       ))
                     )}
@@ -462,7 +496,7 @@ const Home = () => {
                   <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
                     <div className="relative h-48 overflow-hidden">
                       <img
-                        src={article.featured_image_url || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=250&fit=crop&q=80'}
+                        src={article.featured_image_url || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80'}
                         alt={article.title}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         onError={handleImageError}
@@ -561,7 +595,7 @@ const Home = () => {
                   date: "Now",
                   category: "Info",
                   url: "#",
-                  image: "https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=400&h=250&fit=crop"
+                  image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80"
                 }
               ].map((article, index) => (
                 <div key={index} className="group col-span-full max-w-md mx-auto">

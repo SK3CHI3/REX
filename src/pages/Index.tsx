@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import SubmitCaseModal from '@/components/SubmitCaseModal';
 import { Case, FilterState } from '@/types';
 import { useCases } from '@/hooks/useCases';
+import { normalizeCountyName } from '@/utils/countyNormalization';
 import { SidebarProvider, Sidebar, SidebarTrigger } from '@/components/ui/sidebar';
 
 const Index = () => {
@@ -21,11 +22,14 @@ const Index = () => {
   // Fetch real cases from Supabase
   const { data: cases, isLoading, error } = useCases();
 
-  // Filter cases based on current filters
+  // Filter cases based on current filters with normalized county names
   const filteredCases = (cases || []).filter(caseItem => {
-    const matchesCounty = filters.counties.length === 0 || filters.counties.includes(caseItem.county);
-    const matchesCaseType = filters.caseTypes.length === 0 || filters.caseTypes.includes(caseItem.case_type);
-    const caseYear = new Date(caseItem.incident_date).getFullYear();
+    const normalizedCounty = normalizeCountyName(caseItem.county);
+    const matchesCounty = filters.counties.length === 0 || filters.counties.includes(normalizedCounty);
+    const matchesCaseType = filters.caseTypes.length === 0 || filters.caseTypes.includes(caseItem.type);
+
+    // Use the correct field name 'date' instead of 'incident_date'
+    const caseYear = caseItem.date ? new Date(caseItem.date).getFullYear() : 0;
     const matchesYear = caseYear >= filters.yearRange[0] && caseYear <= filters.yearRange[1];
 
     return matchesCounty && matchesCaseType && matchesYear;
