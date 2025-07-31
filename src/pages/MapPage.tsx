@@ -107,12 +107,11 @@ const MapPage = () => {
 
 
         {/* Detail Modal */}
-        {selectedCase && (
-          <IncidentDetailModal
-            case={selectedCase}
-            onClose={() => setSelectedCase(null)}
-          />
-        )}
+        <IncidentDetailModal
+          isOpen={!!selectedCase}
+          incident={selectedCase}
+          onClose={() => setSelectedCase(null)}
+        />
 
         {isSubmitModalOpen && (
           <SubmitCaseModal

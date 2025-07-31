@@ -175,13 +175,11 @@ const MapView = ({ cases, onCaseHover, onCaseLeave, onCaseClick, onCaseSelect, o
                     <button
                       className="w-full bg-red-600 text-white rounded-lg py-2 font-semibold text-sm hover:bg-red-700 transition"
                       onClick={() => {
-                        if (isMobile) {
-                          setOpenMobile(true);
-                        } else {
-                          // Open detailed modal
-                          if (onViewDetails) {
-                            onViewDetails(caseItem);
-                          }
+                        // Open detailed modal for both mobile and desktop
+                        if (onViewDetails) {
+                          onViewDetails(caseItem);
+                        } else if (onCaseSelect) {
+                          onCaseSelect(caseItem);
                         }
                       }}
                     >
