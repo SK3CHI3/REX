@@ -7,10 +7,14 @@ import IncidentDetailModal from '@/components/IncidentDetailModal';
 
 import { Case, FilterState } from '@/types';
 import { useCases } from '@/hooks/useCases';
+import { useVisitorTracking } from '@/hooks/useVisitorTracking';
 import { SidebarProvider, Sidebar, SidebarTrigger } from '@/components/ui/sidebar';
 import { Loader2 } from 'lucide-react';
 
 const MapPage = () => {
+  // Track visitor
+  useVisitorTracking();
+
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [filters, setFilters] = useState<FilterState>({

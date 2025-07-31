@@ -5,11 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 interface IncidentDetailModalProps {
-  case: Case;
+  isOpen: boolean;
+  incident: Case | null;
   onClose: () => void;
 }
 
-const IncidentDetailModal = ({ case: caseItem, onClose }: IncidentDetailModalProps) => {
+const IncidentDetailModal = ({ isOpen, incident: caseItem, onClose }: IncidentDetailModalProps) => {
+  if (!isOpen || !caseItem) return null;
   const getTypeLabel = (type: Case['type']) => {
     switch (type) {
       case 'death': return 'Death';

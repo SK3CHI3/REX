@@ -144,7 +144,8 @@ export async function submitCase(caseData: SubmitCaseData): Promise<string> {
         officer_names: caseData.officerNames || [],
         witnesses: caseData.witnesses || [],
         reporter_name: caseData.reporterName,
-        reporter_contact: caseData.reporterContact
+        reporter_contact: caseData.reporterContact,
+        status: 'pending'
       })
       .select('id')
       .single()

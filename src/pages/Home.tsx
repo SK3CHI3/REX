@@ -5,6 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useCases } from '@/hooks/useCases';
 import { useRecentScrapedArticles } from '@/hooks/useScraping';
+import { useVisitorTracking } from '@/hooks/useVisitorTracking';
+import { useRecentNews } from '@/hooks/useNews';
+import NewsDetailModal from '@/components/NewsDetailModal';
 
 // Helper functions - defined outside component to avoid hoisting issues
 const formatRelativeDate = (dateString: string | null | undefined) => {
@@ -103,9 +106,16 @@ const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
 };
 
 const Home = () => {
+  // Track visitor
+  useVisitorTracking();
+
   const navigate = useNavigate();
   const { data: cases, isLoading, error } = useCases();
   const { data: scrapedArticles, isLoading: articlesLoading } = useRecentScrapedArticles(3);
+  const { data: newsArticles } = useRecentNews(3);
+
+  // News modal state
+  const [selectedNewsArticle, setSelectedNewsArticle] = useState<any>(null);
 
   // Secret admin access state
   const [tapCount, setTapCount] = useState(0);
@@ -113,6 +123,14 @@ const Home = () => {
 
   const handleEnterApp = () => {
     navigate('/map');
+  };
+
+  const handleViewAllNews = () => {
+    navigate('/cases');
+  };
+
+  const handleNewsClick = (article: any) => {
+    setSelectedNewsArticle(article);
   };
 
   // Secret admin access handler
@@ -437,12 +455,56 @@ const Home = () => {
                   </div>
                 </div>
               ))
+            ) : newsArticles && newsArticles.length > 0 ? (
+              // Admin news articles (prioritized)
+              newsArticles.map((article, index) => (
+                <div key={article.id} className="group cursor-pointer" onClick={() => handleNewsClick(article)}>
+                  <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={article.featured_image_url || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&h=250&fit=crop&q=80'}
+                        alt={article.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        onError={handleImageError}
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-red-500/90 text-white text-xs font-medium px-3 py-1 rounded-full">
+                          {article.category || 'News'}
+                        </span>
+                      </div>
+                      {article.source === 'admin' && (
+                        <div className="absolute top-4 right-4">
+                          <span className="bg-blue-500/90 text-white text-xs font-medium px-2 py-1 rounded-full">
+                            Editorial
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
+                        <span>{article.author}</span>
+                        <span>{formatRelativeDate(article.published_at || article.created_at)}</span>
+                      </div>
+                      <h3 className="text-lg font-bold text-white mb-3 line-clamp-2">{article.title}</h3>
+                      <p className="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-4">
+                        {article.excerpt || article.content.substring(0, 150) + '...'}
+                      </p>
+                      <div className="inline-flex items-center text-red-400 hover:text-red-300 text-sm font-medium transition-colors">
+                        Read More
+                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
             ) : scrapedArticles && scrapedArticles.length > 0 ? (
               // Real scraped articles
               scrapedArticles.map((rawArticle, index) => {
                 const article = formatArticleForNews(rawArticle);
                 return (
-              <div key={index} className="group">
+              <div key={index} className="group cursor-pointer" onClick={() => handleNewsClick(article)}>
                 <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
                   <div className="relative h-48 overflow-hidden">
                     <img
@@ -530,10 +592,10 @@ const Home = () => {
 
           <div className="text-center mt-12">
             <button
-              onClick={handleEnterApp}
+              onClick={handleViewAllNews}
               className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
             >
-              View All Cases & Reports
+              View All News & Reports
             </button>
           </div>
         </div>
@@ -652,6 +714,13 @@ const Home = () => {
           </div>
         </div>
       </footer>
+
+      {/* News Detail Modal */}
+      <NewsDetailModal
+        isOpen={!!selectedNewsArticle}
+        onClose={() => setSelectedNewsArticle(null)}
+        article={selectedNewsArticle}
+      />
     </div>
   );
 };

@@ -18,8 +18,10 @@ import {
   BarChart3,
   FileText,
   UserCheck,
-  Activity,
-  MapPin
+  MapPin,
+  Edit,
+  Plus,
+  Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +34,9 @@ import {
   useCases
 } from '@/hooks/useCases';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserAnalytics, useRecentActivity } from '@/hooks/useUserAnalytics';
+import { useVisitorAnalytics } from '@/hooks/useVisitorTracking';
+import { useNews, useDeleteNews, useSyncScrapedNews, NewsArticle } from '@/hooks/useNews';
+import NewsModal from '@/components/NewsModal';
 import {
   useScrapingStatus,
   useScrapingSources,
@@ -47,6 +51,9 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [selectedTab, setSelectedTab] = useState('overview');
+  const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
+  const [selectedNews, setSelectedNews] = useState<NewsArticle | null>(null);
+  const [newsModalMode, setNewsModalMode] = useState<'create' | 'edit'>('create');
 
   // Data hooks
   const { data: cases, isLoading: casesLoading } = useCases();
@@ -54,10 +61,22 @@ const AdminDashboard = () => {
   const pendingScrapedCases = usePendingScrapedCases();
   const scrapingStatus = useScrapingStatus();
   const scrapingSources = useScrapingSources();
+  const { data: newsArticles, isLoading: newsLoading } = useNews();
+  const deleteNews = useDeleteNews();
+  const syncScrapedNews = useSyncScrapedNews();
 
-  // User analytics data
-  const { data: userAnalytics, isLoading: analyticsLoading } = useUserAnalytics();
-  const { data: recentActivity, isLoading: activityLoading } = useRecentActivity();
+  // Get visitor analytics
+  const { data: visitorAnalytics, isLoading: analyticsLoading } = useVisitorAnalytics();
+
+  // Calculate dynamic analytics from actual data
+  const totalCases = cases?.length || 0;
+  const totalSubmissions = pendingSubmissions.data?.length || 0;
+  const recentCases = cases?.filter(c => {
+    const caseDate = new Date(c.created_at || c.date);
+    const dayAgo = new Date();
+    dayAgo.setDate(dayAgo.getDate() - 1);
+    return caseDate >= dayAgo;
+  }).length || 0;
 
   // Action hooks
   const approveSubmission = useApproveSubmission();
@@ -68,7 +87,6 @@ const AdminDashboard = () => {
   const startSourceScraping = useStartSourceScraping();
 
   // Calculate statistics
-  const totalCases = cases?.length || 0;
   const totalPendingSubmissions = pendingSubmissions.data?.length || 0;
   const totalPendingScraped = pendingScrapedCases.data?.length || 0;
   const totalPending = totalPendingSubmissions + totalPendingScraped;
@@ -96,6 +114,39 @@ const AdminDashboard = () => {
       case 'pending': return <Clock className="w-4 h-4" />;
       case 'failed': return <XCircle className="w-4 h-4" />;
       default: return <AlertTriangle className="w-4 h-4" />;
+    }
+  };
+
+  // News management functions
+  const handleCreateNews = () => {
+    setSelectedNews(null);
+    setNewsModalMode('create');
+    setIsNewsModalOpen(true);
+  };
+
+  const handleEditNews = (article: NewsArticle) => {
+    setSelectedNews(article);
+    setNewsModalMode('edit');
+    setIsNewsModalOpen(true);
+  };
+
+  const handleDeleteNews = async (id: string) => {
+    if (confirm('Are you sure you want to delete this news article?')) {
+      try {
+        await deleteNews.mutateAsync(id);
+      } catch (error) {
+        console.error('Error deleting news:', error);
+      }
+    }
+  };
+
+  const handleSyncScrapedNews = async () => {
+    try {
+      const count = await syncScrapedNews.mutateAsync();
+      alert(`Synced ${count} new articles from scraping.`);
+    } catch (error) {
+      console.error('Error syncing scraped news:', error);
+      alert('Error syncing scraped news. Please try again.');
     }
   };
 
@@ -214,7 +265,7 @@ const AdminDashboard = () => {
           <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-2xl hover:bg-black/40 transition-all">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
-                <Activity className="w-6 h-6 text-white" />
+                <TrendingUp className="w-6 h-6 text-white" />
               </div>
               <Badge variant="secondary" className="bg-green-900/50 text-green-300 border-green-500/30">
                 Online
@@ -266,6 +317,13 @@ const AdminDashboard = () => {
                 <Users className="w-4 h-4 mr-2" />
                 Site Users
               </TabsTrigger>
+              <TabsTrigger
+                value="news"
+                className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-300"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                News Management
+              </TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
@@ -308,7 +366,7 @@ const AdminDashboard = () => {
                 {/* Recent Activity */}
                 <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
                   <h3 className="text-xl font-bold mb-4 flex items-center">
-                    <Activity className="w-5 h-5 mr-2 text-red-400" />
+                    <Clock className="w-5 h-5 mr-2 text-red-400" />
                     Recent Activity
                   </h3>
                   <div className="space-y-3">
@@ -541,11 +599,11 @@ const AdminDashboard = () => {
             {/* Users Tab */}
             <TabsContent value="users" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* User Analytics */}
+                {/* Site Analytics */}
                 <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
                   <h3 className="text-xl font-bold mb-6 flex items-center">
                     <Users className="w-5 h-5 mr-2 text-red-400" />
-                    User Analytics
+                    Site Analytics
                   </h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between p-4 bg-black/20 rounded-lg">
@@ -554,25 +612,25 @@ const AdminDashboard = () => {
                         <p className="text-xs text-gray-400">All time unique visitors</p>
                       </div>
                       <div className="text-2xl font-bold text-blue-400">
-                        {analyticsLoading ? '...' : userAnalytics?.totalVisitors || 0}
+                        {analyticsLoading ? '...' : visitorAnalytics?.totalVisitors || 0}
                       </div>
                     </div>
                     <div className="flex items-center justify-between p-4 bg-black/20 rounded-lg">
                       <div>
-                        <p className="text-sm font-medium text-white">Active Today</p>
-                        <p className="text-xs text-gray-400">Visitors in last 24 hours</p>
+                        <p className="text-sm font-medium text-white">Visitors Today</p>
+                        <p className="text-xs text-gray-400">Unique visitors in last 24 hours</p>
                       </div>
                       <div className="text-2xl font-bold text-green-400">
-                        {analyticsLoading ? '...' : userAnalytics?.activeToday || 0}
+                        {analyticsLoading ? '...' : visitorAnalytics?.visitorsToday || 0}
                       </div>
                     </div>
                     <div className="flex items-center justify-between p-4 bg-black/20 rounded-lg">
                       <div>
-                        <p className="text-sm font-medium text-white">Avg. Session</p>
-                        <p className="text-xs text-gray-400">Average time on site</p>
+                        <p className="text-sm font-medium text-white">This Week</p>
+                        <p className="text-xs text-gray-400">Visitors in last 7 days</p>
                       </div>
                       <div className="text-2xl font-bold text-purple-400">
-                        {analyticsLoading ? '...' : `${userAnalytics?.averageSessionMinutes || 0}:00`}
+                        {analyticsLoading ? '...' : visitorAnalytics?.visitorsThisWeek || 0}
                       </div>
                     </div>
                   </div>
@@ -612,44 +670,119 @@ const AdminDashboard = () => {
                 </div>
               </div>
 
-              {/* Recent Activity */}
+
+            </TabsContent>
+
+            {/* News Management Tab */}
+            <TabsContent value="news" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">News Management</h2>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleSyncScrapedNews}
+                    variant="outline"
+                    className="border-blue-500 text-blue-400 hover:bg-blue-500/10"
+                    disabled={syncScrapedNews.isPending}
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    Sync Scraped News
+                  </Button>
+                  <Button onClick={handleCreateNews} className="bg-red-600 hover:bg-red-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create News Article
+                  </Button>
+                </div>
+              </div>
+
               <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-                <h3 className="text-xl font-bold mb-6 flex items-center">
-                  <Activity className="w-5 h-5 mr-2 text-red-400" />
-                  Recent User Activity
-                </h3>
-                <div className="space-y-3">
-                  {activityLoading ? (
-                    <div className="text-center py-4">
-                      <div className="text-gray-400">Loading recent activity...</div>
-                    </div>
-                  ) : recentActivity && recentActivity.length > 0 ? (
-                    recentActivity.map((activity) => (
-                      <div key={activity.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                          <div>
-                            <p className="text-sm font-medium text-white">{activity.description}</p>
-                            <p className="text-xs text-gray-400">
-                              {new Date(activity.timestamp).toLocaleString()}
+                {newsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="text-gray-400">Loading news articles...</div>
+                  </div>
+                ) : newsArticles && newsArticles.length > 0 ? (
+                  <div className="space-y-4">
+                    {newsArticles.map((article) => (
+                      <div key={article.id} className="bg-black/20 rounded-lg p-4 border border-white/10">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="text-lg font-semibold text-white">{article.title}</h3>
+                              <Badge
+                                variant={article.status === 'published' ? 'default' : 'secondary'}
+                                className={article.status === 'published' ? 'bg-green-600' : 'bg-yellow-600'}
+                              >
+                                {article.status}
+                              </Badge>
+                              <Badge
+                                variant="outline"
+                                className={article.source === 'admin' ? 'border-blue-500 text-blue-400' : 'border-purple-500 text-purple-400'}
+                              >
+                                {article.source === 'admin' ? 'Admin' : 'Scraped'}
+                              </Badge>
+                            </div>
+                            <p className="text-gray-300 text-sm mb-2">
+                              By {article.author} • {article.category}
                             </p>
+                            {article.excerpt && (
+                              <p className="text-gray-400 text-sm mb-2">{article.excerpt}</p>
+                            )}
+                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                              <span>Created: {new Date(article.created_at).toLocaleDateString()}</span>
+                              {article.published_at && (
+                                <span>Published: {new Date(article.published_at).toLocaleDateString()}</span>
+                              )}
+                              {article.tags && article.tags.length > 0 && (
+                                <span>Tags: {article.tags.join(', ')}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2 ml-4">
+                            {article.source === 'admin' && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditNews(article)}
+                                className="border-white/20 text-gray-300 hover:bg-white/10"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteNews(article.id)}
+                              className="border-red-500/20 text-red-400 hover:bg-red-500/10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
-                        <Badge variant="secondary" className="bg-blue-900/50 text-blue-300 border-blue-500/30">
-                          {activity.type === 'visit' ? 'Visit' : activity.type === 'submission' ? 'Submission' : 'Interaction'}
-                        </Badge>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-4">
-                      <div className="text-gray-400">No recent activity</div>
-                    </div>
-                  )}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                    <h3 className="text-lg font-medium text-gray-300 mb-2">No News Articles</h3>
+                    <p className="text-gray-400 mb-4">Create your first news article to get started.</p>
+                    <Button onClick={handleCreateNews} className="bg-red-600 hover:bg-red-700">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create News Article
+                    </Button>
+                  </div>
+                )}
               </div>
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* News Modal */}
+        <NewsModal
+          isOpen={isNewsModalOpen}
+          onClose={() => setIsNewsModalOpen(false)}
+          article={selectedNews}
+          mode={newsModalMode}
+        />
       </div>
     </div>
   );
