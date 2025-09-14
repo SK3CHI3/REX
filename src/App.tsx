@@ -7,13 +7,19 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import PerformanceOptimizations from "./components/PerformanceOptimizations";
 import SEOAnalytics from "./components/SEOAnalytics";
+import LazyWrapper, { LazyAdminDashboard } from "./components/LazyWrapper";
 import Home from "./pages/Home";
 import MapPage from "./pages/MapPage";
 import AllNewsPage from "./pages/AllCasesPage";
-import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import { lazy, Suspense } from "react";
+
+// Lazy load heavy components
+const LazyMapView = lazy(() => import("./components/MapView"));
+const LazyCaseModal = lazy(() => import("./components/CaseModal"));
+const LazyNewsDetailModal = lazy(() => import("./components/NewsDetailModal"));
 
 const queryClient = new QueryClient();
 
@@ -35,7 +41,9 @@ const App = () => (
               path="/admin"
               element={
                 <ProtectedRoute>
-                  <AdminDashboard />
+                  <LazyWrapper>
+                    <LazyAdminDashboard />
+                  </LazyWrapper>
                 </ProtectedRoute>
               }
             />
