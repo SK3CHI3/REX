@@ -7,6 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { usePublishedNews } from '@/hooks/useNews';
 import NewsDetailModal from '@/components/NewsDetailModal';
+import SEOHead from '@/components/SEOHead';
+import StructuredData from '@/components/StructuredData';
 
 const AllNewsPage = () => {
   const navigate = useNavigate();
@@ -32,7 +34,16 @@ const AllNewsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white">
+    <>
+      <SEOHead
+        title="All Cases & News | REX Kenya - Police Brutality Reports"
+        description="Browse all police brutality cases and news reports in Kenya. Stay informed with the latest developments in police accountability and human rights."
+        keywords="police brutality cases, Kenya news, incident reports, human rights, police accountability, case database"
+        url="https://rextracker.online/cases"
+      />
+      <StructuredData cases={[]} pageType="cases" />
+      
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white">
       {/* Header */}
       <div className="bg-black/30 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-6">
@@ -139,7 +150,8 @@ const AllNewsPage = () => {
         onClose={() => setSelectedNews(null)}
         article={selectedNews}
       />
-    </div>
+      </div>
+    </>
   );
 };
 

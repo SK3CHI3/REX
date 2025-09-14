@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import PerformanceOptimizations from "./components/PerformanceOptimizations";
+import SEOAnalytics from "./components/SEOAnalytics";
 import Home from "./pages/Home";
 import MapPage from "./pages/MapPage";
 import AllNewsPage from "./pages/AllCasesPage";
@@ -19,6 +21,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
+        <PerformanceOptimizations />
+        <SEOAnalytics />
         <Toaster />
         <Sonner />
         <BrowserRouter>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#991b1b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="scaleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f3f4f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#shieldGradient)" stroke="#991b1b" stroke-width="5"/>
+  
+  <!-- Scales of Justice - matching the header emoji style -->
+  <g transform="translate(100, 100)">
+    <!-- Scale base/stand -->
+    <line x1="0" y1="20" x2="0" y2="40" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Scale beam -->
+    <line x1="-30" y1="20" x2="30" y2="20" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Left scale pan -->
+    <line x1="-30" y1="20" x2="-40" y2="5" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-40" y1="5" x2="-20" y2="5" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-30" y1="5" x2="-30" y2="-5" stroke="url(#scaleGradient)" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Right scale pan -->
+    <line x1="30" y1="20" x2="40" y2="5" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="40" y1="5" x2="20" y2="5" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
+    <line x1="30" y1="5" x2="30" y2="-5" stroke="url(#scaleGradient)" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Center balance point -->
+    <circle cx="0" cy="20" r="3" fill="url(#scaleGradient)" stroke="#991b1b" stroke-width="1"/>
+  </g>
+  
+  <!-- REX Text -->
+  <text x="100" y="160" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="url(#scaleGradient)">REX</text>
+</svg>

@@ -4,6 +4,8 @@ import Header from '@/components/Header';
 import SubmitCaseModal from '@/components/SubmitCaseModal';
 import DataSidebar from '@/components/DataSidebar';
 import IncidentDetailModal from '@/components/IncidentDetailModal';
+import SEOHead from '@/components/SEOHead';
+import StructuredData from '@/components/StructuredData';
 
 import { Case, FilterState } from '@/types';
 import { useCases } from '@/hooks/useCases';
@@ -75,12 +77,21 @@ const MapPage = () => {
   }
 
   return (
-    <SidebarProvider>
-      {/* Mobile Sidebar Trigger */}
-      <div className="fixed top-4 left-4 z-50 md:hidden">
-        <SidebarTrigger />
-      </div>
-      <div className="h-screen w-full bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 overflow-hidden flex flex-col">
+    <>
+      <SEOHead
+        title="Interactive Map | REX Kenya - Police Brutality Tracking"
+        description="Explore police brutality incidents across Kenya with our interactive map. Filter by county, case type, and date range to understand patterns and trends."
+        keywords="police brutality map, Kenya incidents, interactive map, case tracking, county data, incident visualization"
+        url="https://rextracker.online/map"
+      />
+      <StructuredData cases={filteredCases} pageType="map" />
+      
+      <SidebarProvider>
+        {/* Mobile Sidebar Trigger */}
+        <div className="fixed top-4 left-4 z-50 md:hidden">
+          <SidebarTrigger />
+        </div>
+        <div className="h-screen w-full bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 overflow-hidden flex flex-col">
         <Header
           onOpenFilters={() => {}} // Not needed with sidebar
           onSubmitCase={() => setIsSubmitModalOpen(true)}
@@ -118,8 +129,9 @@ const MapPage = () => {
             onClose={() => setIsSubmitModalOpen(false)}
           />
         )}
-      </div>
-    </SidebarProvider>
+        </div>
+      </SidebarProvider>
+    </>
   );
 };
 

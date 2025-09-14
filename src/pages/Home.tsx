@@ -8,6 +8,8 @@ import { useRecentScrapedArticles } from '@/hooks/useScraping';
 import { useVisitorTracking } from '@/hooks/useVisitorTracking';
 import { useRecentNews } from '@/hooks/useNews';
 import NewsDetailModal from '@/components/NewsDetailModal';
+import SEOHead from '@/components/SEOHead';
+import StructuredData from '@/components/StructuredData';
 import { getTopCounties } from '@/utils/countyNormalization';
 
 // Helper functions - defined outside component to avoid hoisting issues
@@ -206,7 +208,16 @@ const Home = () => {
   const topCounties = getTopCounties(cases || [], 3);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
+    <>
+      <SEOHead
+        title="REX - Justice through visibility | Police Brutality Tracking Kenya"
+        description="Interactive platform mapping incidents of police brutality across Kenya. Track, report, and visualize cases of police misconduct. Justice through visibility and transparency."
+        keywords="police brutality, Kenya, justice, transparency, human rights, police misconduct, accountability, tracking, mapping, incidents, cases, interactive map"
+        url="https://rextracker.online"
+      />
+      <StructuredData cases={cases || []} pageType="home" />
+      
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
       {/* Floating Navigation Header */}
       <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-black/40 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl max-w-7xl w-full">
         <div className="px-6 lg:px-8">
@@ -755,7 +766,8 @@ const Home = () => {
         onClose={() => setSelectedNewsArticle(null)}
         article={selectedNewsArticle}
       />
-    </div>
+      </div>
+    </>
   );
 };
 

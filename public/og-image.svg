@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#991b1b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f3f4f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="50" fill="url(#accentGradient)" opacity="0.1"/>
+  <circle cx="1100" cy="530" r="80" fill="url(#accentGradient)" opacity="0.1"/>
+  <circle cx="200" cy="500" r="30" fill="url(#accentGradient)" opacity="0.1"/>
+  
+  <!-- Main content area -->
+  <g transform="translate(600, 315)">
+    <!-- REX Logo -->
+    <g transform="translate(-150, -80)">
+      <!-- Background circle -->
+      <circle cx="150" cy="80" r="70" fill="url(#accentGradient)" stroke="#991b1b" stroke-width="3"/>
+      
+      <!-- Scales of Justice -->
+      <g transform="translate(150, 80)">
+        <!-- Scale base/stand -->
+        <line x1="0" y1="15" x2="0" y2="30" stroke="url(#textGradient)" stroke-width="3" stroke-linecap="round"/>
+        
+        <!-- Scale beam -->
+        <line x1="-25" y1="15" x2="25" y2="15" stroke="url(#textGradient)" stroke-width="3" stroke-linecap="round"/>
+        
+        <!-- Left scale pan -->
+        <line x1="-25" y1="15" x2="-35" y2="0" stroke="url(#textGradient)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="-35" y1="0" x2="-15" y2="0" stroke="url(#textGradient)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="-25" y1="0" x2="-25" y2="-8" stroke="url(#textGradient)" stroke-width="2" stroke-linecap="round"/>
+        
+        <!-- Right scale pan -->
+        <line x1="25" y1="15" x2="35" y2="0" stroke="url(#textGradient)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="35" y1="0" x2="15" y2="0" stroke="url(#textGradient)" stroke-width="3" stroke-linecap="round"/>
+        <line x1="25" y1="0" x2="25" y2="-8" stroke="url(#textGradient)" stroke-width="2" stroke-linecap="round"/>
+        
+        <!-- Center balance point -->
+        <circle cx="0" cy="15" r="2" fill="url(#textGradient)"/>
+      </g>
+    </g>
+    
+    <!-- Main title -->
+    <text x="0" y="20" font-family="Arial, sans-serif" font-size="72" font-weight="bold" text-anchor="middle" fill="url(#textGradient)">REX</text>
+    
+    <!-- Subtitle -->
+    <text x="0" y="60" font-family="Arial, sans-serif" font-size="32" text-anchor="middle" fill="url(#accentGradient)">Justice through visibility</text>
+    
+    <!-- Description -->
+    <text x="0" y="100" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" fill="#94a3b8">Police Brutality Tracking Kenya</text>
+    
+    <!-- URL -->
+    <text x="0" y="140" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="#64748b">rextracker.online</text>
+  </g>
+</svg>

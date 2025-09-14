@@ -1,0 +1,7 @@
+# Redirect all traffic to index.html for SPA routing
+/*    /index.html   200
+
+# Specific redirects for better SEO
+/home    /    301
+/incidents    /cases    301
+/brutality    /cases    301

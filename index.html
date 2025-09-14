@@ -3,18 +3,149 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>REX - Justice through visibility</title>
-    <meta name="description" content="Interactive platform mapping incidents of police brutality across Kenya. Justice through visibility." />
-    <meta name="author" content="REX" />
-
-    <meta property="og:title" content="REX - Justice through visibility" />
-    <meta property="og:description" content="Interactive platform mapping incidents of police brutality across Kenya. Justice through visibility." />
+    <link rel="icon" type="image/svg+xml" sizes="16x16" href="/favicon-16x16.svg" />
+    <link rel="icon" type="image/svg+xml" sizes="32x32" href="/favicon-32x32.svg" />
+    <link rel="shortcut icon" href="/favicon.svg" />
+    
+    <!-- Manifest and PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo.svg" />
+    
+    <!-- Additional favicon formats for better browser support -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.svg" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.svg" />
+    
+    <!-- Primary Meta Tags -->
+    <title>REX - Justice through visibility | Police Brutality Tracking Kenya</title>
+    <meta name="title" content="REX - Justice through visibility | Police Brutality Tracking Kenya" />
+    <meta name="description" content="Interactive platform mapping incidents of police brutality across Kenya. Track, report, and visualize cases of police misconduct. Justice through visibility and transparency." />
+    <meta name="keywords" content="police brutality, Kenya, justice, transparency, human rights, police misconduct, accountability, tracking, mapping, incidents, cases" />
+    <meta name="author" content="REX Team" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="bingbot" content="index, follow" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://rextracker.online/" />
+    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-
+    <meta property="og:url" content="https://rextracker.online/" />
+    <meta property="og:title" content="REX - Justice through visibility | Police Brutality Tracking Kenya" />
+    <meta property="og:description" content="Interactive platform mapping incidents of police brutality across Kenya. Track, report, and visualize cases of police misconduct. Justice through visibility and transparency." />
+    <meta property="og:image" content="https://rextracker.online/og-image.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="REX - Justice through visibility platform showing police brutality incidents across Kenya" />
+    <meta property="og:site_name" content="REX Kenya" />
+    <meta property="og:locale" content="en_KE" />
+    
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="REX - Justice through visibility" />
-    <meta name="twitter:description" content="Interactive platform mapping incidents of police brutality across Kenya. Justice through visibility." />
+    <meta name="twitter:url" content="https://rextracker.online/" />
+    <meta name="twitter:title" content="REX - Justice through visibility | Police Brutality Tracking Kenya" />
+    <meta name="twitter:description" content="Interactive platform mapping incidents of police brutality across Kenya. Track, report, and visualize cases of police misconduct. Justice through visibility and transparency." />
+    <meta name="twitter:image" content="https://rextracker.online/og-image.svg" />
+    <meta name="twitter:image:alt" content="REX - Justice through visibility platform showing police brutality incidents across Kenya" />
+    <meta name="twitter:creator" content="@rexkenya" />
+    <meta name="twitter:site" content="@rexkenya" />
+    
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#1e40af" />
+    <meta name="msapplication-TileColor" content="#1e40af" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="REX Kenya" />
+    
+    <!-- Geo Tags -->
+    <meta name="geo.region" content="KE" />
+    <meta name="geo.country" content="Kenya" />
+    <meta name="geo.placename" content="Kenya" />
+    <meta name="ICBM" content="-1.2921, 36.8219" />
+    
+    <!-- Language -->
+    <meta http-equiv="content-language" content="en-KE" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.supabase.co" />
+    
+    <!-- DNS Prefetch -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="//api.supabase.co" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "REX - Justice through visibility",
+      "alternateName": "REX Kenya",
+      "url": "https://rextracker.online",
+      "description": "Interactive platform mapping incidents of police brutality across Kenya. Track, report, and visualize cases of police misconduct. Justice through visibility and transparency.",
+      "inLanguage": "en-KE",
+      "isAccessibleForFree": true,
+      "publisher": {
+        "@type": "Organization",
+        "name": "REX Team",
+        "url": "https://rextracker.online",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://rextracker.online/logo.svg",
+          "width": 200,
+          "height": 200
+        }
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://rextracker.online/cases?search={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
+      "mainEntity": {
+        "@type": "Dataset",
+        "name": "Police Brutality Incidents in Kenya",
+        "description": "Comprehensive dataset of police brutality incidents across Kenya with geographic and temporal data",
+        "url": "https://rextracker.online/cases",
+        "keywords": ["police brutality", "Kenya", "human rights", "accountability", "transparency"],
+        "spatialCoverage": {
+          "@type": "Country",
+          "name": "Kenya"
+        },
+        "temporalCoverage": "2020/2024",
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "creator": {
+          "@type": "Organization",
+          "name": "REX Team"
+        }
+      }
+    }
+    </script>
+    
+    <!-- Additional Structured Data for Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "REX Team",
+      "url": "https://rextracker.online",
+      "logo": "https://rextracker.online/logo.svg",
+      "description": "Organization dedicated to tracking and visualizing police brutality incidents in Kenya for justice and transparency",
+      "foundingDate": "2024",
+      "areaServed": {
+        "@type": "Country",
+        "name": "Kenya"
+      },
+      "knowsAbout": ["Police Brutality", "Human Rights", "Data Visualization", "Transparency", "Accountability"],
+      "sameAs": [
+        "https://twitter.com/rexkenya"
+      ]
+    }
+    </script>
   </head>
 
   <body>
