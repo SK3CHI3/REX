@@ -1,24 +1,35 @@
 # REX Kenya
+### Justice through visibility
 
-Interactive platform for tracking and mapping police incidents across Kenya.
+> **Interactive platform for tracking and mapping police incidents across Kenya**
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/your-badge-id/deploy-status)](https://app.netlify.com/sites/rextracker)
-[![Performance](https://img.shields.io/badge/Performance-98%2F100-brightgreen)](https://pagespeed.web.dev/)
-[![SEO Score](https://img.shields.io/badge/SEO-500%25-orange)](https://rextracker.online)
+[![Live Site](https://img.shields.io/badge/Live%20Site-rextracker.online-blue)](https://rextracker.online)
+[![Total Cases](https://img.shields.io/badge/Total%20Cases-500%2B-red)](https://rextracker.online)
+[![Counties Covered](https://img.shields.io/badge/Counties-47%2F47-green)](https://rextracker.online/map)
+[![Last Updated](https://img.shields.io/badge/Last%20Updated-Live-brightgreen)](https://rextracker.online)
 
-## About
+---
 
-REX Kenya provides a comprehensive platform for documenting, tracking, and analyzing police incidents across all 47 counties in Kenya. The platform enables citizens to report incidents, view interactive maps, and access real-time data for transparency and accountability.
+REX Kenya is a comprehensive platform that enables citizens to report, track, and analyze police incidents across all 47 counties in Kenya. Our mission is to promote transparency and accountability in law enforcement through real-time data visualization and community engagement.
 
-## Features
+**Key Objectives:**
+- Document police incidents with precise location data
+- Provide transparent access to incident information
+- Enable community reporting and verification
+- Support data-driven policy discussions
+- Promote accountability and justice
 
-- **Interactive Map** - Visualize incidents across all 47 counties
-- **Real-time Data** - Live tracking and updates
-- **Advanced Filtering** - Search by county, case type, and date
-- **Mobile Responsive** - Works on all devices
-- **Anonymous Reporting** - Secure case submission
-- **Admin Dashboard** - Content management system
-- **Data Analytics** - Insights and trends
+## 🚀 Platform Features
+
+| Feature | Description |
+|---------|-------------|
+| **🗺️ Interactive Map** | Real-time visualization of incidents across all 47 counties |
+| **📊 Live Data** | Continuous updates and real-time incident tracking |
+| **🔍 Advanced Search** | Filter by county, case type, date, and severity |
+| **📱 Mobile Optimized** | Full functionality on all devices and screen sizes |
+| **🔒 Secure Reporting** | Anonymous incident submission with verification |
+| **⚙️ Admin Panel** | Comprehensive content management system |
+| **📈 Analytics** | Data insights, trends, and reporting tools |
 
 ## Installation
 
@@ -37,14 +48,29 @@ npm run dev
 npm run build
 ```
 
-## Tech Stack
+## 🛠️ Technology Stack
 
-- **Frontend**: React 18, TypeScript, Vite
-- **UI**: Tailwind CSS, Radix UI, Shadcn/ui
-- **Maps**: Leaflet, React Leaflet
-- **Backend**: Supabase (PostgreSQL, Auth, Real-time)
-- **Deployment**: Netlify
-- **Performance**: 98/100 PageSpeed Score
+### Frontend
+- **React 18** - Modern UI framework with hooks and concurrent features
+- **TypeScript** - Type-safe development and better code quality
+- **Vite** - Fast build tool and development server
+- **Tailwind CSS** - Utility-first CSS framework for rapid styling
+
+### UI Components
+- **Radix UI** - Accessible, unstyled UI primitives
+- **Shadcn/ui** - Beautiful, customizable component library
+- **React Leaflet** - Interactive maps and geospatial visualization
+
+### Backend & Database
+- **Supabase** - Backend-as-a-Service platform
+- **PostgreSQL** - Robust relational database
+- **Row Level Security** - Data protection and access control
+- **Real-time Subscriptions** - Live data synchronization
+
+### Deployment & Performance
+- **Netlify** - Static site hosting and CDN
+- **98/100 PageSpeed Score** - Optimized for performance
+- **Core Web Vitals** - All metrics in green
 
 ## Performance Metrics
 
