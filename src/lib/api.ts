@@ -143,9 +143,9 @@ export async function submitCase(caseData: SubmitCaseData): Promise<string> {
         justice_served: caseData.justiceServed,
         officer_names: caseData.officerNames || [],
         witnesses: caseData.witnesses || [],
-        reporter_name: caseData.reporterName || null,
+        reporter_name: null, // Always null since we don't collect names
         reporter_contact: caseData.reporterContact || null,
-        is_anonymous: caseData.isAnonymous || false,
+        is_anonymous: true, // Always true since we don't collect names
         wants_updates: caseData.wantsUpdates || false,
         status: 'pending'
       })

@@ -65,7 +65,6 @@ export interface SubmitCaseData {
   witnesses?: string[];
   photos?: File[];
   videoLinks?: string[];
-  reporterName?: string;
   reporterContact?: string;
   isAnonymous?: boolean;
   wantsUpdates?: boolean;

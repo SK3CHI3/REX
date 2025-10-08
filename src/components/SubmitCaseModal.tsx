@@ -52,7 +52,7 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation - name and contact are only required if not anonymous
+    // Basic validation - only require essential case information
     if (!formData.victimName || !formData.date || !selectedLocation ||
         !formData.type || !formData.description) {
       toast({
@@ -63,23 +63,11 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
       return;
     }
 
-    // If not anonymous, require reporter name and contact
-    if (!formData.isAnonymous) {
-      if (!formData.reporterName || !formData.reporterContact) {
-        toast({
-          title: "Reporter Information Required",
-          description: "Please provide your name and contact information, or choose to report anonymously.",
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-
-    // If wants updates but is anonymous, require contact info
-    if (formData.isAnonymous && formData.wantsUpdates && !formData.reporterContact) {
+    // If wants updates, require contact info
+    if (formData.wantsUpdates && !formData.reporterContact) {
       toast({
         title: "Contact Information Required",
-        description: "To receive updates, please provide your contact information even when reporting anonymously.",
+        description: "To receive updates, please provide your contact information.",
         variant: "destructive",
       });
       return;
@@ -93,6 +81,8 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
         county: selectedLocation.county,
         latitude: selectedLocation.latitude,
         longitude: selectedLocation.longitude,
+        // Always set as anonymous since we don't collect names
+        isAnonymous: true,
       };
 
       await submitCaseMutation.mutateAsync(submitData);
@@ -624,83 +614,44 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
             {/* Reporter Information */}
             <div className="space-y-4">
               <h3 className="font-medium text-sm uppercase tracking-wide text-muted-foreground">
-                Your Information
+                Contact Information (Optional)
               </h3>
               
-              {/* Anonymous Reporting Option */}
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isAnonymous"
-                  checked={formData.isAnonymous || false}
-                  onCheckedChange={(checked) => setFormData({ ...formData, isAnonymous: !!checked })}
-                />
-                <Label htmlFor="isAnonymous" className="text-sm font-medium">
-                  Report anonymously
-                </Label>
-              </div>
-              
-              <p className="text-xs text-muted-foreground">
-                You can choose to report anonymously. If you want to receive updates about your case, 
-                you'll need to provide contact information.
+              <p className="text-sm text-muted-foreground">
+                All reports are anonymous by default. You can optionally provide contact information 
+                if you want to receive updates about this case.
               </p>
 
-              {/* Conditional Fields */}
-              {!formData.isAnonymous && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="reporterName">Your Name *</Label>
-                    <Input
-                      id="reporterName"
-                      value={formData.reporterName || ''}
-                      onChange={(e) => setFormData({ ...formData, reporterName: e.target.value })}
-                      placeholder="Your full name"
-                      required
-                    />
-                  </div>
+              {/* Updates Option */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="wantsUpdates"
+                    checked={formData.wantsUpdates || false}
+                    onCheckedChange={(checked) => setFormData({ ...formData, wantsUpdates: !!checked })}
+                  />
+                  <Label htmlFor="wantsUpdates" className="text-sm font-medium">
+                    I want to receive updates about this case
+                  </Label>
+                </div>
+                
+                {formData.wantsUpdates && (
                   <div>
                     <Label htmlFor="reporterContact">Contact (Phone/Email) *</Label>
                     <Input
                       id="reporterContact"
                       value={formData.reporterContact || ''}
                       onChange={(e) => setFormData({ ...formData, reporterContact: e.target.value })}
-                      placeholder="Phone number or email"
+                      placeholder="Phone number or email for updates"
                       required
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Your contact information will be kept confidential and only used for case updates. 
+                      Your name will never be collected or displayed.
+                    </p>
                   </div>
-                </div>
-              )}
-
-              {/* Anonymous with Updates Option */}
-              {formData.isAnonymous && (
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="wantsUpdates"
-                      checked={formData.wantsUpdates || false}
-                      onCheckedChange={(checked) => setFormData({ ...formData, wantsUpdates: !!checked })}
-                    />
-                    <Label htmlFor="wantsUpdates" className="text-sm font-medium">
-                      I want to receive updates about this case
-                    </Label>
-                  </div>
-                  
-                  {formData.wantsUpdates && (
-                    <div>
-                      <Label htmlFor="reporterContact">Contact (Phone/Email) *</Label>
-                      <Input
-                        id="reporterContact"
-                        value={formData.reporterContact || ''}
-                        onChange={(e) => setFormData({ ...formData, reporterContact: e.target.value })}
-                        placeholder="Phone number or email for updates"
-                        required
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Your contact information will be kept confidential and only used for case updates.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
