@@ -34,16 +34,16 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
       <Card className="w-full max-w-2xl max-h-[96vh] sm:max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-4 duration-300 sm:slide-in-from-bottom-0 sm:fade-in">
-        {/* Header - more compact */}
-        <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 p-3 sm:p-4 flex items-center justify-between z-10">
-          <div className="flex items-center space-x-3 min-w-0 flex-1">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
+        {/* Header - minimal mobile design */}
+        <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-3 py-2 sm:px-4 sm:py-3 flex items-center justify-between z-10">
+          <div className="flex items-center space-x-2 min-w-0 flex-1">
+            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <User className="w-3 h-3 sm:w-4 sm:h-4 text-red-600" />
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{caseData.victimName}</h2>
+              <h2 className="text-sm sm:text-base font-semibold text-gray-900 truncate">{caseData.victimName}</h2>
               {caseData.age && (
-                <span className="text-xs sm:text-sm text-gray-500">Age {caseData.age}</span>
+                <span className="text-xs text-gray-500">Age {caseData.age}</span>
               )}
             </div>
           </div>
@@ -51,9 +51,9 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
             variant="ghost" 
             size="sm" 
             onClick={onClose}
-            className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 p-0 rounded-full hover:bg-gray-100"
+            className="flex-shrink-0 h-7 w-7 sm:h-8 sm:w-8 p-0 rounded-full hover:bg-gray-100"
           >
-            <X className="w-4 h-4 sm:w-5 sm:h-5" />
+            <X className="w-3 h-3 sm:w-4 sm:h-4" />
           </Button>
         </div>
 
