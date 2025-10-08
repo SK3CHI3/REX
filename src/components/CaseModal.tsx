@@ -32,18 +32,18 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <Card className="w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-4 duration-300 sm:slide-in-from-bottom-0 sm:fade-in">
-        {/* Header - sticky */}
-        <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 p-4 flex items-center justify-between z-10">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4">
+      <Card className="w-full max-w-2xl max-h-[96vh] sm:max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-4 duration-300 sm:slide-in-from-bottom-0 sm:fade-in">
+        {/* Header - more compact */}
+        <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 p-3 sm:p-4 flex items-center justify-between z-10">
           <div className="flex items-center space-x-3 min-w-0 flex-1">
-            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="w-5 h-5 text-red-600" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <User className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-lg font-semibold text-gray-900 truncate">{caseData.victimName}</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{caseData.victimName}</h2>
               {caseData.age && (
-                <span className="text-sm text-gray-500">Age {caseData.age}</span>
+                <span className="text-xs sm:text-sm text-gray-500">Age {caseData.age}</span>
               )}
             </div>
           </div>
@@ -51,14 +51,14 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
             variant="ghost" 
             size="sm" 
             onClick={onClose}
-            className="flex-shrink-0 h-10 w-10 p-0 rounded-full hover:bg-gray-100"
+            className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 p-0 rounded-full hover:bg-gray-100"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
         </div>
 
         {/* Content - scrollable */}
-        <CardContent className="p-4 space-y-6 overflow-y-auto">
+        <CardContent className="p-3 sm:p-4 space-y-4 sm:space-y-6 overflow-y-auto">
           {/* Status badges */}
           <div className="flex flex-wrap gap-2">
             <Badge className={getStatusColor(caseData.status)}>
@@ -69,17 +69,17 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
             </Badge>
           </div>
 
-          {/* Quick info grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+          {/* Quick info grid - better mobile layout */}
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center space-x-3">
-              <Calendar className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Date</p>
                 <p className="text-sm font-medium text-gray-900">{new Date(caseData.date).toLocaleDateString()}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <MapPin className="w-5 h-5 text-gray-400 flex-shrink-0" />
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide">Location</p>
                 <p className="text-sm font-medium text-gray-900">{caseData.location}, {caseData.county}</p>
@@ -88,9 +88,9 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
           </div>
 
           {/* Description */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
-            <h3 className="font-semibold mb-3 flex items-center space-x-2 text-gray-900">
-              <AlertTriangle className="w-5 h-5 text-amber-500" />
+          <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4">
+            <h3 className="font-semibold mb-2 sm:mb-3 flex items-center space-x-2 text-gray-900">
+              <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
               <span>Incident Description</span>
             </h3>
             <p className="text-sm text-gray-700 leading-relaxed">
@@ -100,19 +100,19 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
 
           {/* Evidence section */}
           {((caseData.photos && caseData.photos.length > 0) || (caseData.videoLinks && caseData.videoLinks.length > 0)) && (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <h3 className="font-semibold text-gray-900">Evidence</h3>
               
               {caseData.photos && caseData.photos.length > 0 && (
                 <div>
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Photos ({caseData.photos.length})</h4>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                     {caseData.photos.map((photo, index) => (
                       <img
                         key={index}
                         src={photo}
                         alt={`Evidence ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform cursor-pointer"
+                        className="w-full h-20 sm:h-24 object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform cursor-pointer"
                       />
                     ))}
                   </div>
@@ -129,7 +129,7 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block text-sm text-red-600 hover:text-red-700 hover:underline bg-red-50 p-3 rounded-lg border border-red-200"
+                        className="block text-sm text-red-600 hover:text-red-700 hover:underline bg-red-50 p-2 sm:p-3 rounded-lg border border-red-200"
                       >
                         📹 Video Evidence {index + 1}
                       </a>
@@ -141,8 +141,8 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
           )}
 
           {/* Metadata */}
-          <div className="border-t border-gray-200 pt-4 space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+          <div className="border-t border-gray-200 pt-3 sm:pt-4 space-y-2 sm:space-y-3">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 text-sm">
               <div>
                 <span className="text-gray-500">Source:</span>
                 <span className="ml-2 font-medium text-gray-900">{caseData.source}</span>
