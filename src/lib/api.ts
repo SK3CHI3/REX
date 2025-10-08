@@ -143,8 +143,10 @@ export async function submitCase(caseData: SubmitCaseData): Promise<string> {
         justice_served: caseData.justiceServed,
         officer_names: caseData.officerNames || [],
         witnesses: caseData.witnesses || [],
-        reporter_name: caseData.reporterName,
-        reporter_contact: caseData.reporterContact,
+        reporter_name: caseData.reporterName || null,
+        reporter_contact: caseData.reporterContact || null,
+        is_anonymous: caseData.isAnonymous || false,
+        wants_updates: caseData.wantsUpdates || false,
         status: 'pending'
       })
       .select('id')

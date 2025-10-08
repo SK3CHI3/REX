@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { X, Upload, Plus, Trash2, Loader2, MapPin, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { X, Upload, Plus, Trash2, Loader2, MapPin, Calendar as CalendarIcon, Clock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -51,12 +52,34 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Basic validation
+    // Basic validation - name and contact are only required if not anonymous
     if (!formData.victimName || !formData.date || !selectedLocation ||
-        !formData.type || !formData.description || !formData.reporterName || !formData.reporterContact) {
+        !formData.type || !formData.description) {
       toast({
         title: "Incomplete Information",
         description: "Please fill in all required fields including location.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // If not anonymous, require reporter name and contact
+    if (!formData.isAnonymous) {
+      if (!formData.reporterName || !formData.reporterContact) {
+        toast({
+          title: "Reporter Information Required",
+          description: "Please provide your name and contact information, or choose to report anonymously.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // If wants updates but is anonymous, require contact info
+    if (formData.isAnonymous && formData.wantsUpdates && !formData.reporterContact) {
+      toast({
+        title: "Contact Information Required",
+        description: "To receive updates, please provide your contact information even when reporting anonymously.",
         variant: "destructive",
       });
       return;
@@ -604,28 +627,80 @@ const SubmitCaseModal = ({ onClose }: SubmitCaseModalProps) => {
                 Your Information
               </h3>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="reporterName">Your Name *</Label>
-                  <Input
-                    id="reporterName"
-                    value={formData.reporterName || ''}
-                    onChange={(e) => setFormData({ ...formData, reporterName: e.target.value })}
-                    placeholder="Your full name"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="reporterContact">Contact (Phone/Email) *</Label>
-                  <Input
-                    id="reporterContact"
-                    value={formData.reporterContact || ''}
-                    onChange={(e) => setFormData({ ...formData, reporterContact: e.target.value })}
-                    placeholder="Phone number or email"
-                    required
-                  />
-                </div>
+              {/* Anonymous Reporting Option */}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="isAnonymous"
+                  checked={formData.isAnonymous || false}
+                  onCheckedChange={(checked) => setFormData({ ...formData, isAnonymous: !!checked })}
+                />
+                <Label htmlFor="isAnonymous" className="text-sm font-medium">
+                  Report anonymously
+                </Label>
               </div>
+              
+              <p className="text-xs text-muted-foreground">
+                You can choose to report anonymously. If you want to receive updates about your case, 
+                you'll need to provide contact information.
+              </p>
+
+              {/* Conditional Fields */}
+              {!formData.isAnonymous && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="reporterName">Your Name *</Label>
+                    <Input
+                      id="reporterName"
+                      value={formData.reporterName || ''}
+                      onChange={(e) => setFormData({ ...formData, reporterName: e.target.value })}
+                      placeholder="Your full name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="reporterContact">Contact (Phone/Email) *</Label>
+                    <Input
+                      id="reporterContact"
+                      value={formData.reporterContact || ''}
+                      onChange={(e) => setFormData({ ...formData, reporterContact: e.target.value })}
+                      placeholder="Phone number or email"
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Anonymous with Updates Option */}
+              {formData.isAnonymous && (
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="wantsUpdates"
+                      checked={formData.wantsUpdates || false}
+                      onCheckedChange={(checked) => setFormData({ ...formData, wantsUpdates: !!checked })}
+                    />
+                    <Label htmlFor="wantsUpdates" className="text-sm font-medium">
+                      I want to receive updates about this case
+                    </Label>
+                  </div>
+                  
+                  {formData.wantsUpdates && (
+                    <div>
+                      <Label htmlFor="reporterContact">Contact (Phone/Email) *</Label>
+                      <Input
+                        id="reporterContact"
+                        value={formData.reporterContact || ''}
+                        onChange={(e) => setFormData({ ...formData, reporterContact: e.target.value })}
+                        placeholder="Phone number or email for updates"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Your contact information will be kept confidential and only used for case updates.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4">

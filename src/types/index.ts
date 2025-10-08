@@ -65,8 +65,10 @@ export interface SubmitCaseData {
   witnesses?: string[];
   photos?: File[];
   videoLinks?: string[];
-  reporterName: string;
-  reporterContact: string;
+  reporterName?: string;
+  reporterContact?: string;
+  isAnonymous?: boolean;
+  wantsUpdates?: boolean;
   // Temporary fields for form state
   newOfficerName?: string;
   newWitnessName?: string;
