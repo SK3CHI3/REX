@@ -19,12 +19,13 @@ const __dirname = path.dirname(__filename);
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Error: Supabase credentials not found in environment variables');
-  process.exit(1);
-}
+let supabase = null;
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseKey) {
+  console.warn('⚠️  Warning: Supabase credentials not found. Generating sitemap with static pages only.');
+} else {
+  supabase = createClient(supabaseUrl, supabaseKey);
+}
 
 const BASE_URL = 'https://rextracker.online';
 
@@ -40,6 +41,11 @@ const staticPages = [
  * Fetch all approved case IDs from Supabase
  */
 async function fetchCases() {
+  if (!supabase) {
+    console.log('ℹ️  Skipping case fetch - no Supabase connection');
+    return [];
+  }
+  
   try {
     const { data, error } = await supabase
       .from('cases')
