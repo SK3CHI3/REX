@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run generate:sitemap && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
+    "generate:sitemap": "node scripts/generate-sitemap.js",
     "scraper:start": "node scripts/start-scraper.js start",
     "scraper:stop": "node scripts/start-scraper.js stop",
     "scraper:status": "node scripts/start-scraper.js status",
