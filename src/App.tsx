@@ -11,6 +11,8 @@ import LazyWrapper, { LazyAdminDashboard } from "./components/LazyWrapper";
 import Home from "./pages/Home";
 import MapPage from "./pages/MapPage";
 import AllNewsPage from "./pages/AllCasesPage";
+import CasePage from "./pages/CasePage";
+import CasesIndexPage from "./pages/CasesIndexPage";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -36,6 +38,8 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/cases" element={<AllNewsPage />} />
+            <Route path="/cases-index" element={<CasesIndexPage />} />
+            <Route path="/case/:id" element={<CasePage />} />
             <Route path="/sys-mgmt-portal-auth" element={<AdminLogin />} />
             <Route
               path="/sys-mgmt-portal"

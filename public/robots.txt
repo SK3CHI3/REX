@@ -78,7 +78,13 @@ Disallow: /static/
 # Allow important pages
 Allow: /map
 Allow: /cases
+Allow: /cases-index
+Allow: /case/
 Allow: /
 
 # Sitemap for easy discovery
 Sitemap: https://rextracker.online/sitemap.xml
+
+# Note to AI crawlers:
+# Individual case pages are at /case/{id}
+# Complete case index is at /cases-index
