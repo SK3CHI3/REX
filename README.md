@@ -28,7 +28,7 @@ REX Kenya is a comprehensive platform that enables citizens to report, track, an
 | **🔍 Advanced Search** | Filter by county, case type, date, and severity |
 | **📱 Mobile Optimized** | Full functionality on all devices and screen sizes |
 | **🔒 Secure Reporting** | Anonymous incident submission with verification |
-| **⚙️ Admin Panel** | Comprehensive content management system |
+| **⚙️ Management System** | Comprehensive content management system |
 | **📈 Analytics** | Data insights, trends, and reporting tools |
 
 ## Installation

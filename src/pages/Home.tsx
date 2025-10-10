@@ -153,7 +153,7 @@ const Home = () => {
     // Check for double tap
     if (tapCount + 1 >= 2) {
       setTapCount(0);
-      navigate('/admin/login');
+      navigate('/sys-mgmt-portal-auth');
     }
   };
 

@@ -56,7 +56,7 @@ REX Kenya/
 - **SEO Optimized** - 98/100 Lighthouse score
 - **Mobile Responsive** - Works on all devices
 - **Real-time Updates** - Live data synchronization
-- **Admin Dashboard** - Content management system
+- **Management Dashboard** - Content management system
 
 ## 🛠️ Tech Stack
 

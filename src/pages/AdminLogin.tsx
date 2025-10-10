@@ -31,7 +31,7 @@ const AdminLogin = () => {
       
       if (success) {
         toast.success('Login successful!');
-        navigate('/admin');
+        navigate('/sys-mgmt-portal');
       } else {
         toast.error('Invalid username or password');
       }

@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Security - Do not commit sensitive docs
+docs/SECURITY.md
+.env
+.env.local
+.env.production

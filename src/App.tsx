@@ -36,9 +36,9 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/cases" element={<AllNewsPage />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/sys-mgmt-portal-auth" element={<AdminLogin />} />
             <Route
-              path="/admin"
+              path="/sys-mgmt-portal"
               element={
                 <ProtectedRoute>
                   <LazyWrapper>
