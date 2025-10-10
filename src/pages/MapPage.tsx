@@ -3,7 +3,7 @@ import MapView from '@/components/MapView';
 import Header from '@/components/Header';
 import SubmitCaseModal from '@/components/SubmitCaseModal';
 import DataSidebar from '@/components/DataSidebar';
-import IncidentDetailModal from '@/components/IncidentDetailModal';
+import CaseModal from '@/components/CaseModal';
 import SEOHead from '@/components/SEOHead';
 import StructuredData from '@/components/StructuredData';
 
@@ -118,11 +118,12 @@ const MapPage = () => {
 
 
         {/* Detail Modal */}
-        <IncidentDetailModal
-          isOpen={!!selectedCase}
-          incident={selectedCase}
-          onClose={() => setSelectedCase(null)}
-        />
+        {selectedCase && (
+          <CaseModal
+            case={selectedCase}
+            onClose={() => setSelectedCase(null)}
+          />
+        )}
 
         {isSubmitModalOpen && (
           <SubmitCaseModal

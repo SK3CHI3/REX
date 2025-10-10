@@ -159,26 +159,100 @@ async function performRealScraping(source: any, apiKey: string, supabaseClient: 
   let incidentsExtracted = 0
   const urlsProcessed: string[] = []
 
-  // Kenya-specific police brutality search queries (limited for manual runs)
-  const allQueries = [
-    `site:${source.base_url.replace('https://', '').replace('http://', '')} police brutality Kenya`,
-    `site:${source.base_url.replace('https://', '').replace('http://', '')} police violence Kenya victim`,
-    `site:${source.base_url.replace('https://', '').replace('http://', '')} extrajudicial killing Kenya`,
-    `site:${source.base_url.replace('https://', '').replace('http://', '')} police shooting Kenya`,
-    `site:${source.base_url.replace('https://', '').replace('http://', '')} unlawful arrest Kenya`,
-    `site:${source.base_url.replace('https://', '').replace('http://', '')} IPOA investigation`,
-    `site:${source.base_url.replace('https://', '').replace('http://', '')} human rights violation police`
+  // First, collect URLs directly from configured pages (category_urls/search_urls)
+  try {
+    const discovered = await collectUrlsFromSource(source, apiKey)
+    for (const url of discovered) {
+      if (!url || urlsProcessed.includes(url)) continue
+
+      try {
+        // Skip if we already have this article
+        const { data: existingArticle } = await supabaseClient
+          .from('scraped_articles')
+          .select('id')
+          .eq('url', url)
+          .single()
+        if (existingArticle) {
+          continue
+        }
+
+        const incident = await scrapeAndExtractIncident(url, apiKey)
+
+        if (incident) {
+          const { error: articleError } = await supabaseClient
+            .from('scraped_articles')
+            .insert({
+              job_id: jobId,
+              source_id: source.id,
+              url,
+              title: incident.article_title,
+              content: incident.description,
+              published_date: incident.published_date,
+              processed: true,
+              extracted_data: incident,
+              incidents_extracted: 1
+            })
+
+          if (!articleError) {
+            articlesFound++
+            urlsProcessed.push(url)
+            if (incident.victim_name && incident.case_type && incident.location) {
+              await storeIncidentForReview(supabaseClient, incident, jobId)
+              incidentsExtracted++
+            }
+          }
+        } else {
+          await supabaseClient
+            .from('scraped_articles')
+            .insert({
+              job_id: jobId,
+              source_id: source.id,
+              url,
+              title: 'Unknown Title',
+              processed: true,
+              incidents_extracted: 0
+            })
+          articlesFound++
+          urlsProcessed.push(url)
+        }
+      } catch (e) {
+        console.error('Error processing discovered URL', url, e)
+      }
+    }
+  } catch (e) {
+    console.error('Error collecting URLs from source pages:', e)
+  }
+
+  // Build site-scoped queries from source keywords with sensible defaults
+  const host = (() => {
+    try { return new URL(source.base_url).host } catch { return source.base_url?.replace('https://','').replace('http://','') }
+  })()
+
+  const defaultKeywords = [
+    'police brutality',
+    'police violence',
+    'extrajudicial killing',
+    'police shooting',
+    'unlawful arrest',
+    'IPOA investigation',
+    'human rights violation police'
   ]
 
-  // Use only first 3 queries for manual runs to avoid timeout
-  const searchQueries = allQueries.slice(0, 3)
+  const sourceKeywords: string[] = Array.isArray(source.search_keywords) && source.search_keywords.length > 0
+    ? source.search_keywords
+    : defaultKeywords
+
+  const allQueries: string[] = sourceKeywords.map((kw: string) => host ? `site:${host} ${kw} Kenya` : `${kw} Kenya`)
+
+  // Use only first 4 queries for manual runs to avoid timeout
+  const searchQueries = allQueries.slice(0, 4)
 
   for (const query of searchQueries) {
     try {
       console.log(`🔍 Searching: ${query}`)
 
       // Use Firecrawl search to find relevant articles
-      const searchResponse = await fetch('https://api.firecrawl.dev/v0/search', {
+      const searchResponse = await fetchWithRetry('https://api.firecrawl.dev/v0/search', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
@@ -186,15 +260,40 @@ async function performRealScraping(source: any, apiKey: string, supabaseClient: 
         },
         body: JSON.stringify({
           query: query,
-          limit: 3, // Reduced limit for faster processing
+          limit: 5,
           country: 'KE'
         }),
-        signal: AbortSignal.timeout(15000) // 15 second timeout
+        signal: AbortSignal.timeout(15000)
       })
 
       if (!searchResponse.ok) {
         console.error(`Search failed for query "${query}": ${searchResponse.status}`)
+        // Retry without country scoping as a fallback
+        try {
+          const fallbackResp = await fetchWithRetry('https://api.firecrawl.dev/v0/search', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query: query, limit: 5 }),
+            signal: AbortSignal.timeout(15000)
+          })
+          if (!fallbackResp.ok) {
+            console.error(`Fallback search also failed for "${query}": ${fallbackResp.status}`)
+            continue
+          }
+          const fallbackData = await fallbackResp.json()
+          if (!fallbackData.success || !fallbackData.data) {
+            console.log(`No results for query (fallback): ${query}`)
+            continue
+          }
+          await processSearchResults(fallbackData, source, apiKey, supabaseClient, jobId, urlsProcessed, () => { articlesFound++ }, () => { incidentsExtracted++ })
+          continue
+        } catch (e) {
+          console.error('Fallback search error:', e)
         continue
+        }
       }
 
       const searchData = await searchResponse.json()
@@ -204,80 +303,7 @@ async function performRealScraping(source: any, apiKey: string, supabaseClient: 
         continue
       }
 
-      // Process each found URL
-      for (const result of searchData.data) {
-        if (!result.url || urlsProcessed.includes(result.url)) {
-          continue // Skip duplicates
-        }
-
-        try {
-          console.log(`📄 Processing article: ${result.url}`)
-
-          // Check if we already have this article
-          const { data: existingArticle } = await supabaseClient
-            .from('scraped_articles')
-            .select('id')
-            .eq('url', result.url)
-            .single()
-
-          if (existingArticle) {
-            console.log(`⏭️ Article already exists: ${result.url}`)
-            continue
-          }
-
-          // Scrape and extract incident data
-          const incident = await scrapeAndExtractIncident(result.url, apiKey)
-
-          if (incident) {
-            // Store the article
-            const { data: article, error: articleError } = await supabaseClient
-              .from('scraped_articles')
-              .insert({
-                job_id: jobId,
-                source_id: source.id,
-                url: result.url,
-                title: incident.article_title,
-                content: incident.description,
-                published_date: incident.published_date,
-                processed: true,
-                extracted_data: incident,
-                incidents_extracted: 1
-              })
-              .select()
-              .single()
-
-            if (!articleError) {
-              articlesFound++
-              urlsProcessed.push(result.url)
-
-              // If this looks like a real incident with a victim, store it for review
-              if (incident.victim_name && incident.case_type && incident.location) {
-                await storeIncidentForReview(supabaseClient, incident, jobId)
-                incidentsExtracted++
-                console.log(`✅ Extracted incident: ${incident.victim_name} in ${incident.location}`)
-              }
-            }
-          } else {
-            // Store article even if no incident found
-            await supabaseClient
-              .from('scraped_articles')
-              .insert({
-                job_id: jobId,
-                source_id: source.id,
-                url: result.url,
-                title: result.title || 'Unknown Title',
-                processed: true,
-                incidents_extracted: 0
-              })
-
-            articlesFound++
-            urlsProcessed.push(result.url)
-          }
-
-        } catch (error) {
-          console.error(`Error processing URL ${result.url}:`, error)
-        }
-      }
+      await processSearchResults(searchData, source, apiKey, supabaseClient, jobId, urlsProcessed, () => { articlesFound++ }, () => { incidentsExtracted++ })
 
     } catch (error) {
       console.error(`Error with search query "${query}":`, error)
@@ -294,13 +320,58 @@ async function performRealScraping(source: any, apiKey: string, supabaseClient: 
 }
 
 /**
+ * Discover URLs from a source's configured pages using Firecrawl map
+ */
+async function collectUrlsFromSource(source: any, apiKey: string): Promise<string[]> {
+  const found: Set<string> = new Set()
+  const pages: string[] = []
+  if (Array.isArray(source.category_urls)) pages.push(...source.category_urls)
+  if (Array.isArray(source.search_urls)) pages.push(...source.search_urls)
+
+  const host = (() => {
+    try { return new URL(source.base_url).host } catch { return '' }
+  })()
+
+  for (const pageUrl of pages) {
+    try {
+      // Prefer mapping a page to collect internal links
+      const mapResp = await fetchWithRetry('https://api.firecrawl.dev/v0/map', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: pageUrl, limit: 20 })
+      })
+
+      if (mapResp.ok) {
+        const mapData = await mapResp.json()
+        const urls: string[] = Array.isArray(mapData?.data) ? mapData.data : []
+        urls
+          .filter(u => typeof u === 'string' && u)
+          .filter(u => !host || u.includes(host))
+          .slice(0, 20)
+          .forEach(u => found.add(u))
+      } else {
+        // If map fails, try scraping the page itself (may still be an article)
+        found.add(pageUrl)
+      }
+    } catch (e) {
+      console.error('Map request failed for', pageUrl, e)
+    }
+  }
+
+  return Array.from(found).slice(0, 30)
+}
+
+/**
  * Scrape an article and extract incident data using Firecrawl
  */
 async function scrapeAndExtractIncident(url: string, apiKey: string) {
   try {
     console.log(`🔍 Extracting incident data from: ${url}`)
 
-    const response = await fetch('https://api.firecrawl.dev/v0/scrape', {
+    const response = await fetchWithRetry('https://api.firecrawl.dev/v0/scrape', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -419,6 +490,102 @@ async function scrapeAndExtractIncident(url: string, apiKey: string) {
   } catch (error) {
     console.error(`Error extracting incident from ${url}:`, error)
     return null
+  }
+}
+
+/**
+ * Minimal retry helper with exponential backoff
+ */
+async function fetchWithRetry(input: RequestInfo | URL, init: RequestInit, attempts = 3): Promise<Response> {
+  let lastError: any
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(input, init)
+      if (res.ok) return res
+      lastError = new Error(`HTTP ${res.status}`)
+    } catch (e) {
+      lastError = e
+    }
+    const backoffMs = 500 * Math.pow(2, i)
+    await new Promise(r => setTimeout(r, backoffMs))
+  }
+  throw lastError
+}
+
+/**
+ * Process search results and persist articles/incidents
+ */
+async function processSearchResults(searchData: any, source: any, apiKey: string, supabaseClient: any, jobId: string, urlsProcessed: string[], incArticles: () => void, incIncidents: () => void) {
+  for (const result of searchData.data) {
+    if (!result.url || urlsProcessed.includes(result.url)) {
+      continue // Skip duplicates
+    }
+
+    try {
+      console.log(`📄 Processing article: ${result.url}`)
+
+      // Check if we already have this article
+      const { data: existingArticle } = await supabaseClient
+        .from('scraped_articles')
+        .select('id')
+        .eq('url', result.url)
+        .single()
+
+      if (existingArticle) {
+        console.log(`⏭️ Article already exists: ${result.url}`)
+        continue
+      }
+
+      // Scrape and extract incident data
+      const incident = await scrapeAndExtractIncident(result.url, apiKey)
+
+      if (incident) {
+        // Store the article
+        const { error: articleError } = await supabaseClient
+          .from('scraped_articles')
+          .insert({
+            job_id: jobId,
+            source_id: source.id,
+            url: result.url,
+            title: incident.article_title,
+            content: incident.description,
+            published_date: incident.published_date,
+            processed: true,
+            extracted_data: incident,
+            incidents_extracted: 1
+          })
+
+        if (!articleError) {
+          incArticles()
+          urlsProcessed.push(result.url)
+
+          // If this looks like a real incident with a victim, store it for review
+          if (incident.victim_name && incident.case_type && incident.location) {
+            await storeIncidentForReview(supabaseClient, incident, jobId)
+            incIncidents()
+            console.log(`✅ Extracted incident: ${incident.victim_name} in ${incident.location}`)
+          }
+        }
+      } else {
+        // Store article even if no incident found
+        await supabaseClient
+          .from('scraped_articles')
+          .insert({
+            job_id: jobId,
+            source_id: source.id,
+            url: result.url,
+            title: result.title || 'Unknown Title',
+            processed: true,
+            incidents_extracted: 0
+          })
+
+        incArticles()
+        urlsProcessed.push(result.url)
+      }
+
+    } catch (error) {
+      console.error(`Error processing URL ${result.url}:`, error)
+    }
   }
 }
 

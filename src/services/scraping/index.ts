@@ -117,34 +117,62 @@ class ScrapingOrchestrator {
     const allUrls: Set<string> = new Set();
 
     try {
-      // Search for relevant articles using search URLs
-      for (const searchUrl of source.search_urls) {
+      const host = (() => {
+        try { return new URL(source.base_url).host; } catch { return ''; }
+      })();
+
+      const keywords: string[] = (source as any).search_keywords && Array.isArray((source as any).search_keywords)
+        ? (source as any).search_keywords
+        : [
+            'police brutality', 'police violence', 'extrajudicial killing',
+            'unlawful arrest', 'police harassment', 'human rights violation'
+          ];
+
+      // Site-scoped keyword search
+      for (const keyword of keywords) {
         try {
-          const searchResults = await firecrawlService.searchIncidents(
-            'police brutality Kenya OR police violence Kenya OR extrajudicial killing Kenya',
-            20
-          );
+          const query = host ? `site:${host} ${keyword} Kenya` : `${keyword} Kenya`;
+          const searchResults = await firecrawlService.searchIncidents(query, 10);
           searchResults.forEach(url => allUrls.add(url));
         } catch (error) {
-          console.error(`Error searching with URL ${searchUrl}:`, error);
+          console.error(`Error searching with keyword "${keyword}":`, error);
         }
       }
 
-      // Crawl category pages for additional articles
-      for (const categoryUrl of source.category_urls) {
+      // Crawl known category/search pages for additional discovery
+      for (const categoryUrl of source.category_urls || []) {
         try {
-          const crawlResults = await firecrawlService.crawlNewsSource(categoryUrl, [
-            'police brutality', 'police violence', 'extrajudicial killing',
-            'unlawful arrest', 'police harassment', 'human rights violation'
-          ]);
+          const crawlResults = await firecrawlService.crawlNewsSource(categoryUrl, keywords);
           crawlResults.forEach(url => allUrls.add(url));
         } catch (error) {
           console.error(`Error crawling category ${categoryUrl}:`, error);
         }
       }
 
+      for (const searchUrl of (source as any).search_urls || []) {
+        try {
+          const crawlResults = await firecrawlService.crawlNewsSource(searchUrl, keywords);
+          crawlResults.forEach(url => allUrls.add(url));
+        } catch (error) {
+          console.error(`Error crawling search URL ${searchUrl}:`, error);
+        }
+      }
+
+      // Fallback: broad query if nothing found yet
+      if (allUrls.size === 0 && host) {
+        try {
+          const fallbackQuery = `site:${host} (police brutality OR extrajudicial OR unlawful arrest) Kenya`;
+          const fallbackResults = await firecrawlService.searchIncidents(fallbackQuery, 10);
+          fallbackResults.forEach(url => allUrls.add(url));
+        } catch (error) {
+          console.error('Error running fallback search:', error);
+        }
+      }
+
       // Filter out URLs we've already processed
       const urlsArray = Array.from(allUrls);
+      if (urlsArray.length === 0) return [];
+
       const { data: existingArticles } = await supabase
         .from('scraped_articles')
         .select('url')
@@ -153,7 +181,7 @@ class ScrapingOrchestrator {
       const existingUrls = new Set(existingArticles?.map(a => a.url) || []);
       const newUrls = urlsArray.filter(url => !existingUrls.has(url));
 
-      return newUrls.slice(0, 50); // Limit to 50 URLs per job
+      return newUrls.slice(0, 30);
     } catch (error) {
       console.error('Error collecting URLs to scrape:', error);
       return [];
@@ -380,7 +408,8 @@ class ScrapingOrchestrator {
     const now = new Date();
     const hoursSinceLastScrape = (now.getTime() - lastScraped.getTime()) / (1000 * 60 * 60);
 
-    return hoursSinceLastScrape >= source.scraping_interval_hours;
+    const interval = (source as any).scraping_interval_hours ?? 6;
+    return hoursSinceLastScrape >= interval;
   }
 
   /**
