@@ -1,15 +1,77 @@
+# AI-Friendly Robots.txt Configuration
+# Allow AI search engines and chatbots to index our content
+
+# OpenAI ChatGPT
+User-agent: GPTBot
+Allow: /
+Allow: /map
+Allow: /cases
+Disallow: /sys-mgmt-portal
+Disallow: /sys-mgmt-portal-auth
+
+# OpenAI ChatGPT Browsing
+User-agent: ChatGPT-User
+Allow: /
+Allow: /map
+Allow: /cases
+Disallow: /sys-mgmt-portal
+Disallow: /sys-mgmt-portal-auth
+
+# Anthropic Claude
+User-agent: anthropic-ai
+Allow: /
+Allow: /map
+Allow: /cases
+Disallow: /sys-mgmt-portal
+Disallow: /sys-mgmt-portal-auth
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /map
+Allow: /cases
+Disallow: /sys-mgmt-portal
+Disallow: /sys-mgmt-portal-auth
+
+# Google AI (Bard/Gemini)
+User-agent: Google-Extended
+Allow: /
+Allow: /map
+Allow: /cases
+Disallow: /sys-mgmt-portal
+Disallow: /sys-mgmt-portal-auth
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+Allow: /map
+Allow: /cases
+Disallow: /sys-mgmt-portal
+Disallow: /sys-mgmt-portal-auth
+
+# You.com
+User-agent: YouBot
+Allow: /
+Allow: /map
+Allow: /cases
+Disallow: /sys-mgmt-portal
+Disallow: /sys-mgmt-portal-auth
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Allow: /
+Allow: /map
+Allow: /cases
+Disallow: /sys-mgmt-portal
+Disallow: /sys-mgmt-portal-auth
+
+# General crawlers
 User-agent: *
 Allow: /
-
-# Sitemap
-Sitemap: https://rextracker.online/sitemap.xml
-
-# Crawl-delay for respectful crawling
 Crawl-delay: 1
 
-# Disallow admin areas
-Disallow: /admin/
-Disallow: /api/
+# Disallow management areas (security through obscurity)
+Disallow: /sys-mgmt-portal
+Disallow: /sys-mgmt-portal-auth
 Disallow: /_next/
 Disallow: /static/
 
@@ -17,3 +79,6 @@ Disallow: /static/
 Allow: /map
 Allow: /cases
 Allow: /
+
+# Sitemap for easy discovery
+Sitemap: https://rextracker.online/sitemap.xml
