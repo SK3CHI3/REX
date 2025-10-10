@@ -122,17 +122,23 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
     <div 
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm"
       onClick={onClose}
+      style={{ touchAction: 'none' }}
     >
       <div 
-        className="relative w-full sm:max-w-4xl h-[100vh] sm:h-[95vh] bg-gradient-to-br from-slate-900 via-red-950/50 to-slate-900 border-t sm:border border-white/10 sm:rounded-2xl overflow-hidden shadow-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:fade-in duration-300 flex flex-col"
+        className="relative w-full sm:max-w-4xl h-screen sm:h-[95vh] max-h-[100dvh] bg-gradient-to-br from-slate-900 via-red-950/50 to-slate-900 border-t sm:border border-white/10 sm:rounded-2xl overflow-hidden shadow-2xl animate-in slide-in-from-bottom-8 sm:slide-in-from-bottom-0 sm:fade-in duration-300 flex flex-col"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
       >
         {/* Gradient overlay effects */}
         <div className="absolute inset-0 bg-gradient-to-br from-red-600/5 via-transparent to-slate-900/20 pointer-events-none" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl animate-pulse pointer-events-none" />
         
         {/* Header - Sticky */}
-        <div className="flex-shrink-0 bg-black/40 backdrop-blur-xl border-b border-white/10 relative z-10">
+        <div className="flex-shrink-0 bg-black/40 backdrop-blur-xl border-b border-white/10 relative z-10"
+          style={{ paddingTop: 'max(0.625rem, env(safe-area-inset-top))' }}
+        >
           <div className="px-4 sm:px-6 py-2.5 sm:py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center space-x-2.5 sm:space-x-3 flex-1 min-w-0">
@@ -174,8 +180,17 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto overscroll-contain">
-          <div className="p-3 sm:p-6 space-y-4 sm:space-y-5 pb-6">
+        <div 
+          className="flex-1 overflow-y-auto overscroll-contain"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y',
+            willChange: 'scroll-position'
+          }}
+        >
+          <div className="p-3 sm:p-6 space-y-4 sm:space-y-5 pb-6"
+            style={{ paddingBottom: 'max(1.5rem, calc(1.5rem + env(safe-area-inset-bottom)))' }}
+          >
             
             {/* Image Carousel - Full Width Hero */}
             {caseData.photos && caseData.photos.length > 0 && (

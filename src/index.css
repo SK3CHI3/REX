@@ -249,3 +249,27 @@
 .scroll-smooth {
   scroll-behavior: smooth;
 }
+
+/* Mobile modal scrolling optimization */
+@supports (height: 100dvh) {
+  .mobile-modal-height {
+    height: 100dvh;
+  }
+}
+
+/* iOS momentum scrolling for modals */
+.modal-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Safe area support for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
