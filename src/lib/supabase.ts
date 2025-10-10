@@ -30,6 +30,11 @@ export interface DatabaseCase {
   witnesses?: string[]
   created_at: string
   updated_at: string
+  // Community verification fields
+  confirmation_count?: number
+  community_verified?: boolean
+  needs_verification?: boolean
+  admin_approved_at?: string
 }
 
 export interface DatabaseCasePhoto {

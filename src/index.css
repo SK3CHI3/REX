@@ -273,3 +273,25 @@
     padding-top: env(safe-area-inset-top);
   }
 }
+
+/* Unverified case markers - dimmed with subtle pulse */
+.dimmed-marker {
+  opacity: 0.6;
+  filter: grayscale(20%);
+  animation: dimmed-pulse 3s ease-in-out infinite;
+}
+
+@keyframes dimmed-pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Verified markers - normal appearance */
+.leaflet-marker-icon:not(.dimmed-marker) {
+  opacity: 1;
+  filter: none;
+}

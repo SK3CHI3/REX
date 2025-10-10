@@ -37,6 +37,36 @@ export interface Case {
   scraped_from_url?: string;
   confidence_score?: number;
   auto_approved?: boolean;
+  // Community verification fields
+  confirmation_count?: number;
+  community_verified?: boolean;
+  needs_verification?: boolean;
+  admin_approved_at?: string;
+}
+
+export interface CaseConfirmation {
+  id: string;
+  case_id: string;
+  user_ip: string;
+  user_fingerprint?: string;
+  user_agent?: string;
+  confirmed_at: string;
+  created_at: string;
+}
+
+export interface ConfirmCaseResponse {
+  success: boolean;
+  message: string;
+  confirmation: {
+    id: string;
+    confirmed_at: string;
+  };
+  case: {
+    id: string;
+    confirmation_count: number;
+    community_verified: boolean;
+    needs_verification: boolean;
+  };
 }
 
 export interface FilterState {

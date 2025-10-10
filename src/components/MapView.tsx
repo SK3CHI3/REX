@@ -38,6 +38,29 @@ const personRedIconDesktop = new L.Icon({
   shadowAnchor: undefined
 });
 
+// Dimmed (unverified) icons with lower opacity
+const personRedIconMobileDimmed = new L.Icon({
+  iconUrl: 'data:image/svg+xml;utf8,<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="5" r="3" fill="%23EF4444" opacity="0.5"/><rect x="2" y="9" width="10" height="4" rx="2" fill="%23EF4444" opacity="0.5"/></svg>',
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+  popupAnchor: [0, -7],
+  shadowUrl: undefined,
+  shadowSize: undefined,
+  shadowAnchor: undefined,
+  className: 'dimmed-marker' // For additional CSS styling
+});
+
+const personRedIconDesktopDimmed = new L.Icon({
+  iconUrl: 'data:image/svg+xml;utf8,<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="6" r="4" fill="%23EF4444" opacity="0.5"/><rect x="3" y="12" width="12" height="5" rx="2.5" fill="%23EF4444" opacity="0.5"/></svg>',
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+  popupAnchor: [0, -9],
+  shadowUrl: undefined,
+  shadowSize: undefined,
+  shadowAnchor: undefined,
+  className: 'dimmed-marker'
+});
+
 interface MapViewProps {
   cases: Case[];
   onCaseHover?: (caseItem: Case, position: { x: number; y: number }) => void;
@@ -170,11 +193,21 @@ const MapView = ({ cases, onCaseHover, onCaseLeave, onCaseClick, onCaseSelect, o
         {/* Custom Zoom Control */}
         <ZoomControl kenyaBounds={isMobile ? kenyaMobileBounds : kenyaBounds} />
         
-        {cases.map((caseItem) => (
+        {cases.map((caseItem) => {
+          // Determine if case is verified or needs verification
+          const isVerified = caseItem.community_verified;
+          const needsVerification = caseItem.needs_verification ?? true;
+          
+          // Select appropriate icon based on verification status
+          const markerIcon = needsVerification && !isVerified
+            ? (isMobile ? personRedIconMobileDimmed : personRedIconDesktopDimmed)
+            : (isMobile ? personRedIconMobile : personRedIconDesktop);
+          
+          return (
           <Marker
             key={caseItem.id}
             position={caseItem.coordinates}
-            icon={isMobile ? personRedIconMobile : personRedIconDesktop}
+            icon={markerIcon}
             eventHandlers={{
               mouseover: (e) => {
                 if (!isMobile && !clickedPin) {
@@ -249,10 +282,11 @@ const MapView = ({ cases, onCaseHover, onCaseLeave, onCaseClick, onCaseSelect, o
                           e.stopPropagation();
                           setClickedPin(null);
                           setSelectedPin(null);
-                          // Close the popup by finding the marker
-                          const popup = e.target.closest('.leaflet-popup');
-                          if (popup && popup._source) {
-                            popup._source.closePopup();
+                          // Close the popup
+                          const target = e.target as HTMLElement;
+                          const popup = target.closest('.leaflet-popup');
+                          if (popup && (popup as any)._source) {
+                            (popup as any)._source.closePopup();
                           }
                         }}
                       >
@@ -264,7 +298,8 @@ const MapView = ({ cases, onCaseHover, onCaseLeave, onCaseClick, onCaseSelect, o
               </div>
             </Popup>
           </Marker>
-        ))}
+          );
+        })}
       </MapContainer>
 
       {/* Empty state overlay */}

@@ -25,7 +25,12 @@ export function transformDatabaseCase(
     reportedBy: dbCase.reported_by,
     justiceServed: dbCase.justice_served,
     officersInvolved: dbCase.officer_names?.map(name => ({ name })) || [],
-    witnesses: dbCase.witnesses || []
+    witnesses: dbCase.witnesses || [],
+    // Community verification fields
+    confirmation_count: dbCase.confirmation_count || 0,
+    community_verified: dbCase.community_verified || false,
+    needs_verification: dbCase.needs_verification ?? true,
+    admin_approved_at: dbCase.admin_approved_at,
   }
 }
 

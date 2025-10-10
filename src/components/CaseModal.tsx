@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { X, Calendar, MapPin, User, AlertTriangle, Clock, Shield, Phone, Users, FileText, Video, Image as ImageIcon, ExternalLink, CheckCircle2, XCircle, Scale, Building2, Briefcase, ChevronLeft, ChevronRight, Heart, Camera } from 'lucide-react';
+import { X, Calendar, MapPin, User, AlertTriangle, Clock, Shield, Phone, Users, FileText, Video, Image as ImageIcon, ExternalLink, CheckCircle2, XCircle, Scale, Building2, Briefcase, ChevronLeft, ChevronRight, Heart, Camera, ThumbsUp, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Case } from '@/types';
+import { useConfirmCase } from '@/hooks/useConfirmCase';
+import { toast } from '@/components/ui/sonner';
 
 interface CaseModalProps {
   case: Case;
@@ -11,6 +13,24 @@ interface CaseModalProps {
 
 const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [localConfirmationCount, setLocalConfirmationCount] = useState(caseData.confirmation_count || 0);
+  const [localCommunityVerified, setLocalCommunityVerified] = useState(caseData.community_verified || false);
+  const { confirmCase, isConfirming, error: confirmError, hasConfirmed } = useConfirmCase();
+  
+  const userHasConfirmed = hasConfirmed(caseData.id);
+
+  const handleConfirm = async () => {
+    const result = await confirmCase(caseData.id);
+    
+    if (result) {
+      // Update local state optimistically
+      setLocalConfirmationCount(result.case.confirmation_count);
+      setLocalCommunityVerified(result.case.community_verified);
+      toast.success('Thank you for confirming this case!');
+    } else if (confirmError) {
+      toast.error(confirmError);
+    }
+  };
 
   const getStatusConfig = (status: Case['status']) => {
     switch (status) {
@@ -253,7 +273,7 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
             {/* Quick Info Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="bg-black/30 backdrop-blur-sm border border-white/10 rounded-xl p-3 sm:p-4 hover:border-white/20 transition-colors">
-                <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3">
                   <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
                   </div>
@@ -280,7 +300,7 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
                     <p className="text-sm font-semibold text-white line-clamp-1">{caseData.location}</p>
                     <p className="text-xs text-gray-400 mt-0.5">{caseData.county} County</p>
                   </div>
-                </div>
+              </div>
             </div>
           </div>
 
@@ -502,6 +522,80 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
           )}
               </div>
                 </div>
+
+            {/* Community Verification Section */}
+            <div className="bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-xl p-4 sm:p-5">
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <div className="flex items-center space-x-2">
+                  <ThumbsUp className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
+                  <h3 className="text-base sm:text-lg font-bold text-white">Community Verification</h3>
+                </div>
+                {localCommunityVerified && (
+                  <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 border flex items-center space-x-1 px-2.5 py-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Verified</span>
+                  </Badge>
+                )}
+              </div>
+
+              {/* Progress Bar */}
+              <div className="mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-300">
+                    {localConfirmationCount < 2 
+                      ? `Needs ${2 - localConfirmationCount} more confirmation${2 - localConfirmationCount === 1 ? '' : 's'}`
+                      : `${localConfirmationCount} confirmations`}
+                  </span>
+                  <span className="text-sm font-semibold text-cyan-400">
+                    {localConfirmationCount}/2
+                  </span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                  <div 
+                    className={`h-full transition-all duration-500 ${
+                      localCommunityVerified ? 'bg-emerald-500' : 'bg-cyan-500'
+                    }`}
+                    style={{ width: `${Math.min((localConfirmationCount / 2) * 100, 100)}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Info Message */}
+              <div className="flex items-start space-x-2 mb-4 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  {localCommunityVerified 
+                    ? 'This incident has been verified by the community. Multiple people have confirmed its authenticity.'
+                    : 'Help verify this incident by confirming if you have knowledge about it. Cases need 2 confirmations to be community-verified.'}
+                </p>
+              </div>
+
+              {/* Confirm Button */}
+              {!userHasConfirmed ? (
+                <Button
+                  onClick={handleConfirm}
+                  disabled={isConfirming}
+                  className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-3 rounded-lg transition-all shadow-lg hover:shadow-cyan-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isConfirming ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Confirming...
+                    </>
+                  ) : (
+                    <>
+                      <ThumbsUp className="w-4 h-4 mr-2" />
+                      Confirm This Case
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <div className="flex items-center justify-center space-x-2 bg-emerald-500/20 border border-emerald-500/30 rounded-lg py-3 px-4">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  <span className="text-sm font-medium text-emerald-300">You've confirmed this case</span>
+                </div>
+              )}
+            </div>
 
             {/* Footer timestamp */}
             <div className="text-center text-xs text-gray-500 pt-1 pb-2">
