@@ -274,24 +274,22 @@
   }
 }
 
-/* Unverified case markers - dimmed with subtle pulse */
-.dimmed-marker {
-  opacity: 0.6;
-  filter: grayscale(20%);
-  animation: dimmed-pulse 3s ease-in-out infinite;
+/* Unverified case markers - subtle glow animation on question mark badge */
+.unverified-marker {
+  animation: unverified-glow 2s ease-in-out infinite;
 }
 
-@keyframes dimmed-pulse {
+@keyframes unverified-glow {
   0%, 100% {
-    opacity: 0.5;
+    filter: drop-shadow(0 0 2px rgba(255, 165, 0, 0.4));
   }
   50% {
-    opacity: 0.7;
+    filter: drop-shadow(0 0 6px rgba(255, 165, 0, 0.8));
   }
 }
 
-/* Verified markers - normal appearance */
-.leaflet-marker-icon:not(.dimmed-marker) {
+/* Verified markers - normal appearance, no animation */
+.leaflet-marker-icon:not(.unverified-marker) {
   opacity: 1;
   filter: none;
 }
