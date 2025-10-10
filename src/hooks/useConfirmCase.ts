@@ -63,13 +63,17 @@ export const useConfirmCase = (): UseConfirmCaseReturn => {
         return null;
       }
 
-      // Get the Supabase URL
+      // Get the Supabase URL - same as the client config
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
       if (!supabaseUrl || !supabaseAnonKey) {
+        console.error('Supabase config missing:', { supabaseUrl: !!supabaseUrl, supabaseAnonKey: !!supabaseAnonKey });
         throw new Error('Supabase configuration is missing');
       }
+
+      console.log('Confirming case:', caseId);
+      console.log('Supabase URL:', supabaseUrl);
 
       // Call the Edge Function
       const response = await fetch(`${supabaseUrl}/functions/v1/confirm-case`, {

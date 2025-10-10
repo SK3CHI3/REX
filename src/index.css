@@ -274,24 +274,25 @@
   }
 }
 
-/* Unverified case markers - dimmed with subtle pulse */
+/* Unverified case markers - pulsing to get attention */
 .dimmed-marker {
-  opacity: 0.6;
-  filter: grayscale(20%);
-  animation: dimmed-pulse 3s ease-in-out infinite;
+  animation: attention-pulse 2s ease-in-out infinite;
 }
 
-@keyframes dimmed-pulse {
+@keyframes attention-pulse {
   0%, 100% {
-    opacity: 0.5;
+    opacity: 0.7;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.7;
+    opacity: 1;
+    transform: scale(1.15);
   }
 }
 
-/* Verified markers - normal appearance */
+/* Verified markers - normal appearance, no animation */
 .leaflet-marker-icon:not(.dimmed-marker) {
   opacity: 1;
   filter: none;
+  animation: none;
 }
