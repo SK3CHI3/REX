@@ -38,27 +38,27 @@ const personRedIconDesktop = new L.Icon({
   shadowAnchor: undefined
 });
 
-// Unverified (pulsing) icons - same red color but with pulsing animation via CSS
+// Dimmed (unverified) icons with lower opacity
 const personRedIconMobileDimmed = new L.Icon({
-  iconUrl: 'data:image/svg+xml;utf8,<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="5" r="3" fill="%23EF4444"/><rect x="2" y="9" width="10" height="4" rx="2" fill="%23EF4444"/></svg>',
+  iconUrl: 'data:image/svg+xml;utf8,<svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="5" r="3" fill="%23EF4444" opacity="0.5"/><rect x="2" y="9" width="10" height="4" rx="2" fill="%23EF4444" opacity="0.5"/></svg>',
   iconSize: [14, 14],
   iconAnchor: [7, 7],
   popupAnchor: [0, -7],
   shadowUrl: undefined,
   shadowSize: undefined,
   shadowAnchor: undefined,
-  className: 'dimmed-marker' // Adds pulsing animation via CSS
+  className: 'dimmed-marker' // For additional CSS styling
 });
 
 const personRedIconDesktopDimmed = new L.Icon({
-  iconUrl: 'data:image/svg+xml;utf8,<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="6" r="4" fill="%23EF4444"/><rect x="3" y="12" width="12" height="5" rx="2.5" fill="%23EF4444"/></svg>',
+  iconUrl: 'data:image/svg+xml;utf8,<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="6" r="4" fill="%23EF4444" opacity="0.5"/><rect x="3" y="12" width="12" height="5" rx="2.5" fill="%23EF4444" opacity="0.5"/></svg>',
   iconSize: [18, 18],
   iconAnchor: [9, 9],
   popupAnchor: [0, -9],
   shadowUrl: undefined,
   shadowSize: undefined,
   shadowAnchor: undefined,
-  className: 'dimmed-marker' // Adds pulsing animation via CSS
+  className: 'dimmed-marker'
 });
 
 interface MapViewProps {
