@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Tooltip } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap } from 'react-leaflet';
 import { Case } from '@/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { LatLngBoundsExpression } from 'leaflet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSidebar } from '@/components/ui/sidebar';
+import { Plus, Minus, Maximize2 } from 'lucide-react';
 
 // Fix for default markers in React Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -45,6 +46,54 @@ interface MapViewProps {
   onCaseSelect?: (caseItem: Case) => void; // Keep for backward compatibility
   onViewDetails?: (caseItem: Case) => void;
 }
+
+// Custom Zoom Control Component
+const ZoomControl = ({ kenyaBounds }: { kenyaBounds: LatLngBoundsExpression }) => {
+  const map = useMap();
+
+  const handleZoomIn = () => {
+    map.zoomIn();
+  };
+
+  const handleZoomOut = () => {
+    map.zoomOut();
+  };
+
+  const handleResetView = () => {
+    map.fitBounds(kenyaBounds, { padding: [50, 50] });
+  };
+
+  return (
+    <div className="fixed bottom-12 right-3 z-[1000] pointer-events-auto">
+      <div className="bg-white/95 backdrop-blur-sm border border-gray-300 rounded-lg shadow-xl overflow-hidden">
+        <button
+          onClick={handleZoomIn}
+          className="flex items-center justify-center w-11 h-11 hover:bg-red-50 transition-colors border-b border-gray-200 group"
+          title="Zoom in"
+          aria-label="Zoom in"
+        >
+          <Plus className="w-5 h-5 text-gray-700 group-hover:text-red-600" />
+        </button>
+        <button
+          onClick={handleZoomOut}
+          className="flex items-center justify-center w-11 h-11 hover:bg-red-50 transition-colors border-b border-gray-200 group"
+          title="Zoom out"
+          aria-label="Zoom out"
+        >
+          <Minus className="w-5 h-5 text-gray-700 group-hover:text-red-600" />
+        </button>
+        <button
+          onClick={handleResetView}
+          className="flex items-center justify-center w-11 h-11 hover:bg-red-50 transition-colors group"
+          title="Reset view to Kenya"
+          aria-label="Reset view"
+        >
+          <Maximize2 className="w-4 h-4 text-gray-700 group-hover:text-red-600" />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const MapView = ({ cases, onCaseHover, onCaseLeave, onCaseClick, onCaseSelect, onViewDetails }: MapViewProps) => {
   // Kenya's center point (geographical center of Kenya)
@@ -103,17 +152,23 @@ const MapView = ({ cases, onCaseHover, onCaseLeave, onCaseClick, onCaseSelect, o
       <MapContainer
         bounds={isMobile ? kenyaMobileBounds : kenyaBounds}
         boundsOptions={{ padding: isMobile ? [10, 10] : [50, 50] }}
-        className="w-full h-full z-10"
-        zoomControl={true}
+        className="w-full h-full"
+        zoomControl={false}
         preferCanvas={true}
         ref={mapRef}
         minZoom={5}
         maxZoom={18}
+        scrollWheelZoom={true}
+        doubleClickZoom={true}
+        touchZoom={true}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        
+        {/* Custom Zoom Control */}
+        <ZoomControl kenyaBounds={isMobile ? kenyaMobileBounds : kenyaBounds} />
         
         {cases.map((caseItem) => (
           <Marker
