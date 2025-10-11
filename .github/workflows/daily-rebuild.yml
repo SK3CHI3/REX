@@ -1,0 +1,60 @@
+name: Daily Site Rebuild & Deploy
+
+# Runs every day at midnight UTC (for fresh static HTML)
+# Also can be triggered manually from GitHub Actions tab
+on:
+  schedule:
+    # Runs at 00:00 UTC every day (3am EAT / 8pm EST)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger
+  push:
+    branches:
+      - main # Also triggers on push to main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔐 Create .env file
+        run: |
+          echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
+          echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
+
+      - name: 🏗️ Build site with react-snap
+        run: npm run build
+        env:
+          NODE_ENV: production
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: 🚀 Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: './dist'
+          production-deploy: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Daily rebuild - ${{ github.event_name }}"
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+      - name: ✅ Deployment complete
+        run: |
+          echo "🎉 Site rebuilt and deployed successfully!"
+          echo "📊 New cases are now visible to AI crawlers"
+
