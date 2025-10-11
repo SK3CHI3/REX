@@ -13,7 +13,8 @@
     "scraper:start": "node scripts/start-scraper.js start",
     "scraper:stop": "node scripts/start-scraper.js stop",
     "scraper:status": "node scripts/start-scraper.js status",
-    "scraper:test": "node scripts/start-scraper.js test"
+    "scraper:test": "node scripts/start-scraper.js test",
+    "postbuild": "react-snap"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
@@ -89,11 +90,32 @@
     "globals": "^15.9.0",
     "lovable-tagger": "^1.1.7",
     "postcss": "^8.5.6",
+    "react-snap": "^1.23.0",
     "supabase": "^2.48.3",
     "tailwindcss": "^3.4.17",
     "terser": "^5.44.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"
+  },
+  "reactSnap": {
+    "source": "dist",
+    "minifyHtml": {
+      "collapseWhitespace": false,
+      "removeComments": false
+    },
+    "puppeteerArgs": [
+      "--no-sandbox",
+      "--disable-setuid-sandbox"
+    ],
+    "crawl": true,
+    "skipThirdPartyRequests": true,
+    "cacheAjaxRequests": false,
+    "include": [
+      "/",
+      "/map",
+      "/cases",
+      "/cases-index"
+    ]
   }
 }
