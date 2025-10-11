@@ -106,11 +106,20 @@
     },
     "puppeteerArgs": [
       "--no-sandbox",
-      "--disable-setuid-sandbox"
+      "--disable-setuid-sandbox",
+      "--disable-web-security",
+      "--disable-dev-shm-usage"
     ],
     "crawl": true,
     "skipThirdPartyRequests": true,
     "cacheAjaxRequests": false,
+    "inlineCss": false,
+    "minifyCss": false,
+    "fixWebpackChunksIssue": "single-file",
+    "removeBlobs": true,
+    "ignoreForPrerender": [
+      "service-worker.js"
+    ],
     "include": [
       "/",
       "/map",
