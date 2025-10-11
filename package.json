@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/prepare-snap.js",
     "build": "npm run generate:sitemap && vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
@@ -124,7 +125,16 @@
       "/",
       "/map",
       "/cases",
-      "/cases-index"
+      "/cases-index",
+      "/cases/668f4f28-2f28-40a5-b754-4658838a59b5",
+      "/cases/4bb5ce92-ecb6-489f-ba5c-0f4d4e29d4cd",
+      "/cases/942a0bf8-eaf2-4b85-bdc8-34d9bc64cfc0",
+      "/cases/0c246622-ab49-4efe-82cb-22fadef2f9d1",
+      "/cases/5a815c32-ece2-4e12-9f1c-dfdf0f1d2e95",
+      "/cases/65c5733e-171b-4629-8790-3528945bf3ce",
+      "/cases/b8ad14fa-facd-41c7-9d4f-58f327e9c44e",
+      "/cases/03fbd3a8-ec88-4f4b-b1c1-912719b8ee0b",
+      "/cases/1890fbcd-298c-49ce-9ee6-499dd7dc9658"
     ]
   }
 }
