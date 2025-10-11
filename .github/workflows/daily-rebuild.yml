@@ -41,6 +41,7 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: 🚀 Deploy to Netlify
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
         uses: nwtgck/actions-netlify@v3.0
         with:
           publish-dir: './dist'
@@ -52,9 +53,22 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 10
 
       - name: ✅ Deployment complete
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
         run: |
           echo "🎉 Site rebuilt and deployed successfully!"
           echo "📊 New cases are now visible to AI crawlers"
+      
+      - name: ⚠️ Netlify secrets not configured
+        if: ${{ secrets.NETLIFY_AUTH_TOKEN == '' || secrets.NETLIFY_SITE_ID == '' }}
+        run: |
+          echo "⚠️ WARNING: Netlify secrets not configured!"
+          echo "📝 Build completed successfully, but not deployed to Netlify."
+          echo "To enable automatic deployment, add these secrets to your GitHub repository:"
+          echo "  - NETLIFY_AUTH_TOKEN"
+          echo "  - NETLIFY_SITE_ID"
+          echo "  - VITE_SUPABASE_URL"
+          echo "  - VITE_SUPABASE_ANON_KEY"
 
