@@ -132,6 +132,36 @@ export async function fetchCaseById(id: string): Promise<Case | null> {
 // Submit a new case
 export async function submitCase(caseData: SubmitCaseData): Promise<string> {
   try {
+    // Upload photos to Supabase Storage if any
+    const photoUrls: string[] = []
+    if (caseData.photos && caseData.photos.length > 0) {
+      for (const photo of caseData.photos) {
+        const fileExt = photo.name.split('.').pop()
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+        const filePath = `case-submissions/${fileName}`
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('case-photos')
+          .upload(filePath, photo, {
+            cacheControl: '3600',
+            upsert: false
+          })
+
+        if (uploadError) {
+          console.error('Error uploading photo:', uploadError)
+          // Continue with other photos even if one fails
+          continue
+        }
+
+        // Get public URL for the uploaded photo
+        const { data: { publicUrl } } = supabase.storage
+          .from('case-photos')
+          .getPublicUrl(filePath)
+
+        photoUrls.push(publicUrl)
+      }
+    }
+
     const { data, error } = await supabase
       .from('case_submissions')
       .insert({
@@ -148,6 +178,8 @@ export async function submitCase(caseData: SubmitCaseData): Promise<string> {
         justice_served: caseData.justiceServed,
         officer_names: caseData.officerNames || [],
         witnesses: caseData.witnesses || [],
+        photo_urls: photoUrls,
+        video_urls: caseData.videoLinks || [],
         reporter_name: null, // Always null since we don't collect names
         reporter_contact: caseData.reporterContact || null,
         is_anonymous: true, // Always true since we don't collect names
@@ -206,12 +238,13 @@ export async function approveSubmission(submissionId: string): Promise<void> {
     }
 
     // Create a new case in the main cases table
-    const { error: insertError } = await supabase
+    const { data: newCase, error: insertError } = await supabase
       .from('cases')
       .insert({
         victim_name: submission.victim_name,
         age: submission.age,
         incident_date: submission.incident_date,
+        incident_time: submission.incident_time,
         location: submission.location,
         county: submission.county,
         latitude: submission.latitude || 0,
@@ -221,12 +254,52 @@ export async function approveSubmission(submissionId: string): Promise<void> {
         status: 'investigating',
         source: 'user_submission',
         reported_by: submission.reporter_name,
-        justice_served: false
+        justice_served: submission.justice_served || false,
+        officer_names: submission.officer_names || [],
+        witnesses: submission.witnesses || []
       })
+      .select('id')
+      .single()
 
-    if (insertError) {
+    if (insertError || !newCase) {
       console.error('Error creating approved case:', insertError)
       throw insertError
+    }
+
+    // Insert photos into case_photos table
+    if (submission.photo_urls && submission.photo_urls.length > 0) {
+      const photoInserts = submission.photo_urls.map(photoUrl => ({
+        case_id: newCase.id,
+        photo_url: photoUrl,
+        uploaded_at: new Date().toISOString()
+      }))
+
+      const { error: photoError } = await supabase
+        .from('case_photos')
+        .insert(photoInserts)
+
+      if (photoError) {
+        console.error('Error inserting case photos:', photoError)
+        // Don't throw - case is still created even if photos fail
+      }
+    }
+
+    // Insert videos into case_videos table
+    if (submission.video_urls && submission.video_urls.length > 0) {
+      const videoInserts = submission.video_urls.map(videoUrl => ({
+        case_id: newCase.id,
+        video_url: videoUrl,
+        uploaded_at: new Date().toISOString()
+      }))
+
+      const { error: videoError } = await supabase
+        .from('case_videos')
+        .insert(videoInserts)
+
+      if (videoError) {
+        console.error('Error inserting case videos:', videoError)
+        // Don't throw - case is still created even if videos fail
+      }
     }
 
     // Update submission status to approved

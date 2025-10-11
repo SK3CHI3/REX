@@ -2,26 +2,74 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://rextracker.online/</loc>
-    <lastmod>2025-10-10</lastmod>
+    <lastmod>2025-10-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://rextracker.online/map</loc>
-    <lastmod>2025-10-10</lastmod>
+    <lastmod>2025-10-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://rextracker.online/cases</loc>
-    <lastmod>2025-10-10</lastmod>
+    <lastmod>2025-10-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://rextracker.online/cases-index</loc>
-    <lastmod>2025-10-10</lastmod>
+    <lastmod>2025-10-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://rextracker.online/case/4bb5ce92-ecb6-489f-ba5c-0f4d4e29d4cd</loc>
+    <lastmod>2025-09-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://rextracker.online/case/942a0bf8-eaf2-4b85-bdc8-34d9bc64cfc0</loc>
+    <lastmod>2025-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://rextracker.online/case/0c246622-ab49-4efe-82cb-22fadef2f9d1</loc>
+    <lastmod>2025-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://rextracker.online/case/b8ad14fa-facd-41c7-9d4f-58f327e9c44e</loc>
+    <lastmod>2025-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://rextracker.online/case/65c5733e-171b-4629-8790-3528945bf3ce</loc>
+    <lastmod>2025-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://rextracker.online/case/03fbd3a8-ec88-4f4b-b1c1-912719b8ee0b</loc>
+    <lastmod>2025-10-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://rextracker.online/case/1890fbcd-298c-49ce-9ee6-499dd7dc9658</loc>
+    <lastmod>2025-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://rextracker.online/case/5a815c32-ece2-4e12-9f1c-dfdf0f1d2e95</loc>
+    <lastmod>2025-07-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

@@ -62,13 +62,19 @@ export interface DatabaseCaseSubmission {
   incident_time?: string
   location: string
   county: string
+  latitude?: number
+  longitude?: number
   case_type: 'death' | 'assault' | 'harassment' | 'unlawful_arrest' | 'other'
   description: string
   justice_served?: boolean
   officer_names?: string[]
   witnesses?: string[]
+  photo_urls?: string[]
+  video_urls?: string[]
   reporter_name: string
   reporter_contact: string
+  is_anonymous?: boolean
+  wants_updates?: boolean
   status: 'pending' | 'approved' | 'rejected'
   reviewed_by?: string
   review_notes?: string

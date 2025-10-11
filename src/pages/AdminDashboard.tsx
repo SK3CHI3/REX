@@ -436,6 +436,45 @@ const AdminDashboard = () => {
                         <p><strong>Submitted:</strong> {new Date(submission.created_at).toLocaleString()}</p>
                       </div>
 
+                      {/* Display submitted photos */}
+                      {submission.photo_urls && submission.photo_urls.length > 0 && (
+                        <div className="mb-4">
+                          <p className="text-sm text-gray-300 mb-2"><strong>Photos ({submission.photo_urls.length}):</strong></p>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {submission.photo_urls.map((photoUrl, idx) => (
+                              <div key={idx} className="aspect-square rounded-lg overflow-hidden border border-white/10">
+                                <img 
+                                  src={photoUrl} 
+                                  alt={`Evidence ${idx + 1}`}
+                                  className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                                  onClick={() => window.open(photoUrl, '_blank')}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Display submitted video links */}
+                      {submission.video_urls && submission.video_urls.length > 0 && (
+                        <div className="mb-4">
+                          <p className="text-sm text-gray-300 mb-2"><strong>Video Links ({submission.video_urls.length}):</strong></p>
+                          <div className="space-y-1">
+                            {submission.video_urls.map((videoUrl, idx) => (
+                              <a 
+                                key={idx}
+                                href={videoUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="block text-sm text-blue-400 hover:text-blue-300 underline truncate"
+                              >
+                                {videoUrl}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex gap-3">
                         <Button
                           onClick={() => approveSubmission.mutate(submission.id)}
