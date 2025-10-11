@@ -30,7 +30,9 @@ export default defineConfig(({ mode }) => ({
     },
     rollupOptions: {
       output: {
-        manualChunks: {
+        // Disable code splitting in production for react-snap compatibility
+        inlineDynamicImports: mode === 'production',
+        manualChunks: mode === 'production' ? undefined : {
           vendor: ['react', 'react-dom'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
           maps: ['leaflet', 'react-leaflet'],
