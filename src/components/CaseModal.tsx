@@ -567,7 +567,12 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
               </div>
 
               {/* Confirm Button */}
-              {!userHasConfirmed ? (
+              {localConfirmationCount >= 2 || localCommunityVerified ? (
+                <div className="flex items-center justify-center space-x-2 bg-emerald-500/20 border border-emerald-500/30 rounded-lg py-3 px-4">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  <span className="text-sm font-medium text-emerald-300">Case fully verified</span>
+                </div>
+              ) : !userHasConfirmed ? (
                 <Button
                   onClick={handleConfirm}
                   disabled={isConfirming}
