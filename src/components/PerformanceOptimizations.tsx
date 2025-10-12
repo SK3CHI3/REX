@@ -2,6 +2,9 @@ import { useEffect } from 'react';
 
 const PerformanceOptimizations = () => {
   useEffect(() => {
+    // Only run on client-side
+    if (typeof window === 'undefined') return;
+    
     // Preload critical resources
     const preloadCriticalResources = () => {
       // Preload critical fonts

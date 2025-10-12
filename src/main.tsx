@@ -56,8 +56,14 @@ if ('serviceWorker' in navigator) {
 const rootElement = document.getElementById("root")!;
 
 // Use hydration if the content is already rendered by react-snap
+// Suppress hydration warnings for known mismatches (browser APIs, timestamps, etc.)
 if (rootElement.hasChildNodes()) {
-  hydrateRoot(rootElement, <App />);
+  hydrateRoot(rootElement, <App />, {
+    onRecoverableError: (error) => {
+      // Log hydration errors but don't crash the app
+      console.warn('Hydration error recovered:', error);
+    }
+  });
 } else {
   createRoot(rootElement).render(<App />);
 }

@@ -4,6 +4,11 @@ import { supabase } from '@/lib/supabase';
 
 // Generate a simple browser fingerprint
 function generateVisitorId(): string {
+  // SSR safety check
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return 'ssr-visitor'; // Fallback for SSR
+  }
+  
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (ctx) {
@@ -34,6 +39,9 @@ function generateVisitorId(): string {
 // Track visitor
 export function useVisitorTracking() {
   useEffect(() => {
+    // Only run on client-side
+    if (typeof window === 'undefined') return;
+    
     const trackVisitor = async () => {
       try {
         const visitorId = generateVisitorId();

@@ -32,6 +32,11 @@ export const useConfirmCase = (): UseConfirmCaseReturn => {
 
   // Check if user has already confirmed a case (local storage check)
   const hasConfirmed = (caseId: string): boolean => {
+    // SSR safety check
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return false;
+    }
+    
     try {
       const confirmed = localStorage.getItem(`confirmed_case_${caseId}`);
       return confirmed === 'true';
@@ -42,6 +47,11 @@ export const useConfirmCase = (): UseConfirmCaseReturn => {
 
   // Mark case as confirmed in local storage
   const markAsConfirmed = (caseId: string): void => {
+    // SSR safety check
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+      return;
+    }
+    
     try {
       localStorage.setItem(`confirmed_case_${caseId}`, 'true');
       localStorage.setItem(`confirmed_case_${caseId}_at`, new Date().toISOString());
