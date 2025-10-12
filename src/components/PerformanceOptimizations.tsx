@@ -95,20 +95,11 @@ const PerformanceOptimizations = () => {
       }
     };
 
-    // Add service worker for caching
-    const registerServiceWorker = () => {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-          .then(registration => console.log('SW registered'))
-          .catch(error => console.log('SW registration failed'));
-      }
-    };
-
     // Initialize optimizations
     preloadCriticalResources();
     optimizeImages();
     addPerformanceMonitoring();
-    registerServiceWorker();
+    // Note: Service worker is registered in main.tsx to avoid duplicate registration
 
     // Cleanup
     return () => {

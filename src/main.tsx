@@ -3,16 +3,53 @@ import App from './App.tsx'
 import './styles/critical.css'
 import './index.css'
 
-// Register service worker
+// Register service worker with update handling
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('SW registered: ', registration);
+        console.log('[App] Service worker registered successfully');
+        
+        // Check for updates periodically (every hour)
+        setInterval(() => {
+          registration.update();
+        }, 60 * 60 * 1000);
+
+        // Listen for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New service worker is installed, show update notification
+                console.log('[App] New version available! Refreshing...');
+                
+                // Tell the service worker to skip waiting
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                
+                // Reload the page to use new service worker after a short delay
+                setTimeout(() => {
+                  window.location.reload();
+                }, 1000);
+              }
+            });
+          }
+        });
       })
       .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
+        console.error('[App] Service worker registration failed:', registrationError);
       });
+
+    // Listen for controller change and reload page
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        console.log('[App] Controller changed, reloading...');
+        window.location.reload();
+      }
+    });
   });
 }
 
