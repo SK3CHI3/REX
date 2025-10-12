@@ -46,8 +46,29 @@ const AllNewsPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white">
       {/* Header */}
       <div className="bg-black/30 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+          {/* Mobile Header */}
+          <div className="flex md:hidden items-center justify-between mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/')}
+              className="text-gray-300 hover:text-white p-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <h1 className="text-lg font-bold flex-1 text-center mx-2">Latest News & Reports</h1>
+            <Button
+              size="sm"
+              onClick={() => navigate('/map')}
+              className="bg-red-600 hover:bg-red-700 p-2"
+            >
+              <MapPin className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Desktop Header */}
+          <div className="hidden md:flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
@@ -59,7 +80,7 @@ const AllNewsPage = () => {
               </Button>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">Latest News & Reports</h1>
-                <p className="text-gray-400">Stay informed with the latest developments and editorial content</p>
+                <p className="text-gray-400 text-sm md:text-base">Stay informed with the latest developments and editorial content</p>
               </div>
             </div>
             <Button
