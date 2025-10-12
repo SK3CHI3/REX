@@ -34,28 +34,22 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
 
   const getStatusConfig = (status: Case['status']) => {
     switch (status) {
-      case 'verified':
+      case 'confirmed':
         return {
           color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
           icon: CheckCircle2,
-          label: 'Verified'
+          label: 'Community Verified'
         };
-      case 'investigating':
+      case 'unconfirmed':
         return {
           color: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-          icon: Shield,
-          label: 'Under Investigation'
-        };
-      case 'dismissed':
-        return {
-          color: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
-          icon: XCircle,
-          label: 'Dismissed'
+          icon: AlertTriangle,
+          label: 'Needs Verification'
         };
       default:
         return {
           color: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
-          icon: Shield,
+          icon: AlertTriangle,
           label: status
         };
     }

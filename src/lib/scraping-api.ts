@@ -337,7 +337,7 @@ export async function approveScrapedCase(submissionId: string): Promise<boolean>
         county: submission.county,
         case_type: submission.case_type,
         description: submission.description,
-        status: 'verified',
+        status: 'unconfirmed',
         source: 'Automated Scraper',
         scraped_from_url: submission.scraped_from_url,
         scraping_job_id: submission.scraping_job_id,

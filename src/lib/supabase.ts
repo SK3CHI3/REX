@@ -22,7 +22,7 @@ export interface DatabaseCase {
   longitude: number
   case_type: 'death' | 'assault' | 'harassment' | 'unlawful_arrest' | 'other'
   description: string
-  status: 'verified' | 'investigating' | 'dismissed'
+  status: 'confirmed' | 'unconfirmed'
   source?: string
   reported_by?: string
   justice_served: boolean

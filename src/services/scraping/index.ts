@@ -331,7 +331,7 @@ class ScrapingOrchestrator {
             county: incident.county,
             case_type: incident.case_type,
             description: incident.description,
-            status: 'verified',
+            status: 'unconfirmed',
             source: incident.source,
             scraped_from_url: incident.article_url,
             scraping_job_id: jobId,

@@ -16,7 +16,7 @@ export interface Case {
   coordinates: [number, number];
   type: 'death' | 'assault' | 'harassment' | 'unlawful_arrest' | 'other';
   description: string;
-  status: 'verified' | 'investigating' | 'dismissed';
+  status: 'confirmed' | 'unconfirmed';
   photos?: string[];
   videoLinks?: string[];
   source: string;

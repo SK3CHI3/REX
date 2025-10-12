@@ -71,10 +71,9 @@ const CasePage = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'verified': return 'bg-green-500/20 text-green-400 border-green-500/50';
-      case 'investigating': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
-      case 'dismissed': return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
-      default: return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
+      case 'confirmed': return 'bg-green-500/20 text-green-400 border-green-500/50';
+      case 'unconfirmed': return 'bg-amber-500/20 text-amber-400 border-amber-500/50';
+      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
     }
   };
 

@@ -251,7 +251,7 @@ export async function approveSubmission(submissionId: string): Promise<void> {
         longitude: submission.longitude || 0,
         case_type: submission.case_type,
         description: submission.description,
-        status: 'investigating',
+        status: 'unconfirmed',
         source: 'user_submission',
         reported_by: submission.reporter_name,
         justice_served: submission.justice_served || false,
