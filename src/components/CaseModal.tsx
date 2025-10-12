@@ -38,19 +38,22 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
         return {
           color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
           icon: CheckCircle2,
-          label: 'Community Verified'
+          label: 'Verified',
+          labelFull: 'Community Verified'
         };
       case 'unconfirmed':
         return {
           color: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
           icon: AlertTriangle,
-          label: 'Needs Verification'
+          label: 'Unverified',
+          labelFull: 'Pending Verification'
         };
       default:
         return {
           color: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
           icon: AlertTriangle,
-          label: status
+          label: status,
+          labelFull: status
         };
     }
   };
@@ -169,12 +172,11 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    <Badge className={`${statusConfig.color} border flex items-center space-x-1 px-2 py-0.5 text-xs`}>
+                    <Badge className={`${statusConfig.color} border flex items-center space-x-1 px-2 py-0.5 text-xs whitespace-nowrap`}>
                       <StatusIcon className="w-3 h-3" />
-                      <span className="hidden xs:inline">{statusConfig.label}</span>
-                      <span className="xs:hidden">{statusConfig.label.split(' ')[0]}</span>
+                      <span>{statusConfig.label}</span>
                     </Badge>
-                    <Badge className={`${typeConfig.color} border flex items-center space-x-1 px-2 py-0.5 text-xs`}>
+                    <Badge className={`${typeConfig.color} border flex items-center space-x-1 px-2 py-0.5 text-xs whitespace-nowrap`}>
                       <TypeIcon className="w-3 h-3" />
                       <span>{typeConfig.label}</span>
                     </Badge>
