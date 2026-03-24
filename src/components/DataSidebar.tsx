@@ -155,8 +155,8 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
                     className="text-sm text-gray-300 cursor-pointer flex-1 flex items-center justify-between"
                   >
                     <span>{type.label}</span>
-                    <Badge variant="outline" className="text-xs border-white/20 text-gray-400">
-                      {type.count || 0}
+                     <Badge variant="outline" className="text-xs border-white/20 text-gray-400">
+                      {(type as any).count || 0}
                     </Badge>
                   </label>
                 </div>
