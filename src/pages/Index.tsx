@@ -16,7 +16,7 @@ const Index = () => {
   const [filters, setFilters] = useState<FilterState>({
     counties: [],
     caseTypes: [],
-    yearRange: [2020, 2024]
+    yearRange: [2020, 2024],
   });
 
   // Fetch real cases from Supabase
