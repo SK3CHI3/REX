@@ -267,16 +267,16 @@ const CasePage = () => {
               </div>
 
               {/* Additional Information */}
-              {(caseData.officerNames?.length > 0 || caseData.witnesses?.length > 0) && (
+              {((caseData.officersInvolved && caseData.officersInvolved.length > 0) || (caseData.witnesses && caseData.witnesses.length > 0)) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  {caseData.officerNames && caseData.officerNames.length > 0 && (
+                  {caseData.officersInvolved && caseData.officersInvolved.length > 0 && (
                     <div>
                       <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                         <User className="w-5 h-5 text-yellow-500" />
                         Officers Involved
                       </h3>
                       <ul className="space-y-2">
-                        {caseData.officerNames.map((name, idx) => (
+                        {caseData.officersInvolved.map((officer, idx) => (
                           <li key={idx} className="text-gray-300 pl-4 border-l-2 border-yellow-500/30">
                             {name}
                           </li>
