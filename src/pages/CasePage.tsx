@@ -20,8 +20,8 @@ const CasePage = () => {
 
   useEffect(() => {
     if (caseData) {
-      setLocalConfirmationCount(caseData.confirmationCount || 0);
-      setLocalCommunityVerified(caseData.communityVerified || false);
+      setLocalConfirmationCount(caseData.confirmation_count || 0);
+      setLocalCommunityVerified(caseData.community_verified || false);
       setUserHasConfirmed(hasConfirmed(caseData.id));
     }
   }, [caseData, hasConfirmed]);
