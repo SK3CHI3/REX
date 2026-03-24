@@ -92,7 +92,7 @@ const AdminDashboard = () => {
   const totalPending = totalPendingSubmissions + totalPendingScraped;
 
   const thisMonthCases = cases?.filter(c => {
-    const caseDate = new Date(c.incidentDate);
+    const caseDate = new Date(c.date);
     const now = new Date();
     return caseDate.getMonth() === now.getMonth() && caseDate.getFullYear() === now.getFullYear();
   }).length || 0;
