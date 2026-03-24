@@ -122,14 +122,19 @@ export interface ScrapingStats {
   total_jobs: number;
   successful_jobs: number;
   failed_jobs: number;
-  total_articles_scraped: number;
-  total_incidents_extracted: number;
-  last_successful_scrape: string;
+  running_jobs?: number;
+  total_articles?: number;
+  total_incidents?: number;
+  pending_reviews?: number;
+  total_articles_scraped?: number;
+  total_incidents_extracted?: number;
+  last_successful_scrape?: string;
+  last_job_time?: string | null;
   sources_status: {
-    source_id: string;
-    source_name: string;
-    last_scraped: string;
-    status: 'active' | 'error' | 'disabled';
+    source_id?: string;
+    source_name?: string;
+    last_scraped?: string;
+    status?: 'active' | 'error' | 'disabled';
     error_message?: string;
   }[];
 }

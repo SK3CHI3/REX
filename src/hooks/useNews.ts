@@ -122,16 +122,15 @@ export function useUpdateNews() {
       const { id, ...updateData } = newsData;
       
       // Set published_at when status changes to published
-      if (updateData.status === 'published') {
-        updateData.published_at = new Date().toISOString();
-      }
+      const publishedAt = updateData.status === 'published' ? new Date().toISOString() : undefined;
 
       const { data, error } = await supabase
         .from('news')
         .update({
           ...updateData,
+          ...(publishedAt ? { published_at: publishedAt } : {}),
           updated_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', id)
         .select()
         .single();

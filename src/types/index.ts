@@ -70,13 +70,14 @@ export interface ConfirmCaseResponse {
 }
 
 export interface FilterState {
-  search: string;
+  search?: string;
   counties: string[];
   caseTypes: string[];
-  dateRange: {
+  dateRange?: {
     start: string;
     end: string;
   };
+  yearRange?: [number, number];
 }
 
 export interface SubmitCaseData {

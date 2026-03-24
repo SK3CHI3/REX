@@ -63,8 +63,8 @@ class ScrapingScheduler {
 
     const scheduledTask = cron.schedule(cronExpression, task, {
       scheduled: false,
-      timezone: 'Africa/Nairobi' // Kenya timezone
-    });
+      timezone: 'Africa/Nairobi' as any // Kenya timezone
+    } as any);
 
     this.jobs.set(name, scheduledTask);
     console.log(`Scheduled job: ${name} with cron expression: ${cronExpression}`);

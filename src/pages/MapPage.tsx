@@ -84,7 +84,7 @@ const MapPage = () => {
         keywords="police brutality map, Kenya incidents, interactive map, case tracking, county data, incident visualization"
         url="https://rextracker.online/map"
       />
-      <StructuredData cases={filteredCases} pageType="map" />
+      <StructuredData cases={filteredCases as any} pageType="map" />
       
       <SidebarProvider>
         {/* Mobile Sidebar Trigger */}

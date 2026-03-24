@@ -13,6 +13,8 @@ import MapPage from "./pages/MapPage";
 import AllNewsPage from "./pages/AllCasesPage";
 import CasePage from "./pages/CasePage";
 import CasesIndexPage from "./pages/CasesIndexPage";
+import BlogPage from "./pages/BlogPage";
+import BlogPostPage from "./pages/BlogPostPage";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -40,6 +42,8 @@ const App = () => (
             <Route path="/cases" element={<AllNewsPage />} />
             <Route path="/cases-index" element={<CasesIndexPage />} />
             <Route path="/case/:id" element={<CasePage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/sys-mgmt-portal-auth" element={<AdminLogin />} />
             <Route
               path="/sys-mgmt-portal"

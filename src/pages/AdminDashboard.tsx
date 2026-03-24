@@ -92,7 +92,7 @@ const AdminDashboard = () => {
   const totalPending = totalPendingSubmissions + totalPendingScraped;
 
   const thisMonthCases = cases?.filter(c => {
-    const caseDate = new Date(c.incidentDate);
+    const caseDate = new Date(c.date);
     const now = new Date();
     return caseDate.getMonth() === now.getMonth() && caseDate.getFullYear() === now.getFullYear();
   }).length || 0;
@@ -172,7 +172,7 @@ const AdminDashboard = () => {
                 <span className="text-sm text-gray-300">System Online</span>
               </div>
               <div className="text-sm text-gray-300">
-                Welcome, <span className="font-medium text-white">{user?.full_name || user?.username}</span>
+                Welcome, <span className="font-medium text-white">{(user as any)?.full_name || (user as any)?.username || user?.email}</span>
               </div>
             </div>
 
@@ -590,8 +590,8 @@ const AdminDashboard = () => {
                       Start All Sources
                     </Button>
                     <div className="text-sm text-gray-400">
-                      <p>Last run: {scrapingStatus.data?.last_run ? new Date(scrapingStatus.data.last_run).toLocaleString() : 'Never'}</p>
-                      <p>Status: {scrapingStatus.data?.status || 'Unknown'}</p>
+                      <p>Last run: {(scrapingStatus as any).stats?.last_job_time ? new Date((scrapingStatus as any).stats.last_job_time).toLocaleString() : 'Never'}</p>
+                      <p>Status: {scrapingStatus.isLoading ? 'Loading...' : 'Online'}</p>
                     </div>
                   </div>
                 </div>

@@ -16,7 +16,7 @@ const Index = () => {
   const [filters, setFilters] = useState<FilterState>({
     counties: [],
     caseTypes: [],
-    yearRange: [2020, 2024]
+    yearRange: [2020, 2024],
   });
 
   // Fetch real cases from Supabase
@@ -30,7 +30,8 @@ const Index = () => {
 
     // Use the correct field name 'date' instead of 'incident_date'
     const caseYear = caseItem.date ? new Date(caseItem.date).getFullYear() : 0;
-    const matchesYear = caseYear >= filters.yearRange[0] && caseYear <= filters.yearRange[1];
+    const yr = filters.yearRange || [2020, 2024];
+    const matchesYear = caseYear >= yr[0] && caseYear <= yr[1];
 
     return matchesCounty && matchesCaseType && matchesYear;
   });

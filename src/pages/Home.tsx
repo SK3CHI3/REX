@@ -215,7 +215,7 @@ const Home = () => {
         keywords="police brutality, Kenya, justice, transparency, human rights, police misconduct, accountability, tracking, mapping, incidents, cases, interactive map"
         url="https://rextracker.online"
       />
-      <StructuredData cases={cases || []} pageType="home" />
+      <StructuredData cases={cases as any || []} pageType="home" />
       
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
       {/* Floating Navigation Header */}
@@ -251,6 +251,12 @@ const Home = () => {
                 className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
               >
                 Impact
+              </button>
+              <button 
+                onClick={() => navigate('/blog')}
+                className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
+              >
+                Blog
               </button>
             </div>
 

@@ -40,14 +40,14 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
   };
 
   const handleYearRangeChange = (value: number[]) => {
-    onFiltersChange({ ...filters, yearRange: [value[0], value[1]] });
+    onFiltersChange({ ...filters, yearRange: [value[0], value[1]] as [number, number] });
   };
 
   const clearAllFilters = () => {
     onFiltersChange({
       counties: [],
       caseTypes: [],
-      yearRange: [2020, 2024]
+      yearRange: [2020, 2024],
     });
     setCountySearch('');
   };
@@ -155,8 +155,8 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
                     className="text-sm text-gray-300 cursor-pointer flex-1 flex items-center justify-between"
                   >
                     <span>{type.label}</span>
-                    <Badge variant="outline" className="text-xs border-white/20 text-gray-400">
-                      {type.count || 0}
+                     <Badge variant="outline" className="text-xs border-white/20 text-gray-400">
+                      {(type as any).count || 0}
                     </Badge>
                   </label>
                 </div>
