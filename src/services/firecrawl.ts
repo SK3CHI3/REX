@@ -39,15 +39,16 @@ class FirecrawlService {
         timeout: 30000,
       });
 
-      if (!result.success || !result.data) {
+      const resultData = result as any;
+      if (!resultData.success || !resultData.data) {
         console.error('Failed to scrape URL:', url);
         return null;
       }
 
-      const extractedData = result.data.json as any;
+      const extractedData = resultData.data.json as any;
       
       // Validate and clean extracted data
-      const incident = this.validateAndCleanIncident(extractedData, url, result.data.metadata);
+      const incident = this.validateAndCleanIncident(extractedData, url, resultData.data.metadata);
       
       return incident;
     } catch (error) {
