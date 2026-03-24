@@ -42,6 +42,8 @@ const App = () => (
             <Route path="/cases" element={<AllNewsPage />} />
             <Route path="/cases-index" element={<CasesIndexPage />} />
             <Route path="/case/:id" element={<CasePage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/sys-mgmt-portal-auth" element={<AdminLogin />} />
             <Route
               path="/sys-mgmt-portal"
