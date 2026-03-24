@@ -165,7 +165,6 @@ export async function getScrapingStats(): Promise<ScrapingStats | null> {
 
     if (error) {
       console.error('Error getting scraping stats:', error);
-      // Return default stats if function doesn't exist
       return {
         total_jobs: 0,
         successful_jobs: 0,
@@ -176,13 +175,12 @@ export async function getScrapingStats(): Promise<ScrapingStats | null> {
         pending_reviews: 0,
         last_job_time: null,
         sources_status: []
-      };
+      } as ScrapingStats;
     }
 
     return data;
   } catch (error) {
     console.error('Error getting scraping stats:', error);
-    // Return default stats on error
     return {
       total_jobs: 0,
       successful_jobs: 0,
@@ -193,7 +191,7 @@ export async function getScrapingStats(): Promise<ScrapingStats | null> {
       pending_reviews: 0,
       last_job_time: null,
       sources_status: []
-    };
+    } as ScrapingStats;
   }
 }
 
