@@ -252,6 +252,12 @@ const Home = () => {
               >
                 Impact
               </button>
+              <button 
+                onClick={() => navigate('/blog')}
+                className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
+              >
+                Blog
+              </button>
             </div>
 
             <Button
