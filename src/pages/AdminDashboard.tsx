@@ -590,8 +590,8 @@ const AdminDashboard = () => {
                       Start All Sources
                     </Button>
                     <div className="text-sm text-gray-400">
-                      <p>Last run: {scrapingStatus.data?.last_run ? new Date(scrapingStatus.data.last_run).toLocaleString() : 'Never'}</p>
-                      <p>Status: {scrapingStatus.data?.status || 'Unknown'}</p>
+                      <p>Last run: {(scrapingStatus as any).stats?.last_job_time ? new Date((scrapingStatus as any).stats.last_job_time).toLocaleString() : 'Never'}</p>
+                      <p>Status: {scrapingStatus.isLoading ? 'Loading...' : 'Online'}</p>
                     </div>
                   </div>
                 </div>

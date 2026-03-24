@@ -70,13 +70,14 @@ class FirecrawlService {
         limit: 100,
       });
 
-      if (!mapResult.success || !mapResult.data) {
+      const mapData = mapResult as any;
+      if (!mapData.success || !mapData.data) {
         console.error('Failed to map website:', baseUrl);
         return [];
       }
 
       // Filter URLs that likely contain police brutality content
-      const relevantUrls = mapResult.data.filter((url: string) => 
+      const relevantUrls = mapData.data.filter((url: string) => 
         this.isRelevantUrl(url, searchTerms)
       );
 

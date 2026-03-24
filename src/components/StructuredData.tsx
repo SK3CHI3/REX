@@ -1,13 +1,4 @@
-interface Case {
-  id: string;
-  title: string;
-  description: string;
-  county: string;
-  date: string;
-  type: string;
-  latitude?: number;
-  longitude?: number;
-}
+import { Case } from '@/types';
 
 interface StructuredDataProps {
   cases?: Case[];
@@ -41,7 +32,7 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
       ...(currentCase ? [{
         "@type": "ListItem",
         "position": 3,
-        "name": currentCase.title,
+        "name": currentCase.victimName,
         "item": `https://rextracker.online/cases/${currentCase.id}`
       }] : [])
     ]
@@ -81,7 +72,7 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
   const getCaseStructuredData = (caseItem: Case) => ({
     "@context": "https://schema.org",
     "@type": "Event",
-    "name": caseItem.title,
+    "name": caseItem.victimName,
     "description": caseItem.description,
     "startDate": caseItem.date,
     "location": {
@@ -92,11 +83,11 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
         "addressLocality": caseItem.county,
         "addressCountry": "Kenya"
       },
-      ...(caseItem.latitude && caseItem.longitude ? {
+      ...(caseItem.coordinates ? {
         "geo": {
           "@type": "GeoCoordinates",
-          "latitude": caseItem.latitude,
-          "longitude": caseItem.longitude
+          "latitude": caseItem.coordinates[0],
+          "longitude": caseItem.coordinates[1]
         }
       } : {})
     },
@@ -127,7 +118,7 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
       "url": "https://rextracker.online",
       "logo": {
         "@type": "ImageObject",
-          "url": "https://rextracker.online/logo.svg",
+        "url": "https://rextracker.online/logo.svg",
         "width": 200,
         "height": 200
       }
@@ -178,8 +169,8 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
     ]
   });
 
-  const getStructuredData = () => {
-    const data = [getWebSiteStructuredData(), getBreadcrumbStructuredData()];
+  const getStructuredData = (): any[] => {
+    const data: any[] = [getWebSiteStructuredData(), getBreadcrumbStructuredData()];
     
     if (pageType === 'cases' || pageType === 'map') {
       data.push(getDatasetStructuredData());

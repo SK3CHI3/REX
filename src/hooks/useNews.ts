@@ -128,8 +128,9 @@ export function useUpdateNews() {
         .from('news')
         .update({
           ...updateData,
+          ...(publishedAt ? { published_at: publishedAt } : {}),
           updated_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', id)
         .select()
         .single();

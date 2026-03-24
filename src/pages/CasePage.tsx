@@ -278,7 +278,7 @@ const CasePage = () => {
                       <ul className="space-y-2">
                         {caseData.officersInvolved.map((officer, idx) => (
                           <li key={idx} className="text-gray-300 pl-4 border-l-2 border-yellow-500/30">
-                            {name}
+                            {officer.name}{officer.rank ? ` (${officer.rank})` : ''}
                           </li>
                         ))}
                       </ul>

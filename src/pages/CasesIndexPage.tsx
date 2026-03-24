@@ -145,7 +145,7 @@ const CasesIndexPage = () => {
                       </div>
 
                       {/* Community Verification Indicator */}
-                      {caseItem.communityVerified && (
+                      {caseItem.community_verified && (
                         <div className="mt-3 flex items-center gap-2 text-xs text-green-400">
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                           Community Verified

@@ -137,7 +137,7 @@ const FilterSidebar = ({ isOpen, onClose, filters, onFiltersChange }: FilterSide
               <h3 className="font-medium text-gray-900 text-sm">Year Range</h3>
               <div className="px-2">
                 <Slider
-                  value={filters.yearRange}
+                  value={filters.yearRange || [2020, 2024]}
                   onValueChange={handleYearRangeChange}
                   min={2015}
                   max={2024}
@@ -145,8 +145,8 @@ const FilterSidebar = ({ isOpen, onClose, filters, onFiltersChange }: FilterSide
                   className="mb-2"
                 />
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>{filters.yearRange[0]}</span>
-                  <span>{filters.yearRange[1]}</span>
+                  <span>{(filters.yearRange || [2020, 2024])[0]}</span>
+                  <span>{(filters.yearRange || [2020, 2024])[1]}</span>
                 </div>
               </div>
             </div>

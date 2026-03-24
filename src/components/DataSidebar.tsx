@@ -40,14 +40,14 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
   };
 
   const handleYearRangeChange = (value: number[]) => {
-    onFiltersChange({ ...filters, yearRange: [value[0], value[1]] });
+    onFiltersChange({ ...filters, yearRange: [value[0], value[1]] as [number, number] });
   };
 
   const clearAllFilters = () => {
     onFiltersChange({
       counties: [],
       caseTypes: [],
-      yearRange: [2020, 2024]
+      yearRange: [2020, 2024],
     });
     setCountySearch('');
   };

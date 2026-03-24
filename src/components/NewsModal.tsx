@@ -54,7 +54,7 @@ const NewsModal = ({ isOpen, onClose, article, mode }: NewsModalProps) => {
         excerpt: article.excerpt || '',
         featured_image_url: article.featured_image_url || '',
         author: article.author,
-        status: article.status,
+        status: article.status === 'archived' ? 'draft' : article.status,
         category: article.category || '',
         tags: article.tags || []
       });
