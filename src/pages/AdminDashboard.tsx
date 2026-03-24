@@ -172,7 +172,7 @@ const AdminDashboard = () => {
                 <span className="text-sm text-gray-300">System Online</span>
               </div>
               <div className="text-sm text-gray-300">
-                Welcome, <span className="font-medium text-white">{user?.full_name || user?.username}</span>
+                Welcome, <span className="font-medium text-white">{(user as any)?.full_name || (user as any)?.username || user?.email}</span>
               </div>
             </div>
 
