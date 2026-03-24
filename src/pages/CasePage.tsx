@@ -208,8 +208,8 @@ const CasePage = () => {
                   <div>
                     <div className="text-sm text-gray-400 mb-1">Incident Date</div>
                     <div className="font-semibold">{formatDate(caseData.date)}</div>
-                    {caseData.incidentTime && (
-                      <div className="text-sm text-gray-400">{caseData.incidentTime}</div>
+                    {caseData.time && (
+                      <div className="text-sm text-gray-400">{caseData.time}</div>
                     )}
                   </div>
                 </div>
