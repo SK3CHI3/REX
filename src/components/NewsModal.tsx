@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Eye, Plus, Trash2, Upload, Image } from 'lucide-react';
+import { X, Save, Eye, Plus, Trash2, Upload, Image, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -45,6 +45,7 @@ const NewsModal = ({ isOpen, onClose, article, mode }: NewsModalProps) => {
   const [newTag, setNewTag] = useState('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     if (article && mode === 'edit') {
@@ -158,7 +159,31 @@ const NewsModal = ({ isOpen, onClose, article, mode }: NewsModalProps) => {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex items-center gap-2 mb-4 p-1 bg-black/20 rounded-lg w-fit">
+            <Button
+              type="button"
+              variant={!showPreview ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setShowPreview(false)}
+              className="px-4"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Editor
+            </Button>
+            <Button
+              type="button"
+              variant={showPreview ? "secondary" : "ghost"}
+              size="sm"
+              onClick={() => setShowPreview(true)}
+              className="px-4"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              Preview
+            </Button>
+          </div>
+
+          {!showPreview ? (
+            <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title and Author */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -334,7 +359,78 @@ const NewsModal = ({ isOpen, onClose, article, mode }: NewsModalProps) => {
                 {mode === 'create' ? 'Create Article' : 'Update Article'}
               </Button>
             </div>
-          </form>
+          ) : (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="bg-black/10 rounded-xl p-8 border border-white/5">
+                <h1 className="text-3xl font-bold mb-4">{formData.title || 'Untitled Article'}</h1>
+                <div className="flex items-center gap-4 text-sm text-gray-400 mb-8 pb-4 border-b border-white/5">
+                  <span>By {formData.author || 'Unknown'}</span>
+                  <span>{formData.category || 'No Category'}</span>
+                </div>
+                
+                {imagePreview && (
+                  <img src={imagePreview} alt="Preview" className="w-full h-64 object-cover rounded-xl mb-8" />
+                )}
+
+                <div className="prose prose-invert prose-lg max-w-none
+                  prose-headings:text-white prose-headings:font-bold
+                  prose-p:text-gray-300 prose-p:leading-relaxed
+                  prose-a:text-red-400 prose-a:no-underline hover:prose-a:underline
+                  prose-strong:text-white
+                  prose-blockquote:border-red-500 prose-blockquote:text-gray-300
+                ">
+                  {formData.content?.split('\n\n').map((block, index) => {
+                    const trimmedBlock = block.trim();
+                    if (!trimmedBlock) return null;
+
+                    if (trimmedBlock.startsWith('# ')) return <h1 key={index}>{trimmedBlock.substring(2)}</h1>;
+                    if (trimmedBlock.startsWith('## ')) return <h2 key={index}>{trimmedBlock.substring(3)}</h2>;
+                    if (trimmedBlock.startsWith('### ')) return <h3 key={index}>{trimmedBlock.substring(4)}</h3>;
+
+                    if (trimmedBlock.startsWith('- ') || trimmedBlock.startsWith('* ')) {
+                      const items = block.split('\n').map(line => {
+                        const lt = line.trim();
+                        return lt.startsWith('- ') ? lt.substring(2) : lt.startsWith('* ') ? lt.substring(2) : lt;
+                      }).filter(Boolean);
+                      return <ul key={index}>{items.map((item, i) => <li key={i}>{item}</li>)}</ul>;
+                    }
+
+                    if (/^\d+\. /.test(trimmedBlock)) {
+                      const items = block.split('\n').map(line => line.trim().replace(/^\d+\. /, '')).filter(Boolean);
+                      return <ol key={index}>{items.map((item, i) => <li key={i}>{item}</li>)}</ol>;
+                    }
+
+                    if (trimmedBlock.startsWith('> ')) return <blockquote key={index}>{trimmedBlock.substring(2)}</blockquote>;
+
+                    const parts = trimmedBlock.split(/(\*\*.*?\*\*)/g);
+                    return (
+                      <p key={index}>
+                        {parts.map((part, i) => {
+                          if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={i}>{part.substring(2, part.length - 2)}</strong>;
+                          }
+                          return part;
+                        })}
+                      </p>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setShowPreview(false)}>
+                  Back to Editor
+                </Button>
+                <Button 
+                  onClick={handleSubmit}
+                  disabled={createNews.isPending || updateNews.isPending}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  {mode === 'create' ? 'Create Article' : 'Update Article'}
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

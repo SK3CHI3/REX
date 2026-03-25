@@ -199,10 +199,68 @@ const BlogPostPage = () => {
             prose-strong:text-white
             prose-blockquote:border-red-500 prose-blockquote:text-gray-300
           ">
-            {/* Render content - support basic paragraph splitting */}
-            {article.content?.split('\n\n').map((paragraph, i) => (
-              <p key={i}>{paragraph}</p>
-            ))}
+            {article.content?.split('\n\n').map((block, index) => {
+              const trimmedBlock = block.trim();
+              if (!trimmedBlock) return null;
+
+              // Header 1: # Title
+              if (trimmedBlock.startsWith('# ')) {
+                return <h1 key={index}>{trimmedBlock.substring(2)}</h1>;
+              }
+              // Header 2: ## Title
+              if (trimmedBlock.startsWith('## ')) {
+                return <h2 key={index}>{trimmedBlock.substring(3)}</h2>;
+              }
+              // Header 3: ### Title
+              if (trimmedBlock.startsWith('### ')) {
+                return <h3 key={index}>{trimmedBlock.substring(4)}</h3>;
+              }
+
+              // List items: - Item or * Item
+              if (trimmedBlock.startsWith('- ') || trimmedBlock.startsWith('* ')) {
+                const items = block.split('\n').map(line => {
+                  const lineTrimmed = line.trim();
+                  return lineTrimmed.startsWith('- ') ? lineTrimmed.substring(2) : lineTrimmed.startsWith('* ') ? lineTrimmed.substring(2) : lineTrimmed;
+                }).filter(Boolean);
+                return (
+                  <ul key={index}>
+                    {items.map((item, i) => <li key={i}>{item}</li>)}
+                  </ul>
+                );
+              }
+
+              // Ordered list items: 1. Item
+              if (/^\d+\. /.test(trimmedBlock)) {
+                const items = block.split('\n').map(line => line.trim().replace(/^\d+\. /, '')).filter(Boolean);
+                return (
+                  <ol key={index}>
+                    {items.map((item, i) => <li key={i}>{item}</li>)}
+                  </ol>
+                );
+              }
+
+              // Blockquote: > Quote
+              if (trimmedBlock.startsWith('> ')) {
+                return (
+                  <blockquote key={index}>
+                    {trimmedBlock.substring(2)}
+                  </blockquote>
+                );
+              }
+
+              // Default to paragraph with bold support
+              const parts = trimmedBlock.split(/(\*\*.*?\*\*)/g);
+              return (
+                <p key={index}>
+                  {parts.map((part, i) => {
+                    if (part.startsWith('**') && part.endsWith('**')) {
+                      return <strong key={i}>{part.substring(2, part.length - 2)}</strong>;
+                    }
+                    return part;
+                  })}
+                </p>
+              );
+            })}
           </div>
 
           {/* Tags */}
