@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { NewsArticle, CreateNewsData, UpdateNewsData, useCreateNews, useUpdateNews } from '@/hooks/useNews';
+import MarkdownRenderer from './MarkdownRenderer';
 
 interface NewsModalProps {
   isOpen: boolean;
@@ -359,7 +360,8 @@ const NewsModal = ({ isOpen, onClose, article, mode }: NewsModalProps) => {
                 {mode === 'create' ? 'Create Article' : 'Update Article'}
               </Button>
             </div>
-          ) : (
+          </form>
+        ) : (
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="bg-black/10 rounded-xl p-8 border border-white/5">
                 <h1 className="text-3xl font-bold mb-4">{formData.title || 'Untitled Article'}</h1>
@@ -372,49 +374,7 @@ const NewsModal = ({ isOpen, onClose, article, mode }: NewsModalProps) => {
                   <img src={imagePreview} alt="Preview" className="w-full h-64 object-cover rounded-xl mb-8" />
                 )}
 
-                <div className="prose prose-invert prose-lg max-w-none
-                  prose-headings:text-white prose-headings:font-bold
-                  prose-p:text-gray-300 prose-p:leading-relaxed
-                  prose-a:text-red-400 prose-a:no-underline hover:prose-a:underline
-                  prose-strong:text-white
-                  prose-blockquote:border-red-500 prose-blockquote:text-gray-300
-                ">
-                  {formData.content?.split('\n\n').map((block, index) => {
-                    const trimmedBlock = block.trim();
-                    if (!trimmedBlock) return null;
-
-                    if (trimmedBlock.startsWith('# ')) return <h1 key={index}>{trimmedBlock.substring(2)}</h1>;
-                    if (trimmedBlock.startsWith('## ')) return <h2 key={index}>{trimmedBlock.substring(3)}</h2>;
-                    if (trimmedBlock.startsWith('### ')) return <h3 key={index}>{trimmedBlock.substring(4)}</h3>;
-
-                    if (trimmedBlock.startsWith('- ') || trimmedBlock.startsWith('* ')) {
-                      const items = block.split('\n').map(line => {
-                        const lt = line.trim();
-                        return lt.startsWith('- ') ? lt.substring(2) : lt.startsWith('* ') ? lt.substring(2) : lt;
-                      }).filter(Boolean);
-                      return <ul key={index}>{items.map((item, i) => <li key={i}>{item}</li>)}</ul>;
-                    }
-
-                    if (/^\d+\. /.test(trimmedBlock)) {
-                      const items = block.split('\n').map(line => line.trim().replace(/^\d+\. /, '')).filter(Boolean);
-                      return <ol key={index}>{items.map((item, i) => <li key={i}>{item}</li>)}</ol>;
-                    }
-
-                    if (trimmedBlock.startsWith('> ')) return <blockquote key={index}>{trimmedBlock.substring(2)}</blockquote>;
-
-                    const parts = trimmedBlock.split(/(\*\*.*?\*\*)/g);
-                    return (
-                      <p key={index}>
-                        {parts.map((part, i) => {
-                          if (part.startsWith('**') && part.endsWith('**')) {
-                            return <strong key={i}>{part.substring(2, part.length - 2)}</strong>;
-                          }
-                          return part;
-                        })}
-                      </p>
-                    );
-                  })}
-                </div>
+                <MarkdownRenderer content={formData.content || '_No content to preview_'} />
               </div>
               <div className="flex justify-end gap-2">
                 <Button type="button" variant="outline" onClick={() => setShowPreview(false)}>

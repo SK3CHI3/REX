@@ -129,11 +129,17 @@ const Home = () => {
   };
 
   const handleViewAllNews = () => {
-    navigate('/cases');
+    navigate('/blog');
   };
 
   const handleNewsClick = (article: any) => {
-    setSelectedNewsArticle(article);
+    if (article.slug) {
+      navigate(`/blog/${article.slug}`);
+    } else if (article.url && article.url !== '#') {
+      window.open(article.url, '_blank');
+    } else {
+      setSelectedNewsArticle(article);
+    }
   };
 
   // Secret admin access handler
@@ -642,12 +648,12 @@ const Home = () => {
           </div>
 
           <div className="text-center mt-12">
-            <button
+            <Button
               onClick={handleViewAllNews}
               className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
             >
               View All News & Reports
-            </button>
+            </Button>
           </div>
         </div>
       </section>

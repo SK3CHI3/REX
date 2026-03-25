@@ -18,6 +18,7 @@ export interface NewsArticle {
   updated_by?: string;
   source?: 'admin' | 'scraped';
   scraped_article_id?: string;
+  slug: string;
 }
 
 export interface CreateNewsData {
@@ -29,6 +30,7 @@ export interface CreateNewsData {
   status?: 'draft' | 'published';
   category?: string;
   tags?: string[];
+  slug?: string;
 }
 
 export interface UpdateNewsData extends Partial<CreateNewsData> {
@@ -96,6 +98,7 @@ export function useCreateNews() {
         .from('news')
         .insert({
           ...newsData,
+          slug: newsData.slug || newsData.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-'),
           source: 'admin',
           published_at: newsData.status === 'published' ? new Date().toISOString() : null
         })
@@ -128,6 +131,7 @@ export function useUpdateNews() {
         .from('news')
         .update({
           ...updateData,
+          ...(updateData.title && !updateData.slug ? { slug: updateData.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') } : {}),
           ...(publishedAt ? { published_at: publishedAt } : {}),
           updated_at: new Date().toISOString()
         } as any)
@@ -195,6 +199,7 @@ export function useSyncScrapedNews() {
           source: 'scraped' as const,
           scraped_article_id: article.id,
           published_at: article.published_date || article.created_at,
+          slug: article.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-'),
           tags: ['scraped', 'news']
         }));
 
