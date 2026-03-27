@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown, TrendingUp, Clock } from 'lucide-react';
+import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown, TrendingUp, Clock, Heart, Scale } from 'lucide-react';
+import kenyaStreetsImg from '@/assets/kenya-streets.jpg';
+import kenyaCommunityImg from '@/assets/kenya-community.jpg';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
