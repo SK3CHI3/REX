@@ -1,4 +1,4 @@
-# 🔧 REX Kenya - Technical Overview
+﻿# 🔧 PoliceBrutalityTracker - Technical Overview
 
 ## 🏗️ Architecture
 
@@ -108,9 +108,9 @@ src/
 ### Meta Tags
 ```html
 <!-- Dynamic meta tags -->
-<meta property="og:title" content="REX - Justice through visibility" />
+<meta property="og:title" content="PoliceBrutalityTracker - Justice through visibility" />
 <meta property="og:description" content="Interactive platform mapping incidents..." />
-<meta property="og:image" content="https://rextracker.online/og-image.svg" />
+<meta property="og:image" content="https://policebrutalitytracker.co.ke/og-image.svg" />
 ```
 
 ### Structured Data
@@ -118,8 +118,8 @@ src/
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "REX - Justice through visibility",
-  "url": "https://rextracker.online"
+  "name": "PoliceBrutalityTracker - Justice through visibility",
+  "url": "https://policebrutalitytracker.co.ke"
 }
 ```
 
@@ -241,4 +241,4 @@ jobs:
 
 ---
 
-*This technical overview provides insight into the architecture and implementation of REX Kenya. For specific implementation details, refer to the source code and inline documentation.*
+*This technical overview provides insight into the architecture and implementation of PoliceBrutalityTracker. For specific implementation details, refer to the source code and inline documentation.*

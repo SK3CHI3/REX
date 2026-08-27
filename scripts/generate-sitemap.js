@@ -1,5 +1,5 @@
 /**
- * Dynamic Sitemap Generator for REX Kenya
+ * Dynamic Sitemap Generator for PoliceBrutalityTracker
  * 
  * This script generates a sitemap.xml file that includes all case URLs
  * Run this script before deployment or as part of the build process
@@ -32,7 +32,7 @@ if (!supabaseUrl || !supabaseKey) {
   supabase = createClient(supabaseUrl, supabaseKey);
 }
 
-const BASE_URL = 'https://rextracker.online';
+const BASE_URL = 'https://policebrutalitytracker.co.ke';
 
 // Static pages configuration
 const staticPages = [

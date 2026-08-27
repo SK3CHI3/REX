@@ -1,40 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
   <defs>
-    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#991b1b;stop-opacity:1" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#991b1b"/>
     </linearGradient>
-    <linearGradient id="scaleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#f3f4f6;stop-opacity:1" />
+    <linearGradient id="fg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
     </linearGradient>
   </defs>
   
   <!-- Background circle -->
-  <circle cx="100" cy="100" r="95" fill="url(#shieldGradient)" stroke="#991b1b" stroke-width="5"/>
+  <circle cx="100" cy="100" r="95" fill="url(#bg)"/>
   
-  <!-- Scales of Justice - matching the header emoji style -->
-  <g transform="translate(100, 100)">
-    <!-- Scale base/stand -->
-    <line x1="0" y1="20" x2="0" y2="40" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
+  <!-- Scales of Justice -->
+  <g transform="translate(100, 90)" stroke="url(#fg)" fill="url(#fg)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Vertical post -->
+    <line x1="0" y1="-35" x2="0" y2="40" stroke-width="8"/>
     
-    <!-- Scale beam -->
-    <line x1="-30" y1="20" x2="30" y2="20" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
+    <!-- Base -->
+    <line x1="-20" y1="40" x2="20" y2="40" stroke-width="8"/>
     
-    <!-- Left scale pan -->
-    <line x1="-30" y1="20" x2="-40" y2="5" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
-    <line x1="-40" y1="5" x2="-20" y2="5" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
-    <line x1="-30" y1="5" x2="-30" y2="-5" stroke="url(#scaleGradient)" stroke-width="3" stroke-linecap="round"/>
+    <!-- Beam -->
+    <line x1="-45" y1="-35" x2="45" y2="-35" stroke-width="8"/>
     
-    <!-- Right scale pan -->
-    <line x1="30" y1="20" x2="40" y2="5" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
-    <line x1="40" y1="5" x2="20" y2="5" stroke="url(#scaleGradient)" stroke-width="4" stroke-linecap="round"/>
-    <line x1="30" y1="5" x2="30" y2="-5" stroke="url(#scaleGradient)" stroke-width="3" stroke-linecap="round"/>
+    <!-- Left chains -->
+    <line x1="-45" y1="-35" x2="-55" y2="-10" stroke-width="5"/>
+    <line x1="-45" y1="-35" x2="-35" y2="-10" stroke-width="5"/>
     
-    <!-- Center balance point -->
-    <circle cx="0" cy="20" r="3" fill="url(#scaleGradient)" stroke="#991b1b" stroke-width="1"/>
+    <!-- Right chains -->
+    <line x1="45" y1="-35" x2="55" y2="-10" stroke-width="5"/>
+    <line x1="45" y1="-35" x2="35" y2="-10" stroke-width="5"/>
+    
+    <!-- Left pan -->
+    <path d="M-60,-10 Q-45,2 -30,-10" stroke-width="6" fill="none"/>
+    
+    <!-- Right pan -->
+    <path d="M30,-10 Q45,2 60,-10" stroke-width="6" fill="none"/>
+    
+    <!-- Pivot -->
+    <circle cx="0" cy="-35" r="7" fill="url(#fg)" stroke="none"/>
   </g>
   
-  <!-- REX Text -->
-  <text x="100" y="160" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="url(#scaleGradient)">REX</text>
+  <!-- PBT Text -->
+  <text x="100" y="165" font-family="Arial, sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="url(#fg)">PBT</text>
 </svg>

@@ -1,4 +1,4 @@
-# Community Verification System Documentation
+﻿# Community Verification System Documentation
 
 ## 📋 Table of Contents
 1. [Overview](#overview)
@@ -752,7 +752,7 @@ LIMIT 20;
 
 ### Support
 - GitHub Issues: [Report a bug](https://github.com/YOUR_REPO/issues)
-- Email: support@rextracker.online
+- Email: support@policebrutalitytracker.co.ke
 - Discord: [Join our community](https://discord.gg/YOUR_INVITE)
 
 ---

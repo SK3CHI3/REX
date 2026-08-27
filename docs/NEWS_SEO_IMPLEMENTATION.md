@@ -1,4 +1,4 @@
-# News Article SEO and Accessibility Fix Implementation Plan
+﻿# News Article SEO and Accessibility Fix Implementation Plan
 
 ## Overview
 This document outlines the implementation plan for enhancing SEO and accessibility for the news articles in our application. The changes will cover database migrations, modifications to React components, routing updates, and testing procedures.

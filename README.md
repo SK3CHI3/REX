@@ -1,16 +1,16 @@
-# REX Kenya
+﻿# PoliceBrutalityTracker
 ### Justice through visibility
 
 > **Interactive platform for tracking and mapping police incidents across Kenya**
 
-[![Live Site](https://img.shields.io/badge/Live%20Site-rextracker.online-blue)](https://rextracker.online)
-[![Total Cases](https://img.shields.io/badge/Total%20Cases-500%2B-red)](https://rextracker.online)
-[![Counties Covered](https://img.shields.io/badge/Counties-47%2F47-green)](https://rextracker.online/map)
-[![Last Updated](https://img.shields.io/badge/Last%20Updated-Live-brightgreen)](https://rextracker.online)
+[![Live Site](https://img.shields.io/badge/Live%20Site-policebrutalitytracker.co.ke-blue)](https://policebrutalitytracker.co.ke)
+[![Total Cases](https://img.shields.io/badge/Total%20Cases-500%2B-red)](https://policebrutalitytracker.co.ke)
+[![Counties Covered](https://img.shields.io/badge/Counties-47%2F47-green)](https://policebrutalitytracker.co.ke/map)
+[![Last Updated](https://img.shields.io/badge/Last%20Updated-Live-brightgreen)](https://policebrutalitytracker.co.ke)
 
 ---
 
-REX Kenya is a comprehensive platform that enables citizens to report, track, and analyze police incidents across all 47 counties in Kenya. Our mission is to promote transparency and accountability in law enforcement through real-time data visualization and community engagement.
+PoliceBrutalityTracker is a comprehensive platform that enables citizens to report, track, and analyze police incidents across all 47 counties in Kenya. Our mission is to promote transparency and accountability in law enforcement through real-time data visualization and community engagement.
 
 **Key Objectives:**
 - Document police incidents with precise location data
@@ -35,8 +35,8 @@ REX Kenya is a comprehensive platform that enables citizens to report, track, an
 
 ```bash
 # Clone the repository
-git clone https://github.com/SK3CHI3/REX.git
-cd REX
+git clone https://github.com/SK3CHI3/PoliceBrutalityTracker.git
+cd PoliceBrutalityTracker
 
 # Install dependencies
 npm install
@@ -95,10 +95,10 @@ npm run build
 
 ## License
 
-This project is licensed under the REX Kenya Software License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the PoliceBrutalityTracker Software License - see the [LICENSE](LICENSE) file for details.
 
 ## Links
 
-- **Live Site**: [rextracker.online](https://rextracker.online)
-- **Documentation**: [docs.rextracker.online](https://docs.rextracker.online)
-- **Report Issue**: [GitHub Issues](https://github.com/SK3CHI3/REX/issues)
+- **Live Site**: [policebrutalitytracker.co.ke](https://policebrutalitytracker.co.ke)
+- **Documentation**: [docs.policebrutalitytracker.co.ke](https://docs.policebrutalitytracker.co.ke)
+- **Report Issue**: [GitHub Issues](https://github.com/SK3CHI3/PoliceBrutalityTracker/issues)

@@ -1,4 +1,4 @@
-# Community Verification System - Quick Start Guide
+﻿# Community Verification System - Quick Start Guide
 
 ## 🚀 What Was Implemented
 

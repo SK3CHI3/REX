@@ -1,4 +1,4 @@
-// Cache clearing utility for REX Kenya
+// Cache clearing utility for PoliceBrutalityTracker
 // This script helps clear browser cache when users experience loading issues
 
 (function() {

@@ -1,8 +1,8 @@
-# REX Kenya - SEO Implementation Guide
+﻿# PoliceBrutalityTracker - SEO Implementation Guide
 
 ## 🚀 SEO Score: 500% (Comprehensive Implementation)
 
-This document outlines the comprehensive SEO implementation for the REX Kenya platform, achieving maximum search engine optimization.
+This document outlines the comprehensive SEO implementation for the PoliceBrutalityTracker platform, achieving maximum search engine optimization.
 
 ## 📋 Implementation Checklist
 

@@ -83,7 +83,7 @@ Allow: /case/
 Allow: /
 
 # Sitemap for easy discovery
-Sitemap: https://rextracker.online/sitemap.xml
+Sitemap: https://policebrutalitytracker.co.ke/sitemap.xml
 
 # Note to AI crawlers:
 # Individual case pages are at /case/{id}

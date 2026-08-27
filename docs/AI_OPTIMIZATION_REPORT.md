@@ -1,14 +1,14 @@
-# 🤖 AI Optimization Report - Making AI Love REX Kenya
+﻿# 🤖 AI Optimization Report - Making AI Love PoliceBrutalityTracker
 
 **Date**: October 10, 2025  
 **Version**: 2.0  
-**Purpose**: Optimize REX Kenya for AI chatbots, search engines, and LLM recommendations
+**Purpose**: Optimize PoliceBrutalityTracker for AI chatbots, search engines, and LLM recommendations
 
 ---
 
 ## 📊 Executive Summary
 
-This report outlines strategies to make AI systems (ChatGPT, Claude, Perplexity, Gemini, etc.) **love, cite, and recommend** the REX Kenya website. We'll focus on **AEO (AI Engine Optimization)** and **GEO (Generative Engine Optimization)**.
+This report outlines strategies to make AI systems (ChatGPT, Claude, Perplexity, Gemini, etc.) **love, cite, and recommend** the PoliceBrutalityTracker website. We'll focus on **AEO (AI Engine Optimization)** and **GEO (Generative Engine Optimization)**.
 
 ### 🎯 Primary Goals:
 1. Get cited by AI chatbots when users ask about Kenya police brutality
@@ -138,7 +138,7 @@ Allow: /
 Disallow: /sys-mgmt-portal
 Disallow: /sys-mgmt-portal-auth
 
-Sitemap: https://rextracker.online/sitemap.xml
+Sitemap: https://policebrutalitytracker.co.ke/sitemap.xml
 ```
 
 #### 1.2 Create Public API Endpoint
@@ -195,16 +195,16 @@ Sitemap: https://rextracker.online/sitemap.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>REX Kenya - Police Brutality Cases</title>
-    <link>https://rextracker.online</link>
+    <title>PoliceBrutalityTracker - Police Brutality Cases</title>
+    <link>https://policebrutalitytracker.co.ke</link>
     <description>Real-time tracking of police brutality cases in Kenya</description>
-    <atom:link href="https://rextracker.online/rss.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="https://policebrutalitytracker.co.ke/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
       <title>Case: [Victim Name]</title>
-      <link>https://rextracker.online/cases/[id]</link>
+      <link>https://policebrutalitytracker.co.ke/cases/[id]</link>
       <description>[Case description]</description>
       <pubDate>[ISO Date]</pubDate>
-      <guid>https://rextracker.online/cases/[id]</guid>
+      <guid>https://policebrutalitytracker.co.ke/cases/[id]</guid>
     </item>
   </channel>
 </rss>
@@ -220,10 +220,10 @@ Sitemap: https://rextracker.online/sitemap.xml
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "What is REX Kenya?",
+      "name": "What is PoliceBrutalityTracker?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "REX Kenya is a comprehensive platform tracking police brutality cases across all 47 counties in Kenya, providing transparency and accountability through data visualization and community verification."
+        "text": "PoliceBrutalityTracker is a comprehensive platform tracking police brutality cases across all 47 counties in Kenya, providing transparency and accountability through data visualization and community verification."
       }
     },
     {
@@ -258,12 +258,12 @@ Sitemap: https://rextracker.online/sitemap.xml
 Police brutality refers to the use of excessive or unnecessary force by law enforcement officers...
 
 ### How common is police brutality in Kenya?
-REX Kenya has documented over [X] cases across [Y] counties since [date]...
+PoliceBrutalityTracker has documented over [X] cases across [Y] counties since [date]...
 
 ### What can I do if I witness police brutality?
 1. Ensure your safety first
 2. Document the incident (photos, videos)
-3. Report through REX Kenya's secure platform
+3. Report through PoliceBrutalityTracker's secure platform
 4. Seek legal assistance
 ```
 
@@ -282,7 +282,7 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
 **Add conversational content:**
 - "Where can I report police brutality in Kenya?"
 - "How many police brutality cases in Nairobi?"
-- "What is the REX Kenya tracker?"
+- "What is the PoliceBrutalityTracker tracker?"
 - "How do I verify a police brutality case?"
 
 ### **Phase 3: Technical Enhancements** 🔧
@@ -294,10 +294,10 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "REX Kenya",
+  "name": "PoliceBrutalityTracker",
   "alternateName": "Kenya Police Brutality Tracker",
-  "url": "https://rextracker.online",
-  "logo": "https://rextracker.online/logo.svg",
+  "url": "https://policebrutalitytracker.co.ke",
+  "logo": "https://policebrutalitytracker.co.ke/logo.svg",
   "description": "Comprehensive platform tracking police brutality cases across Kenya with real-time data visualization and community verification",
   "foundingDate": "2025",
   "address": {
@@ -306,8 +306,8 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
     "addressRegion": "Nairobi"
   },
   "sameAs": [
-    "https://twitter.com/rexkenya",
-    "https://github.com/SK3CHI3/REX"
+    "https://twitter.com/PBTKenya",
+    "https://github.com/SK3CHI3/PoliceBrutalityTracker"
   ],
   "knowsAbout": [
     "Police Brutality",
@@ -331,13 +331,13 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://rextracker.online"
+      "item": "https://policebrutalitytracker.co.ke"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Map",
-      "item": "https://rextracker.online/map"
+      "item": "https://policebrutalitytracker.co.ke/map"
     }
   ]
 }
@@ -351,16 +351,16 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
   "@type": "Dataset",
   "name": "Kenya Police Brutality Cases Database",
   "description": "Comprehensive database of police brutality incidents across all 47 counties in Kenya",
-  "url": "https://rextracker.online/cases",
+  "url": "https://policebrutalitytracker.co.ke/cases",
   "keywords": ["police brutality", "Kenya", "human rights", "justice"],
   "creator": {
     "@type": "Organization",
-    "name": "REX Kenya"
+    "name": "PoliceBrutalityTracker"
   },
   "distribution": {
     "@type": "DataDownload",
     "encodingFormat": "JSON",
-    "contentUrl": "https://rextracker.online/api/v1/cases"
+    "contentUrl": "https://policebrutalitytracker.co.ke/api/v1/cases"
   },
   "temporalCoverage": "2024/..",
   "spatialCoverage": {
@@ -378,8 +378,8 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
 #### 4.1 Add Citation Metadata
 
 ```html
-<meta name="citation_title" content="REX Kenya Police Brutality Tracker">
-<meta name="citation_author" content="REX Kenya Team">
+<meta name="citation_title" content="PoliceBrutalityTracker Police Brutality Tracker">
+<meta name="citation_author" content="PoliceBrutalityTracker Team">
 <meta name="citation_publication_date" content="2025">
 <meta name="citation_online_date" content="2025-10-10">
 <meta name="citation_language" content="en">
@@ -391,9 +391,9 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
 **Add to footer:**
 ```html
 <section class="citation-guide">
-  <h3>How to Cite REX Kenya</h3>
-  <p>APA: REX Kenya. (2025). Kenya Police Brutality Tracker. https://rextracker.online</p>
-  <p>MLA: "REX Kenya Police Brutality Tracker." REX Kenya, 2025, https://rextracker.online</p>
+  <h3>How to Cite PoliceBrutalityTracker</h3>
+  <p>APA: PoliceBrutalityTracker. (2025). Kenya Police Brutality Tracker. https://policebrutalitytracker.co.ke</p>
+  <p>MLA: "PoliceBrutalityTracker Police Brutality Tracker." PoliceBrutalityTracker, 2025, https://policebrutalitytracker.co.ke</p>
 </section>
 ```
 
@@ -403,7 +403,7 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
 
 **Add meta description optimized for AI:**
 ```html
-<meta name="description" content="REX Kenya tracks police brutality cases across all 47 counties with real-time data, interactive maps, and community verification. Report incidents anonymously and access verified data on justice and accountability in Kenya.">
+<meta name="description" content="PoliceBrutalityTracker tracks police brutality cases across all 47 counties with real-time data, interactive maps, and community verification. Report incidents anonymously and access verified data on justice and accountability in Kenya.">
 ```
 
 #### 5.2 Add "tldr" Meta Tags
@@ -458,7 +458,7 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
    - Set up custom dimensions
 
 2. **Citation Frequency**
-   - Google "site:rextracker.online" weekly
+   - Google "site:policebrutalitytracker.co.ke" weekly
    - Monitor backlinks
    - Track AI-generated content mentions
 
@@ -550,7 +550,7 @@ REX Kenya has documented over [X] cases across [Y] counties since [date]...
 
 ## 🎓 Conclusion
 
-By implementing these optimizations, REX Kenya will become:
+By implementing these optimizations, PoliceBrutalityTracker will become:
 - **AI's #1 choice** for Kenya police brutality data
 - **Highly cited** by ChatGPT, Claude, Perplexity
 - **Featured** in AI-generated summaries

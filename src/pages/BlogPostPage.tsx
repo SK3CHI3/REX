@@ -77,26 +77,26 @@ const BlogPostPage = () => {
     "@type": "BlogPosting",
     "headline": article.seo_title || article.title,
     "description": article.seo_description || article.excerpt || article.content?.substring(0, 160),
-    "image": article.featured_image_url || "https://rextracker.online/og-image.svg",
+    "image": article.featured_image_url || "https://policebrutalitytracker.co.ke/og-image.svg",
     "author": {
       "@type": "Person",
       "name": article.author
     },
     "publisher": {
       "@type": "Organization",
-      "name": "REX Kenya",
+      "name": "PoliceBrutalityTracker",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://rextracker.online/logo.svg"
+        "url": "https://policebrutalitytracker.co.ke/logo.svg"
       }
     },
     "datePublished": article.published_at || article.created_at,
     "dateModified": article.updated_at,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://rextracker.online/blog/${slug}`
+      "@id": `https://policebrutalitytracker.co.ke/blog/${slug}`
     },
-    "url": `https://rextracker.online/blog/${slug}`,
+    "url": `https://policebrutalitytracker.co.ke/blog/${slug}`,
     "keywords": article.tags?.join(', ') || 'police brutality, Kenya, human rights',
     "articleSection": article.category || 'News',
     "wordCount": article.content?.split(/\s+/).length || 0,
@@ -107,19 +107,19 @@ const BlogPostPage = () => {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://rextracker.online" },
-      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://rextracker.online/blog" },
-      { "@type": "ListItem", "position": 3, "name": article.title, "item": `https://rextracker.online/blog/${slug}` }
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://policebrutalitytracker.co.ke" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://policebrutalitytracker.co.ke/blog" },
+      { "@type": "ListItem", "position": 3, "name": article.title, "item": `https://policebrutalitytracker.co.ke/blog/${slug}` }
     ]
   };
 
   return (
     <>
       <SEOHead
-        title={`${article.seo_title || article.title} | REX Kenya`}
+        title={`${article.seo_title || article.title} | PoliceBrutalityTracker`}
         description={article.seo_description || article.excerpt || article.content?.substring(0, 155) + '...'}
         keywords={article.tags?.join(', ') || `${article.category}, police brutality Kenya, human rights`}
-        url={`https://rextracker.online/blog/${slug}`}
+        url={`https://policebrutalitytracker.co.ke/blog/${slug}`}
         image={article.featured_image_url || undefined}
         type="article"
         structuredData={[articleStructuredData, breadcrumbData]}
@@ -215,7 +215,7 @@ const BlogPostPage = () => {
               </div>
               <div>
                 <p className="font-semibold text-white">{article.author}</p>
-                <p className="text-sm text-gray-400">REX Kenya Contributor</p>
+                <p className="text-sm text-gray-400">PoliceBrutalityTracker Contributor</p>
               </div>
             </CardContent>
           </Card>
@@ -249,7 +249,7 @@ const BlogPostPage = () => {
 
           {/* CTA */}
           <div className="text-center mt-12 pt-8 border-t border-white/10">
-            <p className="text-gray-400 mb-4">Explore more from REX Kenya</p>
+            <p className="text-gray-400 mb-4">Explore more from PoliceBrutalityTracker</p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button onClick={() => navigate('/blog')} variant="outline" className="border-white/20 text-gray-300 hover:bg-white/10">
                 More Articles

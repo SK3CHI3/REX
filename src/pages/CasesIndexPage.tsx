@@ -37,20 +37,20 @@ const CasesIndexPage = () => {
     "@type": "CollectionPage",
     "name": "Police Brutality Cases in Kenya",
     "description": "Comprehensive database of documented police brutality cases across all 47 counties in Kenya",
-    "url": "https://rextracker.online/cases-index",
+    "url": "https://policebrutalitytracker.co.ke/cases-index",
     "publisher": {
       "@type": "Organization",
-      "name": "REX Kenya",
+      "name": "PoliceBrutalityTracker",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://rextracker.online/logo.svg"
+        "url": "https://policebrutalitytracker.co.ke/logo.svg"
       }
     },
     "numberOfItems": cases?.length || 0,
     "itemListElement": cases?.slice(0, 100).map((caseItem, index) => ({
       "@type": "ListItem",
       "position": index + 1,
-      "url": `https://rextracker.online/case/${caseItem.id}`,
+      "url": `https://policebrutalitytracker.co.ke/case/${caseItem.id}`,
       "name": `${caseItem.victimName} - ${caseItem.county}`,
       "description": caseItem.description.substring(0, 200)
     })) || []
@@ -59,10 +59,10 @@ const CasesIndexPage = () => {
   return (
     <>
       <SEOHead
-        title="All Police Brutality Cases Database | REX Kenya"
+        title="All Police Brutality Cases Database | PoliceBrutalityTracker"
         description={`Browse ${cases?.length || 'all'} documented police brutality cases across Kenya's 47 counties. Comprehensive database for transparency and accountability.`}
         keywords="police brutality cases, Kenya database, all cases, incident list, human rights violations, police accountability"
-        url="https://rextracker.online/cases-index"
+        url="https://policebrutalitytracker.co.ke/cases-index"
       />
       
       {/* Structured Data for AI */}
@@ -81,7 +81,7 @@ const CasesIndexPage = () => {
               {cases?.length || 0} documented cases across Kenya's 47 counties
             </p>
             <p className="text-gray-500 text-sm mt-2">
-              This page lists all police brutality cases tracked by REX Kenya. Click any case to view full details.
+              This page lists all police brutality cases tracked by PoliceBrutalityTracker. Click any case to view full details.
             </p>
           </div>
         </div>
@@ -171,7 +171,7 @@ const CasesIndexPage = () => {
             <div className="prose prose-invert max-w-none">
               <h2 className="text-2xl font-bold mb-4">About This Database</h2>
               <p className="text-gray-300 mb-4">
-                REX Kenya maintains a comprehensive database of police brutality cases across all 47 counties in Kenya. 
+                PoliceBrutalityTracker maintains a comprehensive database of police brutality cases across all 47 counties in Kenya. 
                 Each case is documented with location data, incident details, victim information, and current investigation status.
               </p>
               <p className="text-gray-300 mb-4">

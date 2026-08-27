@@ -1,33 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
   <defs>
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#991b1b;stop-opacity:1" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444"/>
+      <stop offset="100%" stop-color="#991b1b"/>
     </linearGradient>
-    <linearGradient id="scaleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:1" />
+    <linearGradient id="fg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
     </linearGradient>
   </defs>
   
-  <!-- Background circle -->
-  <circle cx="8" cy="8" r="7.5" fill="url(#bgGradient)" stroke="#7f1d1d" stroke-width="0.5"/>
+  <circle cx="8" cy="8" r="8" fill="url(#bg)"/>
   
-  <!-- Scales of Justice - Simplified for small size -->
-  <g transform="translate(8, 8)">
-    <!-- Main vertical support -->
-    <line x1="0" y1="-4" x2="0" y2="4" stroke="url(#scaleGradient)" stroke-width="1.5" stroke-linecap="round"/>
-    
-    <!-- Horizontal beam -->
-    <line x1="-4" y1="-4" x2="4" y2="-4" stroke="url(#scaleGradient)" stroke-width="1.5" stroke-linecap="round"/>
-    
-    <!-- Left scale pan -->
-    <ellipse cx="-4" cy="-1" rx="2" ry="1" fill="url(#scaleGradient)" stroke="#e2e8f0" stroke-width="0.3"/>
-    
-    <!-- Right scale pan -->
-    <ellipse cx="4" cy="-1" rx="2" ry="1" fill="url(#scaleGradient)" stroke="#e2e8f0" stroke-width="0.3"/>
-    
-    <!-- Center pivot point -->
-    <circle cx="0" cy="-4" r="0.8" fill="url(#scaleGradient)" stroke="#7f1d1d" stroke-width="0.3"/>
+  <g transform="translate(8, 7.5)" stroke="url(#fg)" fill="url(#fg)" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="0" y1="-3.5" x2="0" y2="4.5" stroke-width="1.5"/>
+    <line x1="-2.5" y1="4.5" x2="2.5" y2="4.5" stroke-width="1.5"/>
+    <line x1="-5" y1="-3.5" x2="5" y2="-3.5" stroke-width="1.5"/>
+    <line x1="-5" y1="-3.5" x2="-6" y2="-1" stroke-width="1"/>
+    <line x1="-5" y1="-3.5" x2="-4" y2="-1" stroke-width="1"/>
+    <line x1="5" y1="-3.5" x2="6" y2="-1" stroke-width="1"/>
+    <line x1="5" y1="-3.5" x2="4" y2="-1" stroke-width="1"/>
+    <path d="M-6.5,-1 Q-5,0.5 -3.5,-1" stroke-width="1.2" fill="none"/>
+    <path d="M3.5,-1 Q5,0.5 6.5,-1" stroke-width="1.2" fill="none"/>
+    <circle cx="0" cy="-3.5" r="1" fill="url(#fg)" stroke="none"/>
   </g>
 </svg>

@@ -1,4 +1,4 @@
-# Blog Accessibility Fix Implementation Plan
+﻿# Blog Accessibility Fix Implementation Plan
 
 ## Overview
 This document outlines the implementation plan for fixing accessibility issues in the blog sections of the website. The primary goal is to ensure that the blog is usable and accessible to all users, including those with disabilities.

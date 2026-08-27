@@ -96,14 +96,14 @@ const CasePage = () => {
     "datePublished": caseData.date,
     "author": {
       "@type": "Organization",
-      "name": "REX Kenya"
+      "name": "PoliceBrutalityTracker"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "REX Kenya",
+      "name": "PoliceBrutalityTracker",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://rextracker.online/logo.svg"
+        "url": "https://policebrutalitytracker.co.ke/logo.svg"
       }
     },
     "location": {
@@ -135,10 +135,10 @@ const CasePage = () => {
   return (
     <>
       <SEOHead
-        title={`${caseData.victimName} - ${caseData.county} | REX Kenya`}
+        title={`${caseData.victimName} - ${caseData.county} | PoliceBrutalityTracker`}
         description={`Police brutality case in ${caseData.county}, Kenya. ${caseData.description.substring(0, 150)}...`}
         keywords={`police brutality, ${caseData.county}, ${caseData.victimName}, Kenya, human rights, ${caseData.type}`}
-        url={`https://rextracker.online/case/${caseData.id}`}
+        url={`https://policebrutalitytracker.co.ke/case/${caseData.id}`}
       />
       
       {/* Structured Data for AI */}

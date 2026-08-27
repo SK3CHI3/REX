@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useCases } from '@/hooks/useCases';
-import { useRecentScrapedArticles } from '@/hooks/useScraping';
 import { useVisitorTracking } from '@/hooks/useVisitorTracking';
 import { useRecentNews } from '@/hooks/useNews';
 import NewsDetailModal from '@/components/NewsDetailModal';
@@ -38,59 +37,6 @@ const formatCaseType = (type: string | null | undefined) => {
   ).join(' ');
 };
 
-const formatArticleForNews = (article: any) => {
-  const extractedData = article.extracted_data || {};
-  const sourceName = article.scraping_sources?.name || 'Unknown Source';
-
-  // Determine category based on case type
-  const getCategoryFromCaseType = (caseType: string) => {
-    switch (caseType) {
-      case 'death': return 'Fatal Incident';
-      case 'assault': return 'Assault';
-      case 'harassment': return 'Harassment';
-      case 'unlawful_arrest': return 'Arrest';
-      default: return 'Investigation';
-    }
-  };
-
-  // Create excerpt from content or description
-  const createExcerpt = (content: string, description: string) => {
-    const text = description || content || '';
-    return text.length > 150 ? text.substring(0, 150) + '...' : text;
-  };
-
-  return {
-    title: article.title || extractedData.victim_name ?
-      `Police Incident: ${extractedData.victim_name || 'Victim'}` :
-      'Police Brutality Incident Reported',
-    excerpt: createExcerpt(article.content, extractedData.description),
-    source: sourceName,
-    date: formatRelativeDate(article.created_at),
-    category: getCategoryFromCaseType(extractedData.case_type),
-    url: article.url || '#', // Use actual article URL or fallback
-    location: extractedData.location || 'Kenya',
-    image: getImageForCategory(extractedData.case_type)
-  };
-};
-
-const getImageForCategory = (caseType: string) => {
-  // Use police brutality/justice related fallback image for news articles
-  const fallbackImage = 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80'; // Justice/protest image
-
-  switch (caseType) {
-    case 'death':
-      return 'https://images.unsplash.com/photo-1586339949916-3e9457bef6d3?w=400&h=250&fit=crop&q=80'; // Memorial/candles
-    case 'assault':
-      return 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=250&fit=crop&q=80'; // Justice scales
-    case 'harassment':
-      return 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80'; // Protest/justice
-    case 'unlawful_arrest':
-      return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop&q=80'; // Police/law enforcement
-    default:
-      return fallbackImage;
-  }
-};
-
 const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
   const target = e.target as HTMLImageElement;
   const parent = target.parentElement;
@@ -116,8 +62,7 @@ const Home = () => {
 
   const navigate = useNavigate();
   const { data: cases, isLoading, error } = useCases();
-  const { data: scrapedArticles, isLoading: articlesLoading } = useRecentScrapedArticles(3);
-  const { data: newsArticles } = useRecentNews(3);
+  const { data: newsArticles, isLoading: articlesLoading } = useRecentNews(3);
 
   // News modal state
   const [selectedNewsArticle, setSelectedNewsArticle] = useState<any>(null);
@@ -218,10 +163,10 @@ const Home = () => {
   return (
     <>
       <SEOHead
-        title="REX - Justice through visibility | Police Brutality Tracking Kenya"
+        title="PoliceBrutalityTracker - Justice through visibility | Police Brutality Tracking Kenya"
         description="Interactive platform mapping incidents of police brutality across Kenya. Track, report, and visualize cases of police misconduct. Justice through visibility and transparency."
         keywords="police brutality, Kenya, justice, transparency, human rights, police misconduct, accountability, tracking, mapping, incidents, cases, interactive map"
-        url="https://rextracker.online"
+        url="https://policebrutalitytracker.co.ke"
       />
       <StructuredData cases={cases as any || []} pageType="home" />
       
@@ -236,7 +181,7 @@ const Home = () => {
                 <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold tracking-tight">REX</h1>
+                <h1 className="text-xl font-bold tracking-tight">PoliceBrutalityTracker</h1>
                 <p className="text-xs text-gray-300 hidden sm:block">Justice through visibility</p>
               </div>
             </div>
@@ -447,7 +392,7 @@ const Home = () => {
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              REX exists to create transparency and accountability in law enforcement through 
+              PoliceBrutalityTracker exists to create transparency and accountability in law enforcement through
               comprehensive documentation and community empowerment.
             </p>
           </div>
@@ -558,64 +503,12 @@ const Home = () => {
                   </div>
                 </div>
               ))
-            ) : scrapedArticles && scrapedArticles.length > 0 ? (
-              // Real scraped articles
-              scrapedArticles.map((rawArticle, index) => {
-                const article = formatArticleForNews(rawArticle);
-                return (
-              <div key={index} className="group cursor-pointer" onClick={() => handleNewsClick(article)}>
-                <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      onError={handleImageError}
-                    />
-                    <div className="absolute top-4 left-4">
-                      <span className="bg-red-500/90 text-white text-xs font-medium px-3 py-1 rounded-full">
-                        {article.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
-                      <span>{article.source}</span>
-                      <span>{article.date}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-white mb-3 line-clamp-2">{article.title}</h3>
-                    <p className="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-4">{article.excerpt}</p>
-                    {article.url && article.url !== '#' ? (
-                      <a
-                        href={article.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
-                      >
-                        Read More
-                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </a>
-                    ) : (
-                      <span className="inline-flex items-center text-gray-500 text-sm font-medium">
-                        Source Unavailable
-                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636" />
-                        </svg>
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-                );
-              })
             ) : (
-              // Fallback when no scraped articles available
+              // Fallback when no news articles available
               [
                 {
                   title: "No Recent Articles Available",
-                  excerpt: "We're currently scraping news sources for the latest police brutality incidents. Check back soon for updates.",
+                  excerpt: "New reports and analysis are published regularly. Check back soon for updates.",
                   source: "System",
                   date: "Now",
                   category: "Info",
@@ -709,7 +602,7 @@ const Home = () => {
                 <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
                   <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
                 </div>
-                <span className="text-xl font-bold">REX</span>
+                <span className="text-xl font-bold">PoliceBrutalityTracker</span>
               </div>
               <p className="text-gray-400 text-sm">
                 Justice through visibility
@@ -757,7 +650,7 @@ const Home = () => {
           <div className="pt-8 border-t border-white/10">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <p className="text-gray-400 text-sm text-center md:text-left mb-4 md:mb-0">
-                © {new Date().getFullYear()} REX. Building a safer Kenya through transparency and accountability.
+                © {new Date().getFullYear()} PoliceBrutalityTracker. Building a safer Kenya through transparency and accountability.
               </p>
               <div className="flex items-center space-x-6">
                 <span className="text-gray-400 text-sm">Together for justice</span>

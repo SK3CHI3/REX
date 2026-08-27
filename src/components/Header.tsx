@@ -39,7 +39,7 @@ const Header = ({ onOpenFilters, onSubmitCase, caseCount }: HeaderProps) => {
               <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">REX</h1>
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">PoliceBrutalityTracker</h1>
               <p className="text-xs text-gray-400 hidden sm:block">Justice through visibility</p>
             </div>
           </div>

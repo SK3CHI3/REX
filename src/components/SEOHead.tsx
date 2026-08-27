@@ -11,15 +11,15 @@ interface SEOHeadProps {
 }
 
 const SEOHead = ({
-  title = "REX - Justice through visibility | Police Brutality Tracking Kenya",
+  title = "PoliceBrutalityTracker - Justice through visibility | Police Brutality Tracking Kenya",
   description = "Interactive platform mapping incidents of police brutality across Kenya. Track, report, and visualize cases of police misconduct. Justice through visibility and transparency.",
   keywords = "police brutality, Kenya, justice, transparency, human rights, police misconduct, accountability, tracking, mapping, incidents, cases",
-  image = "https://rextracker.online/og-image.svg",
-  url = "https://rextracker.online",
+  image = "https://policebrutalitytracker.co.ke/og-image.svg",
+  url = "https://policebrutalitytracker.co.ke",
   type = "website",
   structuredData
 }: SEOHeadProps) => {
-  const fullTitle = title.includes("REX") ? title : `${title} | REX Kenya`;
+  const fullTitle = title.includes("PoliceBrutalityTracker") ? title : `${title} | PoliceBrutalityTracker`;
   
   useEffect(() => {
     // Update document title

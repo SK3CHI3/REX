@@ -1,6 +1,6 @@
 <?php
 /**
- * Dynamic Sitemap Generator for REX Kenya
+ * Dynamic Sitemap Generator for PoliceBrutalityTracker
  * 
  * This file generates a sitemap that includes all case URLs dynamically
  * Note: This requires PHP on the server. For static hosting, use the Node.js version instead.
@@ -10,7 +10,7 @@ header('Content-Type: application/xml; charset=utf-8');
 
 // Database connection (replace with your actual credentials)
 $host = getenv('DB_HOST') ?: 'localhost';
-$dbname = getenv('DB_NAME') ?: 'rex_kenya';
+$dbname = getenv('DB_NAME') ?: 'policebrutalitytracker';
 $username = getenv('DB_USER') ?: 'root';
 $password = getenv('DB_PASS') ?: '';
 
@@ -27,7 +27,7 @@ try {
     $cases = [];
 }
 
-$baseUrl = 'https://rextracker.online';
+$baseUrl = 'https://policebrutalitytracker.co.ke';
 ?>
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -74,7 +74,7 @@ const AdminLogin = () => {
               <Shield className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-white mb-2">Admin Access</h1>
-            <p className="text-gray-300">REX Administrative Panel</p>
+            <p className="text-gray-300">PoliceBrutalityTracker Administrative Panel</p>
           </div>
 
           {/* Login Form */}

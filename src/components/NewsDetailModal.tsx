@@ -104,7 +104,7 @@ const NewsDetailModal = ({ isOpen, onClose, article }: NewsDetailModalProps) => 
                       : 'border-purple-500/70 bg-purple-500/20 text-purple-300'
                   }`}
                 >
-                  {article.source === 'admin' ? 'REX Editorial' : 'News Source'}
+                  {article.source === 'admin' ? 'PBT Editorial' : 'News Source'}
                 </Badge>
               )}
             </div>

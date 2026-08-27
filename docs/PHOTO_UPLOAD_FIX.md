@@ -1,4 +1,4 @@
-# Photo Upload Fix Documentation
+﻿# Photo Upload Fix Documentation
 
 ## Issue Identified
 Photos submitted with cases were not appearing after approval because:

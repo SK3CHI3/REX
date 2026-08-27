@@ -1,11 +1,11 @@
-# 🤝 Contributing to REX Kenya
+﻿# 🤝 Contributing to PoliceBrutalityTracker
 
-Thank you for your interest in contributing to REX Kenya! We welcome contributions from the community to help make police accountability more transparent.
+Thank you for your interest in contributing to PoliceBrutalityTracker! We welcome contributions from the community to help make police accountability more transparent.
 
 ## 🎯 How to Contribute
 
 ### 🐛 Bug Reports
-- Use the [GitHub Issues](https://github.com/SK3CHI3/REX/issues) template
+- Use the [GitHub Issues](https://github.com/SK3CHI3/PoliceBrutalityTracker/issues) template
 - Include steps to reproduce the bug
 - Provide screenshots if applicable
 - Specify your browser and device information
@@ -26,8 +26,8 @@ Thank you for your interest in contributing to REX Kenya! We welcome contributio
 #### Setup
 ```bash
 # Fork the repository
-git clone https://github.com/YOUR_USERNAME/REX.git
-cd REX
+git clone https://github.com/YOUR_USERNAME/PoliceBrutalityTracker.git
+cd PoliceBrutalityTracker
 
 # Install dependencies
 npm install
@@ -113,9 +113,9 @@ npm run build
 
 ## 🆘 Need Help?
 
-- Join our [Discord community](https://discord.gg/rexkenya)
-- Check existing [GitHub Discussions](https://github.com/SK3CHI3/REX/discussions)
-- Email us at [support@rextracker.online](mailto:support@rextracker.online)
+- Join our [Discord community](https://discord.gg/PBTKenya)
+- Check existing [GitHub Discussions](https://github.com/SK3CHI3/PoliceBrutalityTracker/discussions)
+- Email us at [support@policebrutalitytracker.co.ke](mailto:support@policebrutalitytracker.co.ke)
 
 ## 🙏 Recognition
 
@@ -124,4 +124,4 @@ Contributors will be recognized in:
 - Release notes
 - Project documentation
 
-Thank you for helping make REX Kenya better! ⚖️
+Thank you for helping make PoliceBrutalityTracker better! ⚖️

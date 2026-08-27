@@ -1,9 +1,9 @@
-// Service Worker for REX Kenya
+// Service Worker for PoliceBrutalityTracker
 // Version updated: Increment this when deploying changes
 const CACHE_VERSION = 'v3.0.0';
-const CACHE_NAME = `rex-kenya-${CACHE_VERSION}`;
-const CACHE_NAME_STATIC = `rex-kenya-static-${CACHE_VERSION}`;
-const CACHE_NAME_DYNAMIC = `rex-kenya-dynamic-${CACHE_VERSION}`;
+const CACHE_NAME = `pbt-${CACHE_VERSION}`;
+const CACHE_NAME_STATIC = `pbt-static-${CACHE_VERSION}`;
+const CACHE_NAME_DYNAMIC = `pbt-dynamic-${CACHE_VERSION}`;
 
 // Static assets that rarely change - cache-first strategy
 const STATIC_ASSETS = [
@@ -59,7 +59,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           // Delete old caches that don't match current version
-          if (cacheName.startsWith('rex-kenya-') && !cacheName.includes(CACHE_VERSION)) {
+          if (cacheName.startsWith('pbt-') && !cacheName.includes(CACHE_VERSION)) {
             console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }

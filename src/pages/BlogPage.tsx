@@ -27,15 +27,15 @@ const BlogPage = () => {
   const blogStructuredData = {
     "@context": "https://schema.org",
     "@type": "Blog",
-    "name": "REX Kenya Blog",
+    "name": "PoliceBrutalityTracker Blog",
     "description": "News, insights, and reports on police accountability and human rights in Kenya",
-    "url": "https://rextracker.online/blog",
+    "url": "https://policebrutalitytracker.co.ke/blog",
     "publisher": {
       "@type": "Organization",
-      "name": "REX Kenya",
+      "name": "PoliceBrutalityTracker",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://rextracker.online/logo.svg"
+        "url": "https://policebrutalitytracker.co.ke/logo.svg"
       }
     },
     "blogPost": articles?.slice(0, 20).map(article => ({
@@ -44,17 +44,17 @@ const BlogPage = () => {
       "description": article.excerpt || article.content?.substring(0, 160),
       "author": { "@type": "Person", "name": article.author },
       "datePublished": article.published_at || article.created_at,
-      "url": `https://rextracker.online/blog/${generateSlug(article)}`
+      "url": `https://policebrutalitytracker.co.ke/blog/${generateSlug(article)}`
     })) || []
   };
 
   return (
     <>
       <SEOHead
-        title="Blog - News & Insights | REX Kenya"
-        description="Read the latest news, reports, and insights on police accountability, human rights, and justice in Kenya. Stay informed with REX Kenya's editorial content."
+        title="Blog - News & Insights | PoliceBrutalityTracker"
+        description="Read the latest news, reports, and insights on police accountability, human rights, and justice in Kenya. Stay informed with PoliceBrutalityTracker's editorial content."
         keywords="police brutality Kenya blog, human rights news Kenya, police accountability articles, Kenya justice news, civic tech Kenya"
-        url="https://rextracker.online/blog"
+        url="https://policebrutalitytracker.co.ke/blog"
         structuredData={blogStructuredData}
       />
 
@@ -204,9 +204,9 @@ const BlogPage = () => {
           {/* SEO Footer */}
           <div className="mt-16 pt-8 border-t border-white/10">
             <div className="prose prose-invert max-w-none">
-              <h2 className="text-2xl font-bold mb-4">About REX Kenya Blog</h2>
+              <h2 className="text-2xl font-bold mb-4">About PoliceBrutalityTracker Blog</h2>
               <p className="text-gray-300 mb-4">
-                The REX Kenya Blog covers news, analysis, and insights on police accountability and human rights in Kenya.
+                The PoliceBrutalityTracker Blog covers news, analysis, and insights on police accountability and human rights in Kenya.
                 Our editorial team publishes reports on incidents, legal developments, and community responses to
                 police misconduct across all 47 counties.
               </p>

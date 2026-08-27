@@ -1,6 +1,6 @@
-# 📚 REX Kenya Documentation
+﻿# 📚 PoliceBrutalityTracker Documentation
 
-Welcome to the comprehensive documentation for REX Kenya - Justice through visibility.
+Welcome to the comprehensive documentation for PoliceBrutalityTracker - Justice through visibility.
 
 ## 📖 Documentation Index
 
@@ -19,7 +19,7 @@ Welcome to the comprehensive documentation for REX Kenya - Justice through visib
 ## 🏗️ Project Structure
 
 ```
-REX Kenya/
+PoliceBrutalityTracker/
 ├── 📁 docs/                    # Documentation
 ├── 📁 src/                     # Source code
 │   ├── 📁 components/          # React components
@@ -68,10 +68,10 @@ REX Kenya/
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/SK3CHI3/REX/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/SK3CHI3/REX/discussions)
-- **Email**: [support@rextracker.online](mailto:support@rextracker.online)
+- **Issues**: [GitHub Issues](https://github.com/SK3CHI3/PoliceBrutalityTracker/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/SK3CHI3/PoliceBrutalityTracker/discussions)
+- **Email**: [support@policebrutalitytracker.co.ke](mailto:support@policebrutalitytracker.co.ke)
 
 ---
 
-*This documentation is maintained by the REX Kenya team. For updates and contributions, see our [Contributing Guide](CONTRIBUTING.md).*
+*This documentation is maintained by the PoliceBrutalityTracker team. For updates and contributions, see our [Contributing Guide](CONTRIBUTING.md).*

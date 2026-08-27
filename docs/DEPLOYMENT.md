@@ -1,4 +1,4 @@
-# 🚀 Deployment Guide
+﻿# 🚀 Deployment Guide
 
 ## Netlify Deployment
 
@@ -20,7 +20,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ### Custom Domain
 1. Go to Site Settings > Domain Management
-2. Add custom domain: `rextracker.online`
+2. Add custom domain: `policebrutalitytracker.co.ke`
 3. Configure DNS records
 4. Enable HTTPS
 

@@ -1,8 +1,8 @@
-# Caching Strategy Documentation
+﻿# Caching Strategy Documentation
 
 ## Overview
 
-REX uses a multi-layered caching strategy following web performance best practices to ensure fast load times while maintaining data freshness.
+PoliceBrutalityTracker uses a multi-layered caching strategy following web performance best practices to ensure fast load times while maintaining data freshness.
 
 ## Service Worker Version
 
@@ -113,12 +113,12 @@ Cache-Control: public, max-age=31536000, immutable
 
 ### Cache Namespaces
 
-1. **Static Cache** (`rex-kenya-static-v3.0.0`)
+1. **Static Cache** (`pbt-static-v3.0.0`)
    - Pre-cached critical assets
    - Icons, logos, manifest
    - Cleared only when SW version changes
 
-2. **Dynamic Cache** (`rex-kenya-dynamic-v3.0.0`)
+2. **Dynamic Cache** (`pbt-dynamic-v3.0.0`)
    - Runtime cached pages and routes
    - Automatically populated as users browse
    - Cleared when SW version changes
@@ -202,7 +202,7 @@ Cache-Control: public, max-age=31536000, immutable
 For users experiencing caching issues, direct them to:
 
 ```
-https://rextracker.online/clear-cache.js
+https://policebrutalitytracker.co.ke/clear-cache.js
 ```
 
 Or add to HTML:

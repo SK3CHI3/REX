@@ -2,18 +2,12 @@ import React, { useState } from 'react';
 import {
   Shield,
   Users,
-  Eye,
   Calendar,
-  AlertTriangle,
   CheckCircle,
   XCircle,
   Clock,
   TrendingUp,
   Database,
-  Globe,
-  Play,
-  Pause,
-  RefreshCw,
   Settings,
   BarChart3,
   FileText,
@@ -35,17 +29,8 @@ import {
 } from '@/hooks/useCases';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVisitorAnalytics } from '@/hooks/useVisitorTracking';
-import { useNews, useDeleteNews, useSyncScrapedNews, NewsArticle } from '@/hooks/useNews';
+import { useNews, useDeleteNews, NewsArticle } from '@/hooks/useNews';
 import NewsModal from '@/components/NewsModal';
-import {
-  useScrapingStatus,
-  useScrapingSources,
-  usePendingScrapedCases,
-  useStartManualScraping,
-  useStartSourceScraping,
-  useApproveScrapedCase,
-  useRejectScrapedCase
-} from '@/hooks/useScraping';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -58,12 +43,8 @@ const AdminDashboard = () => {
   // Data hooks
   const { data: cases, isLoading: casesLoading } = useCases();
   const pendingSubmissions = usePendingSubmissions();
-  const pendingScrapedCases = usePendingScrapedCases();
-  const scrapingStatus = useScrapingStatus();
-  const scrapingSources = useScrapingSources();
   const { data: newsArticles, isLoading: newsLoading } = useNews();
   const deleteNews = useDeleteNews();
-  const syncScrapedNews = useSyncScrapedNews();
 
   // Get visitor analytics
   const { data: visitorAnalytics, isLoading: analyticsLoading } = useVisitorAnalytics();
@@ -81,41 +62,16 @@ const AdminDashboard = () => {
   // Action hooks
   const approveSubmission = useApproveSubmission();
   const rejectSubmission = useRejectSubmission();
-  const approveScrapedCase = useApproveScrapedCase();
-  const rejectScrapedCase = useRejectScrapedCase();
-  const startManualScraping = useStartManualScraping();
-  const startSourceScraping = useStartSourceScraping();
 
   // Calculate statistics
   const totalPendingSubmissions = pendingSubmissions.data?.length || 0;
-  const totalPendingScraped = pendingScrapedCases.data?.length || 0;
-  const totalPending = totalPendingSubmissions + totalPendingScraped;
+  const totalPending = totalPendingSubmissions;
 
   const thisMonthCases = cases?.filter(c => {
     const caseDate = new Date(c.date);
     const now = new Date();
     return caseDate.getMonth() === now.getMonth() && caseDate.getFullYear() === now.getFullYear();
   }).length || 0;
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-500';
-      case 'running': return 'bg-blue-500';
-      case 'pending': return 'bg-yellow-500';
-      case 'failed': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return <CheckCircle className="w-4 h-4" />;
-      case 'running': return <RefreshCw className="w-4 h-4 animate-spin" />;
-      case 'pending': return <Clock className="w-4 h-4" />;
-      case 'failed': return <XCircle className="w-4 h-4" />;
-      default: return <AlertTriangle className="w-4 h-4" />;
-    }
-  };
 
   // News management functions
   const handleCreateNews = () => {
@@ -140,16 +96,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleSyncScrapedNews = async () => {
-    try {
-      const count = await syncScrapedNews.mutateAsync();
-      alert(`Synced ${count} new articles from scraping.`);
-    } catch (error) {
-      console.error('Error syncing scraped news:', error);
-      alert('Error syncing scraped news. Please try again.');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
       {/* Floating Navigation Header */}
@@ -161,7 +107,7 @@ const AdminDashboard = () => {
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold tracking-tight">REX Admin</h1>
+                <h1 className="text-xl font-bold tracking-tight">PBT Admin</h1>
                 <p className="text-xs text-gray-300 hidden sm:block">Administrative Dashboard</p>
               </div>
             </div>
@@ -207,7 +153,7 @@ const AdminDashboard = () => {
             <h1 className="text-4xl font-bold">Admin Dashboard</h1>
           </div>
           <p className="text-xl text-gray-300">
-            Manage case submissions, monitor scraping, and oversee platform operations
+            Manage case submissions, news, and platform operations
           </p>
         </div>
 
@@ -289,26 +235,12 @@ const AdminDashboard = () => {
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Overview
               </TabsTrigger>
-              <TabsTrigger 
-                value="submissions" 
+              <TabsTrigger
+                value="submissions"
                 className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-300"
               >
                 <FileText className="w-4 h-4 mr-2" />
                 Manual Submissions ({totalPendingSubmissions})
-              </TabsTrigger>
-              <TabsTrigger 
-                value="scraped" 
-                className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-300"
-              >
-                <Globe className="w-4 h-4 mr-2" />
-                Scraped Cases ({totalPendingScraped})
-              </TabsTrigger>
-              <TabsTrigger
-                value="scraping"
-                className="data-[state=active]:bg-red-600 data-[state=active]:text-white text-gray-300"
-              >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Scraping Control
               </TabsTrigger>
               <TabsTrigger
                 value="users"
@@ -345,20 +277,11 @@ const AdminDashboard = () => {
                       Review {totalPendingSubmissions} Manual Submissions
                     </Button>
                     <Button
-                      onClick={() => setSelectedTab('scraped')}
-                      className="w-full justify-start bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
-                      disabled={totalPendingScraped === 0}
-                    >
-                      <Globe className="w-4 h-4 mr-2" />
-                      Review {totalPendingScraped} Scraped Cases
-                    </Button>
-                    <Button
-                      onClick={() => startManualScraping.mutate()}
+                      onClick={() => setSelectedTab('news')}
                       className="w-full justify-start bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
-                      disabled={startManualScraping.isPending}
                     >
-                      <Play className="w-4 h-4 mr-2" />
-                      Start Manual Scraping
+                      <FileText className="w-4 h-4 mr-2" />
+                      Manage News &amp; Blog
                     </Button>
                   </div>
                 </div>
@@ -507,134 +430,6 @@ const AdminDashboard = () => {
               </div>
             </TabsContent>
 
-            {/* Scraped Cases Tab */}
-            <TabsContent value="scraped" className="space-y-6">
-              <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-                <h3 className="text-xl font-bold mb-6 flex items-center">
-                  <Globe className="w-5 h-5 mr-2 text-red-400" />
-                  Scraped Case Reviews
-                </h3>
-                <div className="space-y-4">
-                  {pendingScrapedCases.data?.map((caseItem: any) => (
-                    <div key={caseItem.id} className="bg-black/30 rounded-xl p-6 border border-white/10">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="space-y-2">
-                          <h4 className="text-lg font-semibold text-white">{caseItem.victim_name || 'Unknown Victim'}</h4>
-                          <div className="flex items-center space-x-4 text-sm text-gray-400">
-                            <span>{caseItem.location || 'Unknown location'}</span>
-                            <span>{caseItem.case_type || 'Unknown type'}</span>
-                          </div>
-                          <Badge variant="secondary" className="bg-blue-900/50 text-blue-300 border-blue-500/30">
-                            Scraped Data
-                          </Badge>
-                        </div>
-                        <Badge variant="secondary" className="bg-yellow-900/50 text-yellow-300 border-yellow-500/30">
-                          Pending Review
-                        </Badge>
-                      </div>
-
-                      <div className="mb-4">
-                        <p className="text-sm text-gray-400 bg-black/20 p-3 rounded-lg">
-                          {caseItem.description || 'No description available'}
-                        </p>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Button
-                          onClick={() => approveScrapedCase.mutate(caseItem.id)}
-                          disabled={approveScrapedCase.isPending}
-                          className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Approve
-                        </Button>
-                        <Button
-                          onClick={() => rejectScrapedCase.mutate({ submissionId: caseItem.id })}
-                          disabled={rejectScrapedCase.isPending}
-                          variant="outline"
-                          className="border-red-500/50 text-red-300 hover:bg-red-500/10"
-                        >
-                          <XCircle className="w-4 h-4 mr-2" />
-                          Reject
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                  {(!pendingScrapedCases.data || pendingScrapedCases.data.length === 0) && (
-                    <div className="text-center py-12">
-                      <Globe className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                      <p className="text-xl text-gray-400 mb-2">No pending scraped cases</p>
-                      <p className="text-gray-500">All scraped cases have been reviewed</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </TabsContent>
-
-            {/* Scraping Control Tab */}
-            <TabsContent value="scraping" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Scraping Controls */}
-                <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-                  <h3 className="text-xl font-bold mb-6 flex items-center">
-                    <RefreshCw className="w-5 h-5 mr-2 text-red-400" />
-                    Scraping Controls
-                  </h3>
-                  <div className="space-y-4">
-                    <Button
-                      onClick={() => startManualScraping.mutate()}
-                      disabled={startManualScraping.isPending}
-                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      Start All Sources
-                    </Button>
-                    <div className="text-sm text-gray-400">
-                      <p>Last run: {(scrapingStatus as any).stats?.last_job_time ? new Date((scrapingStatus as any).stats.last_job_time).toLocaleString() : 'Never'}</p>
-                      <p>Status: {scrapingStatus.isLoading ? 'Loading...' : 'Online'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sources Status */}
-                <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-                  <h3 className="text-xl font-bold mb-6 flex items-center">
-                    <Database className="w-5 h-5 mr-2 text-red-400" />
-                    Sources Status
-                  </h3>
-                  <div className="space-y-3">
-                    {scrapingSources.data?.map((source: any) => (
-                      <div key={source.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
-                        <div>
-                          <p className="text-sm font-medium">{source.name}</p>
-                          <p className="text-xs text-gray-400">{source.url}</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge
-                            variant="secondary"
-                            className={source.enabled ? "bg-green-900/50 text-green-300 border-green-500/30" : "bg-gray-900/50 text-gray-300 border-gray-500/30"}
-                          >
-                            {source.enabled ? "Enabled" : "Disabled"}
-                          </Badge>
-                          <Button
-                            size="sm"
-                            onClick={() => startSourceScraping.mutate(source.id)}
-                            disabled={startSourceScraping.isPending}
-                            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
-                          >
-                            <Play className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                    {(!scrapingSources.data || scrapingSources.data.length === 0) && (
-                      <p className="text-center text-gray-400 py-4">No sources configured</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-
             {/* Users Tab */}
             <TabsContent value="users" className="space-y-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -716,21 +511,10 @@ const AdminDashboard = () => {
             <TabsContent value="news" className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">News Management</h2>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleSyncScrapedNews}
-                    variant="outline"
-                    className="border-blue-500 text-blue-400 hover:bg-blue-500/10"
-                    disabled={syncScrapedNews.isPending}
-                  >
-                    <RefreshCw className="w-4 h-4 mr-2" />
-                    Sync Scraped News
-                  </Button>
-                  <Button onClick={handleCreateNews} className="bg-red-600 hover:bg-red-700">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Create News Article
-                  </Button>
-                </div>
+                <Button onClick={handleCreateNews} className="bg-red-600 hover:bg-red-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create News Article
+                </Button>
               </div>
 
               <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
@@ -754,9 +538,9 @@ const AdminDashboard = () => {
                               </Badge>
                               <Badge
                                 variant="outline"
-                                className={article.source === 'admin' ? 'border-blue-500 text-blue-400' : 'border-purple-500 text-purple-400'}
+                                className={article.source === 'scraped' ? 'border-purple-500 text-purple-400' : 'border-blue-500 text-blue-400'}
                               >
-                                {article.source === 'admin' ? 'Admin' : 'Scraped'}
+                                {article.source === 'scraped' ? 'Automated' : 'Admin'}
                               </Badge>
                             </div>
                             <p className="text-gray-300 text-sm mb-2">
@@ -776,16 +560,14 @@ const AdminDashboard = () => {
                             </div>
                           </div>
                           <div className="flex gap-2 ml-4">
-                            {article.source === 'admin' && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleEditNews(article)}
-                                className="border-white/20 text-gray-300 hover:bg-white/10"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                            )}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditNews(article)}
+                              className="border-white/20 text-gray-300 hover:bg-white/10"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
                             <Button
                               variant="outline"
                               size="sm"

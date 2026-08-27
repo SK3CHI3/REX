@@ -1,4 +1,4 @@
-# GitHub Actions Auto-Deploy Setup Guide
+﻿# GitHub Actions Auto-Deploy Setup Guide
 
 ## 🎯 What This Does
 
@@ -44,7 +44,7 @@ Automatically rebuilds and deploys your site **every day at midnight** so that:
 
 ### Step 3: Add Secrets to GitHub
 
-1. Go to your GitHub repository: `https://github.com/SK3CHI3/REX`
+1. Go to your GitHub repository: `https://github.com/SK3CHI3/PoliceBrutalityTracker`
 2. Click **Settings** tab
 3. In left sidebar, click **Secrets and variables** → **Actions**
 4. Click **New repository secret** button
@@ -170,7 +170,7 @@ Once set up, your site will:
 ## 📚 More Info
 
 - See [.github/workflows/README.md](../.github/workflows/README.md) for technical details
-- Check [Actions tab](https://github.com/SK3CHI3/REX/actions) for workflow runs
+- Check [Actions tab](https://github.com/SK3CHI3/PoliceBrutalityTracker/actions) for workflow runs
 - Monitor [Netlify dashboard](https://app.netlify.com) for deployments
 
 ---

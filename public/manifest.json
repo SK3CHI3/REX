@@ -1,6 +1,6 @@
 {
-  "name": "REX Kenya - Justice through visibility",
-  "short_name": "REX Kenya",
+  "name": "PoliceBrutalityTracker - Justice through visibility",
+  "short_name": "PBT",
   "description": "Interactive platform mapping incidents of police brutality across Kenya. Justice through visibility and transparency.",
   "start_url": "/",
   "display": "standalone",
@@ -29,5 +29,5 @@
   "lang": "en-KE",
   "dir": "ltr",
   "scope": "/",
-  "id": "rex-kenya-app"
+  "id": "pbt-app"
 }

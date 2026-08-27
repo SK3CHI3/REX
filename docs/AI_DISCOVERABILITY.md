@@ -1,4 +1,4 @@
-# AI Discoverability Implementation Guide
+﻿# AI Discoverability Implementation Guide
 
 ## 🎯 Problem We Solved
 
@@ -19,7 +19,7 @@
 **File**: `src/pages/CasePage.tsx`
 
 Every case now has its own dedicated URL:
-- ✅ Example: `https://rextracker.online/case/abc123-def456-ghi789`
+- ✅ Example: `https://policebrutalitytracker.co.ke/case/abc123-def456-ghi789`
 - ✅ Full case details displayed
 - ✅ Community verification system integrated
 - ✅ SEO-optimized meta tags
@@ -46,7 +46,7 @@ Every case now has its own dedicated URL:
   "datePublished": "2024-06-15",
   "author": {
     "@type": "Organization",
-    "name": "REX Kenya"
+    "name": "PoliceBrutalityTracker"
   },
   "location": {
     "@type": "Place",
@@ -68,7 +68,7 @@ Every case now has its own dedicated URL:
 
 A dedicated **discovery page** for AI crawlers to find ALL cases at once.
 
-**URL**: `https://rextracker.online/cases-index`
+**URL**: `https://policebrutalitytracker.co.ke/cases-index`
 
 **What It Does**:
 - Lists ALL cases in a grid layout
@@ -89,7 +89,7 @@ A dedicated **discovery page** for AI crawlers to find ALL cases at once.
     {
       "@type": "ListItem",
       "position": 1,
-      "url": "https://rextracker.online/case/abc123",
+      "url": "https://policebrutalitytracker.co.ke/case/abc123",
       "name": "John Doe - Nairobi",
       "description": "Incident description..."
     }
@@ -135,7 +135,7 @@ Allow: /case/
 **New Entry**:
 ```xml
 <url>
-  <loc>https://rextracker.online/cases-index</loc>
+  <loc>https://policebrutalitytracker.co.ke/cases-index</loc>
   <lastmod>2025-10-10</lastmod>
   <changefreq>daily</changefreq>
   <priority>0.9</priority>
@@ -178,17 +178,17 @@ Allow: /case/
 
 ### Before Implementation:
 **User**: "Tell me about police brutality cases in Nairobi"
-**AI**: "I don't have specific information about cases on REX Kenya."
+**AI**: "I don't have specific information about cases on PoliceBrutalityTracker."
 
 ### After Implementation:
 **User**: "Tell me about police brutality cases in Nairobi"
-**AI**: "According to REX Kenya's database, there are several documented cases in Nairobi:
+**AI**: "According to PoliceBrutalityTracker's database, there are several documented cases in Nairobi:
 
-1. **John Doe** (Age 28) - Occurred on June 15, 2024 in Kibera. The incident involved unlawful arrest and excessive force. Status: Investigating. [View case](https://rextracker.online/case/abc123)
+1. **John Doe** (Age 28) - Occurred on June 15, 2024 in Kibera. The incident involved unlawful arrest and excessive force. Status: Investigating. [View case](https://policebrutalitytracker.co.ke/case/abc123)
 
-2. **Jane Smith** (Age 34) - Occurred on July 3, 2024 in Eastleigh. The incident involved harassment during a peaceful protest. Status: Community Verified. [View case](https://rextracker.online/case/def456)
+2. **Jane Smith** (Age 34) - Occurred on July 3, 2024 in Eastleigh. The incident involved harassment during a peaceful protest. Status: Community Verified. [View case](https://policebrutalitytracker.co.ke/case/def456)
 
-You can explore all cases on their interactive map at https://rextracker.online/map"
+You can explore all cases on their interactive map at https://policebrutalitytracker.co.ke/map"
 
 ---
 
@@ -198,7 +198,7 @@ You can explore all cases on their interactive map at https://rextracker.online/
 
 1. **Meta Tags**:
    ```html
-   <title>John Doe - Nairobi | REX Kenya</title>
+   <title>John Doe - Nairobi | PoliceBrutalityTracker</title>
    <meta name="description" content="Police brutality case in Nairobi...">
    <meta name="keywords" content="police brutality, Nairobi, John Doe, Kenya">
    ```
@@ -238,25 +238,25 @@ After deploying, check:
 ### 2. Manual Testing
 ```bash
 # Test with Google
-site:rextracker.online/case/
+site:policebrutalitytracker.co.ke/case/
 
 # Test with specific case
-site:rextracker.online/case/YOUR_CASE_ID
+site:policebrutalitytracker.co.ke/case/YOUR_CASE_ID
 ```
 
 ### 3. AI Testing
 Ask ChatGPT/Claude/Perplexity:
 ```
-"What cases are documented on REX Kenya in [county]?"
-"Tell me about police brutality case involving [victim name] on REX Kenya"
-"How many cases are on REX Kenya tracker?"
+"What cases are documented on PoliceBrutalityTracker in [county]?"
+"Tell me about police brutality case involving [victim name] on PoliceBrutalityTracker"
+"How many cases are on PoliceBrutalityTracker tracker?"
 ```
 
 ### 4. Schema Validation
 Use Google's Rich Results Test:
 https://search.google.com/test/rich-results
 
-Paste URL: `https://rextracker.online/case/[any-case-id]`
+Paste URL: `https://policebrutalitytracker.co.ke/case/[any-case-id]`
 
 ---
 
@@ -285,7 +285,7 @@ Paste URL: `https://rextracker.online/case/[any-case-id]`
 
 2. **AI Citations**:
    - Cases mentioned by ChatGPT, Claude, Perplexity
-   - Links back to rextracker.online
+   - Links back to policebrutalitytracker.co.ke
 
 3. **Referral Traffic**:
    - Users coming from AI chatbots
@@ -402,7 +402,7 @@ const { data: caseData } = useCase(id);
 We'll know this is working when:
 
 1. ✅ All case pages are indexed by Google (check Search Console)
-2. ✅ AI chatbots can cite specific cases from REX Kenya
+2. ✅ AI chatbots can cite specific cases from PoliceBrutalityTracker
 3. ✅ Users report finding cases via AI search
 4. ✅ Referral traffic increases from AI platforms
 5. ✅ Schema validation passes 100%

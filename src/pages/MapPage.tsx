@@ -79,10 +79,10 @@ const MapPage = () => {
   return (
     <>
       <SEOHead
-        title="Interactive Map | REX Kenya - Police Brutality Tracking"
+        title="Interactive Map | PoliceBrutalityTracker - Police Brutality Tracking"
         description="Explore police brutality incidents across Kenya with our interactive map. Filter by county, case type, and date range to understand patterns and trends."
         keywords="police brutality map, Kenya incidents, interactive map, case tracking, county data, incident visualization"
-        url="https://rextracker.online/map"
+        url="https://policebrutalitytracker.co.ke/map"
       />
       <StructuredData cases={filteredCases as any} pageType="map" />
       

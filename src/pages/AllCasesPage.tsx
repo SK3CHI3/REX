@@ -36,10 +36,10 @@ const AllNewsPage = () => {
   return (
     <>
       <SEOHead
-        title="All Cases & News | REX Kenya - Police Brutality Reports"
+        title="All Cases & News | PoliceBrutalityTracker - Police Brutality Reports"
         description="Browse all police brutality cases and news reports in Kenya. Stay informed with the latest developments in police accountability and human rights."
         keywords="police brutality cases, Kenya news, incident reports, human rights, police accountability, case database"
-        url="https://rextracker.online/cases"
+        url="https://policebrutalitytracker.co.ke/cases"
       />
       <StructuredData cases={[]} pageType="cases" />
       

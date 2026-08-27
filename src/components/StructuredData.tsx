@@ -15,25 +15,25 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://rextracker.online"
+        "item": "https://policebrutalitytracker.co.ke"
       },
       ...(pageType === 'map' ? [{
         "@type": "ListItem",
         "position": 2,
         "name": "Map View",
-        "item": "https://rextracker.online/map"
+        "item": "https://policebrutalitytracker.co.ke/map"
       }] : []),
       ...(pageType === 'cases' ? [{
         "@type": "ListItem",
         "position": 2,
         "name": "All Cases",
-        "item": "https://rextracker.online/cases"
+        "item": "https://policebrutalitytracker.co.ke/cases"
       }] : []),
       ...(currentCase ? [{
         "@type": "ListItem",
         "position": 3,
         "name": currentCase.victimName,
-        "item": `https://rextracker.online/cases/${currentCase.id}`
+        "item": `https://policebrutalitytracker.co.ke/cases/${currentCase.id}`
       }] : [])
     ]
   });
@@ -43,7 +43,7 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
     "@type": "Dataset",
     "name": "Police Brutality Incidents in Kenya",
     "description": "Comprehensive dataset of police brutality incidents across Kenya with geographic and temporal data",
-    "url": "https://rextracker.online/cases",
+    "url": "https://policebrutalitytracker.co.ke/cases",
     "keywords": ["police brutality", "Kenya", "human rights", "accountability", "transparency"],
     "spatialCoverage": {
       "@type": "Country",
@@ -53,12 +53,12 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
     "license": "https://creativecommons.org/licenses/by/4.0/",
     "creator": {
       "@type": "Organization",
-      "name": "REX Team"
+      "name": "PoliceBrutalityTracker Team"
     },
     "distribution": {
       "@type": "DataDownload",
       "encodingFormat": "application/json",
-      "contentUrl": "https://rextracker.online/api/cases"
+      "contentUrl": "https://policebrutalitytracker.co.ke/api/cases"
     },
     "variableMeasured": [
       "Incident Date",
@@ -98,34 +98,34 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
     },
     "organizer": {
       "@type": "Organization",
-      "name": "REX Team"
+      "name": "PoliceBrutalityTracker Team"
     },
-    "url": `https://rextracker.online/cases/${caseItem.id}`
+    "url": `https://policebrutalitytracker.co.ke/cases/${caseItem.id}`
   });
 
   const getWebSiteStructuredData = () => ({
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "REX - Justice through visibility",
-    "alternateName": "REX Kenya",
-    "url": "https://rextracker.online",
+    "name": "PoliceBrutalityTracker - Justice through visibility",
+    "alternateName": "PoliceBrutalityTracker Kenya",
+    "url": "https://policebrutalitytracker.co.ke",
     "description": "Interactive platform mapping incidents of police brutality across Kenya. Track, report, and visualize cases of police misconduct. Justice through visibility and transparency.",
     "inLanguage": "en-KE",
     "isAccessibleForFree": true,
     "publisher": {
       "@type": "Organization",
-      "name": "REX Team",
-      "url": "https://rextracker.online",
+      "name": "PoliceBrutalityTracker Team",
+      "url": "https://policebrutalitytracker.co.ke",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://rextracker.online/logo.svg",
+        "url": "https://policebrutalitytracker.co.ke/logo.svg",
         "width": 200,
         "height": 200
       }
     },
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://rextracker.online/cases?search={search_term_string}",
+      "target": "https://policebrutalitytracker.co.ke/cases?search={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   });
@@ -136,10 +136,10 @@ const StructuredData = ({ cases = [], pageType = 'home', currentCase }: Structur
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "What is REX?",
+        "name": "What is PoliceBrutalityTracker?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "REX is an interactive platform that maps incidents of police brutality across Kenya to promote justice through visibility and transparency."
+          "text": "PoliceBrutalityTracker is an interactive platform that maps incidents of police brutality across Kenya to promote justice through visibility and transparency."
         }
       },
       {
