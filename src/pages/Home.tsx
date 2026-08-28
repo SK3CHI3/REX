@@ -1,9 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { MapPin, ArrowRight, Shield, Users, Eye, Calendar, AlertTriangle, ChevronDown, TrendingUp, Clock, Heart, Scale } from 'lucide-react';
-import kenyaStreetsImg from '@/assets/kenya-streets.jpg';
-import kenyaCommunityImg from '@/assets/kenya-community.jpg';
+import { useState, useRef, lazy, Suspense } from 'react';
+import { ArrowRight, Shield, Scale } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useCases } from '@/hooks/useCases';
 import { useVisitorTracking } from '@/hooks/useVisitorTracking';
@@ -11,77 +8,50 @@ import { useRecentNews } from '@/hooks/useNews';
 import NewsDetailModal from '@/components/NewsDetailModal';
 import SEOHead from '@/components/SEOHead';
 import StructuredData from '@/components/StructuredData';
-import { getTopCounties } from '@/utils/countyNormalization';
+import HeroSection from '@/components/home/HeroSection';
+import NamesTicker from '@/components/home/NamesTicker';
+import NewsSection from '@/components/home/NewsSection';
+import MapCTA from '@/components/home/MapCTA';
+import SectionHeading from '@/components/home/SectionHeading';
+import { computeHomeStats } from '@/components/home/homeUtils';
 
-// Helper functions - defined outside component to avoid hoisting issues
-const formatRelativeDate = (dateString: string | null | undefined) => {
-  if (!dateString) return 'Unknown date';
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return 'Invalid date';
+// Charts are heavy — keep them out of the initial bundle
+const LazyDataModules = lazy(() => import('@/components/home/DataModules'));
 
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - date.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 1) return '1 day ago';
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 14) return '1 week ago';
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-  return `${Math.floor(diffDays / 30)} months ago`;
-};
-
-const formatCaseType = (type: string | null | undefined) => {
-  if (!type) return 'Unknown';
-  return type.split('_').map(word =>
-    word.charAt(0).toUpperCase() + word.slice(1)
-  ).join(' ');
-};
-
-const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-  const target = e.target as HTMLImageElement;
-  const parent = target.parentElement;
-
-  if (parent) {
-    // Replace image with a styled placeholder related to justice/police brutality
-    parent.innerHTML = `
-      <div class="w-full h-full bg-gradient-to-br from-red-900 to-red-800 flex items-center justify-center">
-        <div class="text-center text-red-200">
-          <svg class="w-12 h-12 mx-auto mb-2 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-          </svg>
-          <p class="text-xs">Justice Report</p>
-        </div>
+const DataModulesFallback = () => (
+  <section id="data" className="py-24 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto">
+      <div className="h-4 w-32 bg-white/5 rounded mb-4 animate-pulse" />
+      <div className="h-10 w-2/3 bg-white/5 rounded mb-12 animate-pulse" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="h-[420px] bg-white/[0.03] border border-white/10 rounded-2xl animate-pulse" />
+        ))}
       </div>
-    `;
-  }
-};
+    </div>
+  </section>
+);
 
 const Home = () => {
-  // Track visitor
   useVisitorTracking();
 
   const navigate = useNavigate();
   const { data: cases, isLoading, error } = useCases();
   const { data: newsArticles, isLoading: articlesLoading } = useRecentNews(3);
 
-  // News modal state
   const [selectedNewsArticle, setSelectedNewsArticle] = useState<any>(null);
 
   // Secret admin access state
   const [tapCount, setTapCount] = useState(0);
   const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleEnterApp = () => {
-    navigate('/map');
-  };
+  const stats = computeHomeStats(cases);
 
-  const handleViewAllNews = () => {
-    navigate('/blog');
-  };
+  const handleEnterApp = () => navigate('/map');
 
   const handleNewsClick = (article: any) => {
     if (article.slug) {
-      navigate(`/blog/${article.slug}`);
+      navigate(`/news/${article.slug}`);
     } else if (article.url && article.url !== '#') {
       window.open(article.url, '_blank');
     } else {
@@ -91,19 +61,16 @@ const Home = () => {
 
   // Secret admin access handler
   const handleLiveIndicatorClick = () => {
-    setTapCount(prev => prev + 1);
+    setTapCount((prev) => prev + 1);
 
-    // Clear existing timeout
     if (tapTimeoutRef.current) {
       clearTimeout(tapTimeoutRef.current);
     }
 
-    // Set new timeout to reset tap count
     tapTimeoutRef.current = setTimeout(() => {
       setTapCount(0);
-    }, 500); // Reset after 500ms
+    }, 500);
 
-    // Check for double tap
     if (tapCount + 1 >= 2) {
       setTapCount(0);
       navigate('/sys-mgmt-portal-auth');
@@ -111,54 +78,11 @@ const Home = () => {
   };
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    element?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Calculate statistics from real data
-  const totalCases = cases?.length || 0;
-
-  // Calculate this month's cases with better error handling and timezone awareness
-  const thisMonthCases = cases?.filter(c => {
-    if (!c.date) return false;
-
-    try {
-      // Parse the date string (should be in YYYY-MM-DD format)
-      const caseDate = new Date(c.date + 'T00:00:00'); // Add time to avoid timezone issues
-      const now = new Date();
-
-      // Check if date is valid
-      if (isNaN(caseDate.getTime())) {
-        console.warn('Invalid date found in case:', c.id, c.date);
-        return false;
-      }
-
-      // Compare month and year
-      const isThisMonth = caseDate.getMonth() === now.getMonth() &&
-                         caseDate.getFullYear() === now.getFullYear();
-
-      return isThisMonth;
-    } catch (error) {
-      console.warn('Error parsing date for case:', c.id, c.date, error);
-      return false;
-    }
-  }).length || 0;
-
-  // Debug logging (remove in production)
-  if (process.env.NODE_ENV === 'development' && cases && cases.length > 0) {
-    console.log('Total cases:', totalCases);
-    console.log('This month cases:', thisMonthCases);
-    console.log('Current month/year:', new Date().getMonth(), new Date().getFullYear());
-    console.log('Sample case dates:', cases.slice(0, 3).map(c => ({ id: c.id, date: c.date })));
-  }
-
-  // Show error state if data fails to load
-  if (error) {
-    console.error('Error loading cases:', error);
-  }
-
-  // Get top counties using the utility function
-  const topCounties = getTopCounties(cases || [], 3);
+  const navLinkClass =
+    'text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200';
 
   return (
     <>
@@ -168,511 +92,188 @@ const Home = () => {
         keywords="police brutality, Kenya, justice, transparency, human rights, police misconduct, accountability, tracking, mapping, incidents, cases, interactive map"
         url="https://policebrutalitytracker.co.ke"
       />
-      <StructuredData cases={cases as any || []} pageType="home" />
-      
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white overflow-x-hidden">
-      {/* Floating Navigation Header */}
-      <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-black/40 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl max-w-7xl w-full">
-        <div className="px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
-                {/* Police shield with crack/slash SVG */}
-                <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">PoliceBrutalityTracker</h1>
-                <p className="text-xs text-gray-300 hidden sm:block">Justice through visibility</p>
-              </div>
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-8">
-              <button 
-                onClick={() => scrollToSection('about')}
-                className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
-              >
-                About
-              </button>
-              <button 
-                onClick={() => scrollToSection('features')}
-                className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
-              >
-                Features
-              </button>
-              <button 
-                onClick={() => scrollToSection('impact')}
-                className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
-              >
-                Impact
-              </button>
-              <button 
-                onClick={() => navigate('/blog')}
-                className="text-gray-300 hover:text-white transition-colors text-sm font-medium hover:scale-105 transform duration-200"
-              >
-                Blog
-              </button>
-            </div>
+      <StructuredData cases={(cases as any) || []} pageType="home" />
 
-            <Button
-              onClick={handleEnterApp}
-              size="sm"
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 transform duration-200"
-            >
-              Launch App
-            </Button>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section - Split Layout */}
-      <section className="relative min-h-[80vh] flex items-center px-4 sm:px-6 lg:px-8 pt-24 pb-10 sm:pb-16">
-        {/* Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-600/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-        </div>
-
-        <div className="relative max-w-6xl mx-auto w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center min-h-[60vh]">
-
-            {/* Left Side - Main Content */}
-            <div className="space-y-8 animate-fade-in flex flex-col justify-center h-full text-center lg:text-left">
-              {/* Badge */}
-              <div className="inline-flex items-center space-x-2 bg-red-900/30 backdrop-blur-sm border border-red-500/30 text-red-300 px-6 py-3 rounded-full text-sm font-medium w-fit mx-auto lg:mx-0">
-                <Shield className="w-4 h-4" />
-                <span>Brutality Marked On Map</span>
-              </div>
-              
-              {/* Main Headline */}
-              <div className="space-y-6">
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight">
-                  <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                    Kenya's
-                  </span>
-                  <br />
-                  <span className="bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent block ml-4 sm:ml-6">
-                    Justice
-                  </span>
-                  <span className="bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                    Tracker
-                  </span>
-                </h1>
-                
-                <p className="text-xl text-gray-300 leading-relaxed font-light">
-                  An interactive platform documenting police brutality incidents across Kenya. 
-                  <span className="text-red-400 font-medium"> Empowering communities through data transparency.</span>
-                </p>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-center lg:items-start space-y-4 sm:space-y-0 sm:space-x-6">
-                <Button
-                  onClick={handleEnterApp}
-                  size="lg"
-                  className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-10 py-6 text-lg font-bold rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105 group"
-                >
-                  <span>Explore Interactive Map</span>
-                  <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                
-                <button 
-                  onClick={() => scrollToSection('about')}
-                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors text-lg font-medium group"
-                >
-                  <span>Learn More</span>
-                  <ChevronDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
-                </button>
-              </div>
-
-              {/* Key Metrics - No background card, moved up */}
-              <div className="mt-6 mb-4">
-                <div className="grid grid-cols-2 gap-8 justify-items-center lg:justify-items-start">
-                  <div className="flex flex-col items-center lg:items-start">
-                    <div className="text-3xl font-bold text-white mb-1">24/7</div>
-                    <div className="text-sm text-gray-400">Live Monitoring</div>
-                  </div>
-                  <div className="flex flex-col items-center lg:items-start">
-                    <div className="text-3xl font-bold text-white mb-1">100%</div>
-                    <div className="text-sm text-gray-400">Data Transparency</div>
-                  </div>
+      <div className="theme-light min-h-screen bg-slate-950 text-white overflow-x-hidden">
+        {/* Floating Navigation Header */}
+        <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-black/50 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl max-w-7xl w-[calc(100%-2rem)]">
+          <div className="px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
+                </div>
+                <div>
+                  <h1 className="text-lg sm:text-xl font-bold tracking-tight">PoliceBrutalityTracker</h1>
+                  <p className="text-xs text-gray-400 hidden sm:block">Justice through visibility</p>
                 </div>
               </div>
-            </div>
 
-            {/* Right Side - Data Visualization & Recent Cases */}
-            <div className="animate-fade-in lg:pl-8 flex items-center justify-center">
-              {/* Live Stats Card - Responsive width */}
-              <div className="bg-black/30 backdrop-blur-xl border border-white/20 rounded-3xl p-4 sm:p-8 shadow-2xl w-full max-w-xs sm:max-w-md md:max-w-lg flex flex-col">
-                <div className="flex items-center space-x-3 mb-6">
-                  <TrendingUp className="w-6 h-6 text-red-400" />
-                  <h3 className="text-xl font-bold">Live Statistics</h3>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-6 mb-8">
-                  <div className="text-center group">
-                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      47
-                    </div>
-                    <div className="text-sm text-gray-400 font-medium">Counties</div>
-                  </div>
-                  <div className="text-center group">
-                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      {isLoading ? '...' : error ? '--' : totalCases}
-                    </div>
-                    <div className="text-sm text-gray-400 font-medium">Total Cases</div>
-                  </div>
-                  <div className="text-center group">
-                    <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform">
-                      {isLoading ? '...' : error ? '--' : thisMonthCases}
-                    </div>
-                    <div className="text-sm text-gray-400 font-medium">This Month</div>
-                  </div>
-                </div>
-
-                {/* Top Counties by Incidents */}
-                <div className="space-y-4 flex-1 flex flex-col">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-lg font-semibold flex items-center">
-                      <TrendingUp className="w-4 h-4 mr-2 text-gray-400" />
-                      Top Counties
-                    </h4>
-                    <Badge variant="secondary" className="bg-red-900/50 text-red-300 border-red-500/30">
-                      Most Incidents
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-3 flex-1 overflow-y-auto min-h-0">
-                    {isLoading ? (
-                      <div className="text-center text-gray-400 py-4">Loading county data...</div>
-                    ) : error ? (
-                      <div className="text-center text-gray-400 py-4">Unable to load data</div>
-                    ) : topCounties.length === 0 ? (
-                      <div className="text-center text-gray-400 py-4">No data available</div>
-                    ) : (
-                      topCounties.map((county, index) => (
-                        <div key={county.county} className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors group">
-                          <div className="flex items-center space-x-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                              index === 0 ? 'bg-yellow-500/20 text-yellow-400' :
-                              index === 1 ? 'bg-gray-400/20 text-gray-300' :
-                              'bg-orange-500/20 text-orange-400'
-                            }`}>
-                              #{county.rank}
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-white group-hover:text-red-300 transition-colors">
-                                {county.county}
-                              </p>
-                              <p className="text-xs text-gray-400">{county.count} incidents</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-sm font-semibold text-red-400">{county.percentage}%</span>
-                            <p className="text-xs text-gray-500">of total</p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
+              <div className="hidden md:flex items-center space-x-8">
+                <button onClick={() => scrollToSection('data')} className={navLinkClass}>The Data</button>
+                <button onClick={() => scrollToSection('about')} className={navLinkClass}>About</button>
+                <button onClick={() => navigate('/news')} className={navLinkClass}>News</button>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* About Section */}
-      <section id="about" className="py-24 px-4 bg-black/20 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Our Mission
-              </span>
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              PoliceBrutalityTracker exists to create transparency and accountability in law enforcement through
-              comprehensive documentation and community empowerment.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
-              <h3 className="text-2xl font-bold text-white">Why This Matters</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Police brutality cases often go undocumented or unreported, making it difficult 
-                to understand patterns and hold authorities accountable. Our platform bridges 
-                this gap by providing a comprehensive, transparent view of incidents across Kenya.
-              </p>
-              <div className="flex items-center space-x-3 text-red-400">
-                <Calendar className="w-5 h-5" />
-                <span className="font-medium">Real-time incident tracking</span>
-              </div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-red-900/20 to-black/40 backdrop-blur-sm rounded-2xl p-8 border border-red-500/20">
-              <h4 className="text-xl font-bold text-white mb-4">Data-Driven Justice</h4>
-              <p className="text-gray-300 mb-6">
-                Every pin on our map represents a human story. By visualizing these incidents, 
-                we help communities, activists, and policymakers make informed decisions.
-              </p>
-              <Button 
+              <Button
                 onClick={handleEnterApp}
-                variant="outline" 
-                className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white shadow-lg transition-all hover:scale-105 transform duration-200"
               >
-                View Data Now
+                Launch App
               </Button>
             </div>
           </div>
-        </div>
-      </section>
+        </nav>
 
-      {/* News Section */}
-      <section id="news" className="py-24 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Latest News & Reports
-              </span>
-            </h2>
-            <p className="text-gray-400 text-lg max-w-3xl mx-auto">
-              Stay informed with the latest developments in police accountability and human rights in Kenya
-            </p>
-          </div>
+        {/* Hero */}
+        <HeroSection onScrollToData={() => scrollToSection('data')} />
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {articlesLoading ? (
-              // Loading state
-              Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="group">
-                  <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 animate-pulse">
-                    <div className="h-48 bg-gray-700"></div>
-                    <div className="p-6">
-                      <div className="h-4 bg-gray-700 rounded mb-3"></div>
-                      <div className="h-6 bg-gray-700 rounded mb-3"></div>
-                      <div className="h-16 bg-gray-700 rounded mb-4"></div>
-                      <div className="h-4 bg-gray-700 rounded w-20"></div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : newsArticles && newsArticles.length > 0 ? (
-              // Admin news articles (prioritized)
-              newsArticles.map((article, index) => (
-                <div key={article.id} className="group cursor-pointer" onClick={() => handleNewsClick(article)}>
-                  <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-300 hover:transform hover:scale-105">
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={article.featured_image_url || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80'}
-                        alt={article.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        onError={handleImageError}
-                      />
-                      <div className="absolute top-4 left-4">
-                        <span className="bg-red-500/90 text-white text-xs font-medium px-3 py-1 rounded-full">
-                          {article.category || 'News'}
-                        </span>
-                      </div>
-                      {article.source === 'admin' && (
-                        <div className="absolute top-4 right-4">
-                          <span className="bg-blue-500/90 text-white text-xs font-medium px-2 py-1 rounded-full">
-                            Editorial
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
-                        <span>{article.author}</span>
-                        <span>{formatRelativeDate(article.published_at || article.created_at)}</span>
-                      </div>
-                      <h3 className="text-lg font-bold text-white mb-3 line-clamp-2">{article.title}</h3>
-                      <p className="text-gray-300 text-sm leading-relaxed line-clamp-3 mb-4">
-                        {article.excerpt || article.content.substring(0, 150) + '...'}
-                      </p>
-                      <div className="inline-flex items-center text-red-400 hover:text-red-300 text-sm font-medium transition-colors">
-                        Read More
-                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              // Fallback when no news articles available
-              [
-                {
-                  title: "No Recent Articles Available",
-                  excerpt: "New reports and analysis are published regularly. Check back soon for updates.",
-                  source: "System",
-                  date: "Now",
-                  category: "Info",
-                  url: "#",
-                  image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=250&fit=crop&q=80"
-                }
-              ].map((article, index) => (
-                <div key={index} className="group col-span-full max-w-md mx-auto">
-                  <div className="bg-gradient-to-br from-black/40 to-gray-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/10">
-                    <div className="relative h-48 overflow-hidden">
-                      <img
-                        src={article.image}
-                        alt={article.title}
-                        className="w-full h-full object-cover opacity-50"
-                        onError={handleImageError}
-                      />
-                      <div className="absolute top-4 left-4">
-                        <span className="bg-blue-500/90 text-white text-xs font-medium px-3 py-1 rounded-full">
-                          {article.category}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-6 text-center">
-                      <h3 className="text-lg font-bold text-white mb-3">{article.title}</h3>
-                      <p className="text-gray-300 text-sm leading-relaxed mb-4">{article.excerpt}</p>
-                      <p className="text-gray-400 text-xs">Scraping system is actively collecting incident data...</p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+        {/* Memorial names ticker */}
+        <NamesTicker cases={cases} isLoading={isLoading} />
 
-          <div className="text-center mt-12">
-            <Button
-              onClick={handleViewAllNews}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
-            >
-              View All News & Reports
-            </Button>
-          </div>
-        </div>
-      </section>
+        {/* Data modules: county, trend, type charts */}
+        <Suspense fallback={<DataModulesFallback />}>
+          <LazyDataModules cases={cases} isLoading={isLoading} />
+        </Suspense>
 
-      {/* Impact Section */}
-      <section id="impact" className="py-24 px-4 bg-gradient-to-r from-red-900/10 to-black/20 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-8">
-            <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              Creating Real Impact
-            </span>
-          </h2>
-          <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
-            Join thousands of Kenyans working together to build a more transparent 
-            and accountable society through data-driven advocacy.
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-3xl font-bold text-red-400 mb-2">{isLoading ? '...' : error ? '--' : totalCases}</div>
-              <div className="text-gray-300">Cases Documented</div>
-            </div>
-            <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-3xl font-bold text-red-400 mb-2">47</div>
-              <div className="text-gray-300">Counties Covered</div>
-            </div>
-            <div className="bg-black/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
-              <div className="text-3xl font-bold text-red-400 mb-2">24/7</div>
-              <div className="text-gray-300">Live Monitoring</div>
-            </div>
-          </div>
-          
-          <Button
-            onClick={handleEnterApp}
-            size="lg"
-            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-12 py-6 text-xl font-bold rounded-2xl shadow-2xl hover:shadow-red-500/25 transition-all duration-300 transform hover:scale-105"
-          >
-            Start Exploring
-            <ArrowRight className="w-6 h-6 ml-3" />
-          </Button>
-        </div>
-      </section>
+        {/* County choropleth + live data panel */}
+        <MapCTA cases={cases} isLoading={isLoading} />
 
-      {/* Footer */}
-      <footer className="py-16 px-4 border-t border-white/10 bg-black/40 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            {/* Brand */}
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
-                  <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
-                </div>
-                <span className="text-xl font-bold">PoliceBrutalityTracker</span>
-              </div>
-              <p className="text-gray-400 text-sm">
-                Justice through visibility
+        {/* Research & reports */}
+        <NewsSection articles={newsArticles as any} isLoading={articlesLoading} onArticleClick={handleNewsClick} />
+
+        {/* Mission */}
+        <section id="about" className="py-24 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+            <div>
+              <SectionHeading
+                kicker="Our mission"
+                title="Transparency is the first step to accountability."
+              />
+              <p className="text-gray-300 leading-relaxed mb-6">
+                Police brutality cases in Kenya often go undocumented or unreported, making it difficult to
+                understand patterns and hold authorities accountable. This platform bridges that gap —
+                a comprehensive, transparent record of incidents across all 47 counties.
+              </p>
+              <p className="text-gray-300 leading-relaxed">
+                Every pin on the map represents a human story. By visualizing these incidents, we help
+                communities, activists, journalists, and policymakers make informed decisions.
               </p>
             </div>
 
-            {/* Platform */}
-            <div className="space-y-4">
-              <h4 className="font-semibold text-white">Platform</h4>
-              <div className="space-y-2">
-                <button onClick={handleEnterApp} className="block text-gray-400 hover:text-white text-sm transition-colors">
-                  Interactive Map
-                </button>
-                <button onClick={() => scrollToSection('about')} className="block text-gray-400 hover:text-white text-sm transition-colors">
-                  About
-                </button>
-                <button onClick={() => scrollToSection('news')} className="block text-gray-400 hover:text-white text-sm transition-colors">
-                  News
-                </button>
+            <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-8">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/30 flex items-center justify-center">
+                  <Scale className="w-5 h-5 text-red-400" />
+                </div>
+                <h4 className="text-xl font-bold text-white">Data sources &amp; methodology</h4>
+              </div>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Community submissions, reviewed before publication',
+                  'Verified media reports and court records',
+                  'Community confirmation voting on each case',
+                  'All figures on this site are computed live from the database',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-gray-300">
+                    <Shield className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Button
+                onClick={handleEnterApp}
+                variant="outline"
+                className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-300 gap-2"
+              >
+                View the data now
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-16 px-4 border-t border-white/10 bg-black/40">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-4 gap-8 mb-8">
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
+                    <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
+                  </div>
+                  <span className="text-xl font-bold">PoliceBrutalityTracker</span>
+                </div>
+                <p className="text-gray-400 text-sm">Justice through visibility</p>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-semibold text-white">Platform</h4>
+                <div className="space-y-2">
+                  <button onClick={handleEnterApp} className="block text-gray-400 hover:text-white text-sm transition-colors">
+                    Interactive Map
+                  </button>
+                  <button onClick={() => scrollToSection('data')} className="block text-gray-400 hover:text-white text-sm transition-colors">
+                    The Data
+                  </button>
+                  <button onClick={() => navigate('/news')} className="block text-gray-400 hover:text-white text-sm transition-colors">
+                    News
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-semibold text-white">Data</h4>
+                <div className="space-y-2">
+                  <div className="text-gray-400 text-sm">
+                    Total cases: {isLoading ? '…' : error ? '—' : stats.totalCases}
+                  </div>
+                  <div className="text-gray-400 text-sm">Counties: {isLoading ? '…' : error ? '—' : stats.countiesCount}</div>
+                  <div className="text-gray-400 text-sm">
+                    Last updated:{' '}
+                    {stats.latestUpdate
+                      ? stats.latestUpdate.toLocaleDateString('en-KE', { day: 'numeric', month: 'short', year: 'numeric' })
+                      : '—'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-semibold text-white">Support</h4>
+                <div className="space-y-2">
+                  <div className="text-gray-400 text-sm">Report an Issue</div>
+                  <div className="text-gray-400 text-sm">Community Guidelines</div>
+                  <div className="text-gray-400 text-sm">Privacy Policy</div>
+                </div>
               </div>
             </div>
 
-            {/* Data */}
-            <div className="space-y-4">
-              <h4 className="font-semibold text-white">Data</h4>
-              <div className="space-y-2">
-                <div className="text-gray-400 text-sm">Total Cases: {isLoading ? '...' : error ? '--' : totalCases}</div>
-                <div className="text-gray-400 text-sm">Counties: 47</div>
-                <div className="text-gray-400 text-sm">Last Updated: Today</div>
-              </div>
-            </div>
-
-            {/* Contact */}
-            <div className="space-y-4">
-              <h4 className="font-semibold text-white">Support</h4>
-              <div className="space-y-2">
-                <div className="text-gray-400 text-sm">Report an Issue</div>
-                <div className="text-gray-400 text-sm">Community Guidelines</div>
-                <div className="text-gray-400 text-sm">Privacy Policy</div>
+            <div className="pt-8 border-t border-white/10">
+              <div className="flex flex-col md:flex-row items-center justify-between">
+                <p className="text-gray-400 text-sm text-center md:text-left mb-4 md:mb-0">
+                  © {new Date().getFullYear()} PoliceBrutalityTracker. Building a safer Kenya through transparency and accountability.
+                </p>
+                <div className="flex items-center space-x-6">
+                  <span className="text-gray-400 text-sm">Together for justice</span>
+                  <button
+                    onClick={handleLiveIndicatorClick}
+                    className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
+                  >
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-green-400 text-sm font-medium">Live</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+        </footer>
 
-          {/* Bottom */}
-          <div className="pt-8 border-t border-white/10">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <p className="text-gray-400 text-sm text-center md:text-left mb-4 md:mb-0">
-                © {new Date().getFullYear()} PoliceBrutalityTracker. Building a safer Kenya through transparency and accountability.
-              </p>
-              <div className="flex items-center space-x-6">
-                <span className="text-gray-400 text-sm">Together for justice</span>
-                <button
-                  onClick={handleLiveIndicatorClick}
-                  className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
-                >
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                  <span className="text-green-400 text-sm font-medium">Live</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* News Detail Modal */}
-      <NewsDetailModal
-        isOpen={!!selectedNewsArticle}
-        onClose={() => setSelectedNewsArticle(null)}
-        article={selectedNewsArticle}
-      />
+        <NewsDetailModal
+          isOpen={!!selectedNewsArticle}
+          onClose={() => setSelectedNewsArticle(null)}
+          article={selectedNewsArticle}
+        />
       </div>
     </>
   );

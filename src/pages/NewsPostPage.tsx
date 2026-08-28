@@ -7,7 +7,7 @@ import { useNewsArticleBySlug, useAllPublishedNews } from '@/hooks/useNewsArticl
 import SEOHead from '@/components/SEOHead';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 
-const BlogPostPage = () => {
+const NewsPostPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const { data: article, isLoading, error } = useNewsArticleBySlug(slug || '');
@@ -63,9 +63,9 @@ const BlogPostPage = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Article Not Found</h1>
           <p className="text-gray-400 mb-6">The article you're looking for doesn't exist or has been removed.</p>
-          <Button onClick={() => navigate('/blog')} className="bg-red-600 hover:bg-red-700">
+          <Button onClick={() => navigate('/news')} className="bg-red-600 hover:bg-red-700">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Blog
+            Back to News
           </Button>
         </div>
       </div>
@@ -74,7 +74,7 @@ const BlogPostPage = () => {
 
   const articleStructuredData = {
     "@context": "https://schema.org",
-    "@type": "BlogPosting",
+    "@type": "NewsArticle",
     "headline": article.seo_title || article.title,
     "description": article.seo_description || article.excerpt || article.content?.substring(0, 160),
     "image": article.featured_image_url || "https://policebrutalitytracker.co.ke/og-image.svg",
@@ -94,9 +94,9 @@ const BlogPostPage = () => {
     "dateModified": article.updated_at,
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://policebrutalitytracker.co.ke/blog/${slug}`
+      "@id": `https://policebrutalitytracker.co.ke/news/${slug}`
     },
-    "url": `https://policebrutalitytracker.co.ke/blog/${slug}`,
+    "url": `https://policebrutalitytracker.co.ke/news/${slug}`,
     "keywords": article.tags?.join(', ') || 'police brutality, Kenya, human rights',
     "articleSection": article.category || 'News',
     "wordCount": article.content?.split(/\s+/).length || 0,
@@ -108,8 +108,8 @@ const BlogPostPage = () => {
     "@type": "BreadcrumbList",
     "itemListElement": [
       { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://policebrutalitytracker.co.ke" },
-      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://policebrutalitytracker.co.ke/blog" },
-      { "@type": "ListItem", "position": 3, "name": article.title, "item": `https://policebrutalitytracker.co.ke/blog/${slug}` }
+      { "@type": "ListItem", "position": 2, "name": "News", "item": "https://policebrutalitytracker.co.ke/news" },
+      { "@type": "ListItem", "position": 3, "name": article.title, "item": `https://policebrutalitytracker.co.ke/news/${slug}` }
     ]
   };
 
@@ -119,7 +119,7 @@ const BlogPostPage = () => {
         title={`${article.seo_title || article.title} | PoliceBrutalityTracker`}
         description={article.seo_description || article.excerpt || article.content?.substring(0, 155) + '...'}
         keywords={article.tags?.join(', ') || `${article.category}, police brutality Kenya, human rights`}
-        url={`https://policebrutalitytracker.co.ke/blog/${slug}`}
+        url={`https://policebrutalitytracker.co.ke/news/${slug}`}
         image={article.featured_image_url || undefined}
         type="article"
         structuredData={[articleStructuredData, breadcrumbData]}
@@ -131,7 +131,7 @@ const BlogPostPage = () => {
           <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
             <Button
               variant="ghost"
-              onClick={() => navigate('/blog')}
+              onClick={() => navigate('/news')}
               className="text-gray-300 hover:text-white"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
@@ -228,7 +228,7 @@ const BlogPostPage = () => {
                 {relatedArticles.map((related) => (
                   <Link
                     key={related.id}
-                    to={`/blog/${related.slug || related.id}`}
+                    to={`/news/${related.slug || related.id}`}
                     className="block group"
                   >
                     <Card className="bg-white/5 border-white/10 hover:bg-white/10 transition-all h-full">
@@ -251,7 +251,7 @@ const BlogPostPage = () => {
           <div className="text-center mt-12 pt-8 border-t border-white/10">
             <p className="text-gray-400 mb-4">Explore more from PoliceBrutalityTracker</p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button onClick={() => navigate('/blog')} variant="outline" className="border-white/20 text-gray-300 hover:bg-white/10">
+              <Button onClick={() => navigate('/news')} variant="outline" className="border-white/20 text-gray-300 hover:bg-white/10">
                 More Articles
               </Button>
               <Button onClick={() => navigate('/map')} className="bg-red-600 hover:bg-red-700">
@@ -265,4 +265,4 @@ const BlogPostPage = () => {
   );
 };
 
-export default BlogPostPage;
+export default NewsPostPage;

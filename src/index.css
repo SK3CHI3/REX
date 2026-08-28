@@ -232,6 +232,40 @@
   animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+.animate-fade-in {
+  animation: fadeIn 0.7s ease-out forwards;
+}
+
+/* Staggered entrance — pair with inline animation-delay */
+.fade-up {
+  opacity: 0;
+  animation: fadeIn 0.7s ease-out forwards;
+}
+
+/* Memorial names marquee — inner track holds two copies of the list */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--marquee-duration, 60s) linear infinite;
+}
+
+.ticker-hover-pause:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation-duration: 240s;
+  }
+}
+
 /* Gradient text utilities */
 .bg-clip-text {
   -webkit-background-clip: text;
@@ -318,4 +352,83 @@
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(239, 68, 68, 0.5) rgba(255, 255, 255, 0.05);
+}
+
+/* ============ Warm light theme (homepage scope) ============
+   The homepage root carries .theme-light; this block remaps the
+   dark-theme utility classes to a reddish-white palette in one place. */
+.theme-light {
+  background-color: #faf3f1 !important;
+  color: #0f172a;
+}
+
+.theme-light .text-white {
+  color: #0f172a !important;
+}
+
+/* Keep white text on red surfaces (buttons, badges) */
+.theme-light [class*="bg-red-"].text-white,
+.theme-light [class*="bg-red-"] .text-white {
+  color: #ffffff !important;
+}
+
+.theme-light .hover\:text-white:hover {
+  color: #0f172a !important;
+}
+
+.theme-light .text-gray-300 {
+  color: #475569 !important;
+}
+
+.theme-light .text-gray-400 {
+  color: #64748b !important;
+}
+
+.theme-light .text-gray-500 {
+  color: #64748b !important;
+}
+
+.theme-light .text-red-400 {
+  color: #dc2626 !important;
+}
+
+.theme-light .text-green-400 {
+  color: #16a34a !important;
+}
+
+.theme-light .bg-black\/20 {
+  background-color: rgba(243, 231, 228, 0.55) !important;
+}
+
+.theme-light .bg-black\/40 {
+  background-color: #f3e7e4 !important;
+}
+
+.theme-light .bg-black\/50 {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.theme-light .bg-white\/\[0\.02\],
+.theme-light .bg-white\/\[0\.03\],
+.theme-light .bg-white\/\[0\.04\],
+.theme-light .bg-white\/\[0\.05\] {
+  background-color: #ffffff !important;
+}
+
+.theme-light .bg-white\/5 {
+  background-color: #f1e4e0 !important;
+}
+
+.theme-light .border-white\/10,
+.theme-light .border-white\/15,
+.theme-light .border-white\/20 {
+  border-color: #f0dcd7 !important;
+}
+
+.theme-light svg text {
+  fill: #475569;
+}
+
+.theme-light svg line {
+  stroke: rgba(15, 23, 42, 0.08);
 }

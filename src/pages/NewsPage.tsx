@@ -7,7 +7,7 @@ import { useAllPublishedNews } from '@/hooks/useNewsArticle';
 import SEOHead from '@/components/SEOHead';
 import { useNavigate } from 'react-router-dom';
 
-const BlogPage = () => {
+const NewsPage = () => {
   const { data: articles, isLoading } = useAllPublishedNews();
   const navigate = useNavigate();
 
@@ -24,12 +24,12 @@ const BlogPage = () => {
     return article.slug || article.id;
   };
 
-  const blogStructuredData = {
+  const newsStructuredData = {
     "@context": "https://schema.org",
-    "@type": "Blog",
-    "name": "PoliceBrutalityTracker Blog",
+    "@type": "CollectionPage",
+    "name": "PoliceBrutalityTracker News",
     "description": "News, insights, and reports on police accountability and human rights in Kenya",
-    "url": "https://policebrutalitytracker.co.ke/blog",
+    "url": "https://policebrutalitytracker.co.ke/news",
     "publisher": {
       "@type": "Organization",
       "name": "PoliceBrutalityTracker",
@@ -38,24 +38,24 @@ const BlogPage = () => {
         "url": "https://policebrutalitytracker.co.ke/logo.svg"
       }
     },
-    "blogPost": articles?.slice(0, 20).map(article => ({
-      "@type": "BlogPosting",
+    "hasPart": articles?.slice(0, 20).map(article => ({
+      "@type": "NewsArticle",
       "headline": article.title,
       "description": article.excerpt || article.content?.substring(0, 160),
       "author": { "@type": "Person", "name": article.author },
       "datePublished": article.published_at || article.created_at,
-      "url": `https://policebrutalitytracker.co.ke/blog/${generateSlug(article)}`
+      "url": `https://policebrutalitytracker.co.ke/news/${generateSlug(article)}`
     })) || []
   };
 
   return (
     <>
       <SEOHead
-        title="Blog - News & Insights | PoliceBrutalityTracker"
+        title="News & Insights | PoliceBrutalityTracker"
         description="Read the latest news, reports, and insights on police accountability, human rights, and justice in Kenya. Stay informed with PoliceBrutalityTracker's editorial content."
-        keywords="police brutality Kenya blog, human rights news Kenya, police accountability articles, Kenya justice news, civic tech Kenya"
-        url="https://policebrutalitytracker.co.ke/blog"
-        structuredData={blogStructuredData}
+        keywords="police brutality Kenya news, human rights news Kenya, police accountability articles, Kenya justice news, civic tech Kenya"
+        url="https://policebrutalitytracker.co.ke/news"
+        structuredData={newsStructuredData}
       />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white">
@@ -95,7 +95,7 @@ const BlogPage = () => {
               {/* Featured Article */}
               {articles[0] && (
                 <Link
-                  to={`/blog/${generateSlug(articles[0])}`}
+                  to={`/news/${generateSlug(articles[0])}`}
                   className="block group mb-12"
                 >
                   <Card className="bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-300 overflow-hidden">
@@ -147,7 +147,7 @@ const BlogPage = () => {
                 {articles.slice(1).map((article) => (
                   <Link
                     key={article.id}
-                    to={`/blog/${generateSlug(article)}`}
+                    to={`/news/${generateSlug(article)}`}
                     className="block group"
                   >
                     <Card className="bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-300 h-full">
@@ -204,14 +204,14 @@ const BlogPage = () => {
           {/* SEO Footer */}
           <div className="mt-16 pt-8 border-t border-white/10">
             <div className="prose prose-invert max-w-none">
-              <h2 className="text-2xl font-bold mb-4">About PoliceBrutalityTracker Blog</h2>
+              <h2 className="text-2xl font-bold mb-4">About PoliceBrutalityTracker News</h2>
               <p className="text-gray-300 mb-4">
-                The PoliceBrutalityTracker Blog covers news, analysis, and insights on police accountability and human rights in Kenya.
+                PoliceBrutalityTracker News covers news, analysis, and insights on police accountability and human rights in Kenya.
                 Our editorial team publishes reports on incidents, legal developments, and community responses to
                 police misconduct across all 47 counties.
               </p>
               <p className="text-gray-300">
-                Stay informed about the fight for justice and transparency. Our blog complements our
+                Stay informed about the fight for justice and transparency. Our newsroom complements our
                 <Link to="/map" className="text-red-400 hover:text-red-300 mx-1">interactive incident map</Link>
                 and <Link to="/cases-index" className="text-red-400 hover:text-red-300 mx-1">case database</Link>,
                 providing context and depth to the data we track.
@@ -224,4 +224,4 @@ const BlogPage = () => {
   );
 };
 
-export default BlogPage;
+export default NewsPage;

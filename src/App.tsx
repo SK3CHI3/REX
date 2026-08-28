@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import PerformanceOptimizations from "./components/PerformanceOptimizations";
 import SEOAnalytics from "./components/SEOAnalytics";
@@ -13,8 +13,8 @@ import MapPage from "./pages/MapPage";
 import AllNewsPage from "./pages/AllCasesPage";
 import CasePage from "./pages/CasePage";
 import CasesIndexPage from "./pages/CasesIndexPage";
-import BlogPage from "./pages/BlogPage";
-import BlogPostPage from "./pages/BlogPostPage";
+import NewsPage from "./pages/NewsPage";
+import NewsPostPage from "./pages/NewsPostPage";
 import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
@@ -26,6 +26,12 @@ const LazyCaseModal = lazy(() => import("./components/CaseModal"));
 const LazyNewsDetailModal = lazy(() => import("./components/NewsDetailModal"));
 
 const queryClient = new QueryClient();
+
+// Old /blog URLs keep working — everything is news now
+const BlogSlugRedirect = () => {
+  const { slug } = useParams();
+  return <Navigate to={`/news/${slug}`} replace />;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -42,8 +48,10 @@ const App = () => (
             <Route path="/cases" element={<AllNewsPage />} />
             <Route path="/cases-index" element={<CasesIndexPage />} />
             <Route path="/case/:id" element={<CasePage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:slug" element={<BlogPostPage />} />
+            <Route path="/news" element={<NewsPage />} />
+            <Route path="/news/:slug" element={<NewsPostPage />} />
+            <Route path="/blog" element={<Navigate to="/news" replace />} />
+            <Route path="/blog/:slug" element={<BlogSlugRedirect />} />
             <Route path="/sys-mgmt-portal-auth" element={<AdminLogin />} />
             <Route
               path="/sys-mgmt-portal"

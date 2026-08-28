@@ -281,7 +281,7 @@ const AdminDashboard = () => {
                       className="w-full justify-start bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
                     >
                       <FileText className="w-4 h-4 mr-2" />
-                      Manage News &amp; Blog
+                      Manage News
                     </Button>
                   </div>
                 </div>
