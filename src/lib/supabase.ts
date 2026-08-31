@@ -56,23 +56,27 @@ export interface DatabaseCaseVideo {
 
 export interface DatabaseCaseSubmission {
   id: string
-  victim_name: string
+  victim_name?: string | null
   age?: number
-  incident_date: string
+  incident_date?: string | null
   incident_time?: string
-  location: string
-  county: string
+  location?: string | null
+  county?: string | null
   latitude?: number
   longitude?: number
-  case_type: 'death' | 'assault' | 'harassment' | 'unlawful_arrest' | 'other'
+  case_type?: 'death' | 'assault' | 'harassment' | 'unlawful_arrest' | 'other' | null
   description: string
+  // Scraper-only fields (populated by the n8n weekly scraper)
+  title?: string | null
+  severity?: string | null
+  source_url?: string | null
   justice_served?: boolean
   officer_names?: string[]
   witnesses?: string[]
   photo_urls?: string[]
   video_urls?: string[]
-  reporter_name: string
-  reporter_contact: string
+  reporter_name?: string | null
+  reporter_contact?: string | null
   is_anonymous?: boolean
   wants_updates?: boolean
   status: 'pending' | 'approved' | 'rejected'

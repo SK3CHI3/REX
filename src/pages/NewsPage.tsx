@@ -116,9 +116,16 @@ const NewsPage = () => {
                           </div>
                         )}
                         <div className="p-8 flex flex-col justify-center">
-                          <Badge className="w-fit mb-4 bg-red-600/20 text-red-300 border-red-500/30">
-                            Featured
-                          </Badge>
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            <Badge className="w-fit bg-red-600/20 text-red-300 border-red-500/30">
+                              Featured
+                            </Badge>
+                            {articles[0].isAiGenerated && (
+                              <Badge className="w-fit bg-purple-600/20 text-purple-300 border-purple-500/30">
+                                AI Generated
+                              </Badge>
+                            )}
+                          </div>
                           <h2 className="text-2xl md:text-3xl font-bold text-white group-hover:text-red-400 transition-colors mb-4">
                             {articles[0].title}
                           </h2>
@@ -165,11 +172,18 @@ const NewsPage = () => {
                           </div>
                         )}
                         <div className="p-6">
-                          {article.category && (
-                            <Badge variant="outline" className="mb-3 border-white/20 text-gray-300 text-xs">
-                              {article.category}
-                            </Badge>
-                          )}
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {article.category && (
+                              <Badge variant="outline" className="border-white/20 text-gray-300 text-xs">
+                                {article.category}
+                              </Badge>
+                            )}
+                            {article.isAiGenerated && (
+                              <Badge className="bg-purple-600/20 text-purple-300 border-purple-500/30 text-xs">
+                                AI Generated
+                              </Badge>
+                            )}
+                          </div>
                           <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition-colors mb-3 line-clamp-2">
                             {article.title}
                           </h3>

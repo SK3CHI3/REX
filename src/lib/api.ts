@@ -1,5 +1,6 @@
 import { supabase, DatabaseCase, DatabaseCasePhoto, DatabaseCaseVideo, DatabaseCaseSubmission } from './supabase'
 import { Case, SubmitCaseData } from '@/types'
+import { getCountyCentroid } from './countyCentroids'
 
 // Transform database case to frontend case format
 export function transformDatabaseCase(
@@ -223,7 +224,7 @@ export async function fetchPendingSubmissions(): Promise<DatabaseCaseSubmission[
 }
 
 // Approve a case submission
-export async function approveSubmission(submissionId: string): Promise<void> {
+export async function approveSubmission(submissionId: string, caseTypeOverride?: string): Promise<void> {
   try {
     // First, get the submission data
     const { data: submission, error: fetchError } = await supabase
@@ -237,6 +238,10 @@ export async function approveSubmission(submissionId: string): Promise<void> {
       throw fetchError
     }
 
+    // Scraped submissions carry no coordinates; pin them to the county centroid
+    // so approved cases still appear on the map.
+    const centroid = getCountyCentroid(submission.county)
+
     // Create a new case in the main cases table
     const { data: newCase, error: insertError } = await supabase
       .from('cases')
@@ -247,9 +252,9 @@ export async function approveSubmission(submissionId: string): Promise<void> {
         incident_time: submission.incident_time,
         location: submission.location,
         county: submission.county,
-        latitude: submission.latitude || 0,
-        longitude: submission.longitude || 0,
-        case_type: submission.case_type,
+        latitude: submission.latitude || centroid?.lat || 0,
+        longitude: submission.longitude || centroid?.lng || 0,
+        case_type: caseTypeOverride || submission.case_type,
         description: submission.description,
         status: 'unconfirmed',
         source: 'user_submission',

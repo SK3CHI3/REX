@@ -32,6 +32,27 @@ import { useVisitorAnalytics } from '@/hooks/useVisitorTracking';
 import { useNews, useDeleteNews, NewsArticle } from '@/hooks/useNews';
 import NewsModal from '@/components/NewsModal';
 
+const CASE_TYPE_OPTIONS = [
+  { value: 'death', label: 'Death' },
+  { value: 'assault', label: 'Assault' },
+  { value: 'harassment', label: 'Harassment' },
+  { value: 'unlawful_arrest', label: 'Unlawful arrest' },
+  { value: 'other', label: 'Other' },
+];
+
+const severityBadgeClass = (severity: string) => {
+  switch (severity) {
+    case 'critical':
+      return 'bg-red-900/60 text-red-300 border-red-500/40';
+    case 'high':
+      return 'bg-orange-900/60 text-orange-300 border-orange-500/40';
+    case 'medium':
+      return 'bg-yellow-900/50 text-yellow-300 border-yellow-500/30';
+    default:
+      return 'bg-blue-900/50 text-blue-300 border-blue-500/30';
+  }
+};
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -39,6 +60,7 @@ const AdminDashboard = () => {
   const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
   const [selectedNews, setSelectedNews] = useState<NewsArticle | null>(null);
   const [newsModalMode, setNewsModalMode] = useState<'create' | 'edit'>('create');
+  const [caseTypeSelections, setCaseTypeSelections] = useState<Record<string, string>>({});
 
   // Data hooks
   const { data: cases, isLoading: casesLoading } = useCases();
@@ -323,24 +345,75 @@ const AdminDashboard = () => {
                   Manual Case Submissions
                 </h3>
                 <div className="space-y-4">
-                  {pendingSubmissions.data?.map((submission) => (
+                  {pendingSubmissions.data?.map((submission) => {
+                    const isScraped = submission.reporter_name === 'Automated Scraper';
+                    const needsCaseType = !submission.case_type;
+                    const selectedType = caseTypeSelections[submission.id];
+                    const incidentDate = submission.incident_date ? new Date(submission.incident_date) : null;
+                    return (
                     <div key={submission.id} className="bg-black/30 rounded-xl p-6 border border-white/10">
                       <div className="flex items-start justify-between mb-4">
                         <div className="space-y-2">
-                          <h4 className="text-lg font-semibold text-white">{submission.victim_name}</h4>
+                          <h4 className="text-lg font-semibold text-white">
+                            {submission.victim_name || 'Unknown victim'}
+                            {isScraped && (
+                              <Badge variant="secondary" className="ml-2 bg-purple-900/50 text-purple-300 border-purple-500/30 align-middle">
+                                Auto-scraped
+                              </Badge>
+                            )}
+                          </h4>
+                          {submission.title && (
+                            <p className="text-sm text-gray-300 italic">{submission.title}</p>
+                          )}
                           <div className="flex items-center space-x-4 text-sm text-gray-400">
                             <span className="flex items-center">
                               <MapPin className="w-4 h-4 mr-1" />
-                              {submission.location}, {submission.county}
+                              {[submission.location, submission.county].filter(Boolean).join(', ') || 'Unknown location'}
                             </span>
-                            <span className="flex items-center">
-                              <Calendar className="w-4 h-4 mr-1" />
-                              {new Date(submission.incident_date).toLocaleDateString()}
-                            </span>
+                            {incidentDate && !isNaN(incidentDate.getTime()) && (
+                              <span className="flex items-center">
+                                <Calendar className="w-4 h-4 mr-1" />
+                                {incidentDate.toLocaleDateString()}
+                              </span>
+                            )}
                           </div>
-                          <Badge variant="secondary" className="bg-red-900/50 text-red-300 border-red-500/30">
-                            {submission.case_type.replace('_', ' ').toUpperCase()}
-                          </Badge>
+                          <div className="flex flex-wrap items-center gap-2">
+                            {submission.case_type ? (
+                              <Badge variant="secondary" className="bg-red-900/50 text-red-300 border-red-500/30">
+                                {submission.case_type.replace('_', ' ').toUpperCase()}
+                              </Badge>
+                            ) : (
+                              <select
+                                value={selectedType || ''}
+                                onChange={(e) =>
+                                  setCaseTypeSelections((prev) => ({ ...prev, [submission.id]: e.target.value }))
+                                }
+                                className="bg-black/40 border border-white/20 rounded-lg px-3 py-1.5 text-sm text-white focus:outline-none focus:border-red-500/50"
+                              >
+                                <option value="">Assign case type...</option>
+                                {CASE_TYPE_OPTIONS.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+                            {submission.severity && (
+                              <Badge variant="secondary" className={severityBadgeClass(submission.severity)}>
+                                Severity: {submission.severity.toUpperCase()}
+                              </Badge>
+                            )}
+                          </div>
+                          {submission.source_url && (
+                            <a
+                              href={submission.source_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-xs text-blue-400 hover:text-blue-300 underline truncate max-w-xl"
+                            >
+                              Source: {submission.source_url}
+                            </a>
+                          )}
                         </div>
                         <Badge variant="secondary" className="bg-yellow-900/50 text-yellow-300 border-yellow-500/30">
                           Pending Review
@@ -355,7 +428,7 @@ const AdminDashboard = () => {
                       </div>
 
                       <div className="mb-4 text-sm text-gray-400">
-                        <p><strong>Reporter:</strong> {submission.reporter_name} ({submission.reporter_contact})</p>
+                        <p><strong>Reporter:</strong> {submission.reporter_name || 'Anonymous'}{submission.reporter_contact ? ` (${submission.reporter_contact})` : ''}</p>
                         <p><strong>Submitted:</strong> {new Date(submission.created_at).toLocaleString()}</p>
                       </div>
 
@@ -400,8 +473,13 @@ const AdminDashboard = () => {
 
                       <div className="flex gap-3">
                         <Button
-                          onClick={() => approveSubmission.mutate(submission.id)}
-                          disabled={approveSubmission.isPending}
+                          onClick={() =>
+                            approveSubmission.mutate({
+                              submissionId: submission.id,
+                              caseType: needsCaseType ? selectedType : undefined,
+                            })
+                          }
+                          disabled={approveSubmission.isPending || (needsCaseType && !selectedType)}
                           className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
                         >
                           <CheckCircle className="w-4 h-4 mr-2" />
@@ -418,7 +496,8 @@ const AdminDashboard = () => {
                         </Button>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                   {(!pendingSubmissions.data || pendingSubmissions.data.length === 0) && (
                     <div className="text-center py-12">
                       <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />

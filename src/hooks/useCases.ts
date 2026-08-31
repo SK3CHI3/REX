@@ -65,7 +65,8 @@ export function useApproveSubmission() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: approveSubmission,
+    mutationFn: ({ submissionId, caseType }: { submissionId: string; caseType?: string }) =>
+      approveSubmission(submissionId, caseType),
     onSuccess: async () => {
       // Small delay to ensure database operation completes
       await new Promise(resolve => setTimeout(resolve, 500))

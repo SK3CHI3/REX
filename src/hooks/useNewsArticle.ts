@@ -17,28 +17,79 @@ export interface NewsArticle {
   slug?: string;
   seo_title?: string;
   seo_description?: string;
+  isAiGenerated?: boolean;
 }
 
-// Get news article by slug
+// Row shape of the news_articles table (weekly AI digests written by n8n)
+interface WeeklyDigestRow {
+  id: string;
+  title: string;
+  summary: string | null;
+  body: string;
+  category: string | null;
+  ai_generated: boolean | null;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+function mapDigestToArticle(digest: WeeklyDigestRow): NewsArticle {
+  return {
+    id: digest.id,
+    title: digest.title,
+    content: digest.body,
+    excerpt: digest.summary || undefined,
+    author: 'AI Newsroom',
+    status: 'published',
+    category: digest.category || 'Weekly Digest',
+    tags: ['weekly-digest', 'ai-generated'],
+    published_at: digest.published_at || undefined,
+    created_at: digest.created_at,
+    updated_at: digest.updated_at,
+    isAiGenerated: digest.ai_generated ?? true,
+  };
+}
+
+// Digests live in news_articles; a missing/failed table must not break the News page
+async function fetchPublishedDigests(): Promise<NewsArticle[]> {
+  const { data, error } = await supabase
+    .from('news_articles')
+    .select('*')
+    .eq('published', true)
+    .order('published_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching weekly digests:', error);
+    return [];
+  }
+  return ((data as WeeklyDigestRow[]) || []).map(mapDigestToArticle);
+}
+
+// Get news article by slug (falls back to digest id lookup)
 export function useNewsArticleBySlug(slug: string) {
   return useQuery({
     queryKey: ['newsArticle', slug],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('news')
         .select('*')
         .eq('slug', slug)
         .eq('status', 'published')
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
-      return data as NewsArticle;
+      if (data) return data as NewsArticle;
+
+      // Weekly digests are linked by their id
+      const digests = await fetchPublishedDigests();
+      const digest = digests.find((d) => d.id === slug);
+      if (!digest) throw new Error('Article not found');
+      return digest;
     },
     enabled: !!slug,
   });
 }
 
-// Get all published news articles
+// Get all published news articles (editorial + weekly AI digests)
 export function useAllPublishedNews() {
   return useQuery({
     queryKey: ['allPublishedNews'],
@@ -50,7 +101,15 @@ export function useAllPublishedNews() {
         .order('published_at', { ascending: false });
 
       if (error) throw error;
-      return data as NewsArticle[];
+
+      const digests = await fetchPublishedDigests();
+      const merged = [...(data as NewsArticle[]), ...digests];
+      merged.sort(
+        (a, b) =>
+          new Date(b.published_at || b.created_at).getTime() -
+          new Date(a.published_at || a.created_at).getTime()
+      );
+      return merged;
     }
   });
 }

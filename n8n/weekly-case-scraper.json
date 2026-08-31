@@ -1,0 +1,1192 @@
+{
+  "name": "Weekly Case Scraper + AI Digest",
+  "nodes": [
+    {
+      "id": "e2afb018-fb44-4b93-bc61-783ea51f413a",
+      "name": "Schedule Trigger - Weekly",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * 1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2b002bb5-04fd-412c-bf03-1ca4900b3cd2",
+      "name": "Manual Test Run",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        220
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "78a34adf-2c43-4515-802c-697d5be80361",
+      "name": "Set Run Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        110
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8a5efc8d-0a79-4257-991a-0f8fb1295c6d",
+              "name": "maxPagesPerSource",
+              "type": "number",
+              "value": "={{ Number($env.MAX_PAGES_PER_SOURCE) || 8 }}"
+            },
+            {
+              "id": "dfca1039-a7e5-4a5f-b3a0-2914fcd1de58",
+              "name": "maxNewPerSource",
+              "type": "number",
+              "value": "={{ Number($env.MAX_NEW_PER_SOURCE) || 12 }}"
+            },
+            {
+              "id": "8597d65c-a8a2-424a-9f8b-d9648d85e84b",
+              "name": "maxNewTotal",
+              "type": "number",
+              "value": "={{ Number($env.MAX_NEW_TOTAL) || 40 }}"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a32a0635-8098-4f77-ae84-babbb0b74857",
+      "name": "Get Scraped URLs",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        540,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "getAll",
+        "tableId": "scraped_articles",
+        "returnAll": true
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "id": "7ee59b46-7f8f-4d9b-82ea-fd0a32cb084f",
+      "name": "Cache Scraped URL Set",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        0
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nstaticData.scrapedUrls = $input.all().map(item => item.json.url).filter(Boolean);\nstaticData.newArticles = [];\nstaticData.jobStats = {};\nreturn [{ json: { cachedUrlCount: staticData.scrapedUrls.length } }];"
+      }
+    },
+    {
+      "id": "70671480-8849-4180-9e74-f12b65e88f97",
+      "name": "Get Enabled Sources",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        0
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "getAll",
+        "tableId": "scraping_sources",
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "enabled",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "id": "9b15fb84-4d91-4417-be91-ef38c148ad7b",
+      "name": "Loop Over Sources",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1320,
+        0
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    },
+    {
+      "id": "7fccf42e-5955-4a91-a717-4f1ebefe7866",
+      "name": "Build Apify Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        -120
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const source = $json;\nconst cfg = $('Set Run Config').item.json;\nconst urls = (Array.isArray(source.category_urls) && source.category_urls.length)\n  ? source.category_urls\n  : [source.base_url];\n\nconst pageFunction = `async function pageFunction(context) {\n    const { $, request } = context;\n    const url = request.url;\n    const title = $('h1').first().text().trim() || $('title').text().trim();\n    const paragraphs = [];\n    $('article p, main p, .article-body p, .entry-content p, .post-content p').each((i, el) => {\n        const t = $(el).text().trim();\n        if (t) paragraphs.push(t);\n    });\n    const text = paragraphs.join('\\\\n\\\\n');\n    if (!text || text.length < 200) {\n        return null;\n    }\n    const publishedDate = $('meta[property=\"article:published_time\"]').attr('content')\n        || $('time').attr('datetime')\n        || null;\n    return { url, title, text, publishedDate };\n}`;\n\nreturn { json: {\n  apifyBody: {\n    startUrls: urls.map(u => ({ url: u })),\n    linkSelector: 'a',\n    maxCrawlingDepth: 1,\n    maxPagesPerCrawl: cfg.maxPagesPerSource,\n    pageFunction,\n  }\n}};"
+      }
+    },
+    {
+      "id": "361de7a2-f9c0-4b4a-9c2b-8d2df03fb841",
+      "name": "Run Apify Scraper",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1840,
+        -120
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~cheerio-scraper/run-sync-get-dataset-items",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $env.APIFY_API_TOKEN }}"
+            },
+            {
+              "name": "memory",
+              "value": "256"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.apifyBody }}",
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "fddcc4e1-00f3-4f3a-baf4-55d05ba10278",
+      "name": "Filter & Track New URLs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2100,
+        -120
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const source = $('Loop Over Sources').item.json;\nconst staticData = $getWorkflowStaticData('global');\nconst seen = new Set(staticData.scrapedUrls || []);\nconst maxNewPerSource = $('Set Run Config').item.json.maxNewPerSource;\n\nlet articles = [];\nfor (const item of $input.all()) {\n  const data = item.json;\n  if (Array.isArray(data)) articles.push(...data);\n  else if (Array.isArray(data.data)) articles.push(...data.data);\n  else if (data && data.url) articles.push(data);\n}\n\nlet newCount = 0;\nconst foundCount = articles.length;\nfor (const art of articles) {\n  if (!art || !art.url) continue;\n  if (seen.has(art.url)) continue;\n  if (newCount >= maxNewPerSource) break;\n  seen.add(art.url);\n  staticData.newArticles.push({\n    sourceId: source.id,\n    sourceName: source.name,\n    url: art.url,\n    title: art.title || '',\n    text: art.text || art.content || '',\n    publishedDate: art.publishedDate || null,\n  });\n  newCount++;\n}\nstaticData.scrapedUrls = Array.from(seen);\nstaticData.jobStats[source.id] = {\n  sourceId: source.id,\n  sourceName: source.name,\n  articlesFound: foundCount,\n  newArticles: newCount,\n  errors: 0,\n};\n\nreturn [{ json: { source: source.name, found: foundCount, new: newCount } }];"
+      }
+    },
+    {
+      "id": "9f5ede39-2f0b-4c33-9266-d771b5741aff",
+      "name": "Load Aggregated New Articles",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        260
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst maxTotal = $('Set Run Config').item.json.maxNewTotal;\nconst articles = (staticData.newArticles || []).slice(0, maxTotal);\nif (articles.length === 0) return [];\nreturn articles.map(a => ({ json: a }));"
+      }
+    },
+    {
+      "id": "d049c290-2191-4f1e-afc8-182bc2ecbd94",
+      "name": "Loop Over New Articles",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1840,
+        260
+      ],
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      }
+    },
+    {
+      "id": "0cbd2c74-632a-48ca-aa8c-870ca912ad79",
+      "name": "Gemini Chat Model - Extraction",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2100,
+        460
+      ],
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "",
+          "name": "Google Gemini account"
+        }
+      }
+    },
+    {
+      "id": "5184c33e-8b57-412a-addf-cf2b09bcaf38",
+      "name": "Case Extraction Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2100,
+        620
+      ],
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"isRelevant\": {\n      \"type\": \"boolean\",\n      \"description\": \"true only if the article describes a specific Kenyan police brutality/misconduct incident\"\n    },\n    \"title\": {\n      \"type\": \"string\"\n    },\n    \"description\": {\n      \"type\": \"string\"\n    },\n    \"location\": {\n      \"type\": \"string\"\n    },\n    \"county\": {\n      \"type\": \"string\"\n    },\n    \"incidentDate\": {\n      \"type\": \"string\",\n      \"description\": \"ISO 8601 date if known, else empty string\"\n    },\n    \"victimName\": {\n      \"type\": \"string\"\n    },\n    \"severity\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"low\",\n        \"medium\",\n        \"high\",\n        \"critical\"\n      ]\n    },\n    \"tags\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      }\n    }\n  },\n  \"required\": [\n    \"isRelevant\",\n    \"title\",\n    \"description\"\n  ]\n}"
+      }
+    },
+    {
+      "id": "e418764f-5746-4ae7-a611-1ddbc1a596bc",
+      "name": "AI Agent - Extract Case",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2360,
+        260
+      ],
+      "parameters": {
+        "promptType": "define",
+        "text": "=Article title: {{ $json.title }}\nSource URL: {{ $json.url }}\nPublished: {{ $json.publishedDate }}\n\nArticle text:\n{{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a careful human-rights research assistant reviewing Kenyan news articles for the REX police brutality tracker. Read the article text and decide if it describes a specific incident of police brutality, misconduct, unlawful killing, or excessive force in Kenya. If it is general commentary, unrelated news, or a duplicate/roundup with no new specific incident, set isRelevant to false and leave other fields empty. If relevant, extract the fields factually from the article only - never invent details that are not in the text. Write description as 2-4 neutral, factual sentences."
+        }
+      }
+    },
+    {
+      "id": "fd51001a-1fca-4464-8062-24ccd799a331",
+      "name": "IF Is Relevant Case",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2620,
+        260
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "14a4cbba-f89b-4019-b46c-28622c37aa2f",
+              "leftValue": "={{ $json.output.isRelevant ? 'yes' : '' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "02f5bfb8-3437-491b-847d-5e665ffa4226",
+      "name": "Map Case Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2880,
+        140
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "556d55e1-ce58-4a3a-b9e8-45ddd4453daf",
+              "name": "title",
+              "type": "string",
+              "value": "={{ $json.output.title }}"
+            },
+            {
+              "id": "f479f50a-983c-425d-9f4c-6943c97e5bbb",
+              "name": "description",
+              "type": "string",
+              "value": "={{ $json.output.description }}"
+            },
+            {
+              "id": "1a00acb3-ae32-4759-930a-d8efab3a0cd8",
+              "name": "location",
+              "type": "string",
+              "value": "={{ $json.output.location }}"
+            },
+            {
+              "id": "2831199c-57bb-4d1b-b698-d08a919a0852",
+              "name": "county",
+              "type": "string",
+              "value": "={{ $json.output.county }}"
+            },
+            {
+              "id": "6af6e436-5826-4baf-b144-7789696ce02f",
+              "name": "incident_date",
+              "type": "string",
+              "value": "={{ $json.output.incidentDate || null }}"
+            },
+            {
+              "id": "a1f33380-bc33-418d-b387-f54c156f7072",
+              "name": "victim_name",
+              "type": "string",
+              "value": "={{ $json.output.victimName }}"
+            },
+            {
+              "id": "84fd1735-986b-4858-9ac6-f6538a0a256b",
+              "name": "severity",
+              "type": "string",
+              "value": "={{ $json.output.severity }}"
+            },
+            {
+              "id": "d4ff7715-60b2-4a9c-a30c-457e35625bfe",
+              "name": "tags",
+              "type": "array",
+              "value": "={{ $json.output.tags }}"
+            },
+            {
+              "id": "2889297e-8dbf-455c-9a38-c827115b2915",
+              "name": "source_url",
+              "type": "string",
+              "value": "={{ $('Loop Over New Articles').item.json.url }}"
+            },
+            {
+              "id": "bc5e3481-d7e8-4707-a488-fff8309a19de",
+              "name": "reporter_name",
+              "type": "string",
+              "value": "Automated Scraper"
+            },
+            {
+              "id": "57c7507c-e2e7-4e7d-9a9c-c35ab5e06508",
+              "name": "status",
+              "type": "string",
+              "value": "pending"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "5f107a0f-b35f-4864-b313-5265e9112adb",
+      "name": "Insert Case Submission",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3140,
+        140
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "tableId": "case_submissions",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $json.title }}"
+            },
+            {
+              "fieldId": "description",
+              "fieldValue": "={{ $json.description }}"
+            },
+            {
+              "fieldId": "location",
+              "fieldValue": "={{ $json.location }}"
+            },
+            {
+              "fieldId": "county",
+              "fieldValue": "={{ $json.county }}"
+            },
+            {
+              "fieldId": "incident_date",
+              "fieldValue": "={{ $json.incident_date }}"
+            },
+            {
+              "fieldId": "victim_name",
+              "fieldValue": "={{ $json.victim_name }}"
+            },
+            {
+              "fieldId": "severity",
+              "fieldValue": "={{ $json.severity }}"
+            },
+            {
+              "fieldId": "source_url",
+              "fieldValue": "={{ $json.source_url }}"
+            },
+            {
+              "fieldId": "reporter_name",
+              "fieldValue": "={{ $json.reporter_name }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "id": "1ab3cc2d-4197-4be8-b5ab-c97a243dadea",
+      "name": "Log Scraped Article",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3400,
+        260
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "tableId": "scraped_articles",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "url",
+              "fieldValue": "={{ $('Loop Over New Articles').item.json.url }}"
+            },
+            {
+              "fieldId": "source_id",
+              "fieldValue": "={{ $('Loop Over New Articles').item.json.sourceId }}"
+            },
+            {
+              "fieldId": "processed_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            },
+            {
+              "fieldId": "case_created",
+              "fieldValue": "={{ Boolean($json.id) }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "id": "114133da-2228-4a60-9861-f6602f35ee5f",
+      "name": "Build Job Stats Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2100,
+        780
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst stats = Object.values(staticData.jobStats || {});\nif (stats.length === 0) return [];\nreturn stats.map(s => ({ json: {\n  source_id: s.sourceId,\n  source_name: s.sourceName,\n  articles_found: s.articlesFound,\n  new_articles: s.newArticles,\n  errors: s.errors,\n  run_at: new Date().toISOString(),\n}}));"
+      }
+    },
+    {
+      "id": "4815fe3a-f762-42a6-9800-e96722a156db",
+      "name": "Insert Job Stats",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2360,
+        780
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "tableId": "scraping_jobs",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "source_id",
+              "fieldValue": "={{ $json.source_id }}"
+            },
+            {
+              "fieldId": "source_name",
+              "fieldValue": "={{ $json.source_name }}"
+            },
+            {
+              "fieldId": "articles_found",
+              "fieldValue": "={{ $json.articles_found }}"
+            },
+            {
+              "fieldId": "new_articles",
+              "fieldValue": "={{ $json.new_articles }}"
+            },
+            {
+              "fieldId": "errors",
+              "fieldValue": "={{ $json.errors }}"
+            },
+            {
+              "fieldId": "run_at",
+              "fieldValue": "={{ $json.run_at }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "id": "05481d91-8c7b-45f6-b225-d78ed9d2469b",
+      "name": "Get Cases From Last 7 Days",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2620,
+        780
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "getAll",
+        "tableId": "case_submissions",
+        "returnAll": true,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "created_at",
+              "condition": "gte",
+              "keyValue": "={{ $now.minus({ days: 7 }).toISO() }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "id": "0ddbc1b8-7b29-4bc1-9b5a-4a9763b2e4d6",
+      "name": "Aggregate Weekly Cases",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        780
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const cases = $input.all().map(i => i.json);\nreturn [{ json: { caseCount: cases.length, hasCases: cases.length > 0 ? 'yes' : '', cases } }];"
+      }
+    },
+    {
+      "id": "2097667d-c5bc-4325-b421-ba121f21a32f",
+      "name": "IF Has Cases This Week",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3140,
+        780
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "7ecf7b43-4b88-4df7-b6c8-772ed9826338",
+              "leftValue": "={{ $json.hasCases }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "f5151836-77aa-44ae-9b2b-edd78660fd64",
+      "name": "Gemini Chat Model - Digest",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        3400,
+        980
+      ],
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {
+          "temperature": 0.5
+        }
+      },
+      "credentials": {
+        "googlePalmApi": {
+          "id": "",
+          "name": "Google Gemini account"
+        }
+      }
+    },
+    {
+      "id": "4f5e3ab0-449f-4bf8-9189-37342ea9edf9",
+      "name": "Digest Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3400,
+        1140
+      ],
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"title\": {\n      \"type\": \"string\"\n    },\n    \"summary\": {\n      \"type\": \"string\",\n      \"description\": \"1-2 sentence teaser\"\n    },\n    \"body\": {\n      \"type\": \"string\",\n      \"description\": \"Full article body in markdown\"\n    }\n  },\n  \"required\": [\n    \"title\",\n    \"body\"\n  ]\n}"
+      }
+    },
+    {
+      "id": "d3b31614-14ee-45a4-a427-4c4951958339",
+      "name": "AI Agent - Write Weekly Digest",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        3660,
+        780
+      ],
+      "parameters": {
+        "promptType": "define",
+        "text": "=Here are this week's {{ $json.caseCount }} newly submitted police brutality cases for the REX tracker (JSON):\n\n{{ JSON.stringify($json.cases, null, 2) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are writing the weekly digest article for REX, a Kenyan police brutality tracking platform. Given this week's newly submitted cases as JSON, write a factual, sober news digest: an overview of how many incidents were recorded, which counties were affected, and any notable patterns. Do not sensationalize. Stick to what is in the provided case data - do not invent details. This article will be published labelled as AI-generated."
+        }
+      }
+    },
+    {
+      "id": "31744761-2e37-4841-bb46-e3393dcbb1cd",
+      "name": "Insert Weekly Digest Article",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3920,
+        780
+      ],
+      "parameters": {
+        "resource": "row",
+        "operation": "create",
+        "tableId": "news_articles",
+        "dataToSend": "defineBelow",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "title",
+              "fieldValue": "={{ $json.output.title }}"
+            },
+            {
+              "fieldId": "summary",
+              "fieldValue": "={{ $json.output.summary }}"
+            },
+            {
+              "fieldId": "body",
+              "fieldValue": "={{ $json.output.body }}"
+            },
+            {
+              "fieldId": "category",
+              "fieldValue": "weekly-digest"
+            },
+            {
+              "fieldId": "ai_generated",
+              "fieldValue": "={{ true }}"
+            },
+            {
+              "fieldId": "published",
+              "fieldValue": "={{ true }}"
+            },
+            {
+              "fieldId": "published_at",
+              "fieldValue": "={{ $now.toISO() }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "supabaseApi": {
+          "id": "",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "id": "a2b65b65-21a6-4b84-920e-a90f1ac3c28a",
+      "name": "No Cases This Week",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3400,
+        620
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "e99e0b17-0de9-4eae-879a-3c7a310f3e6e",
+      "name": "Sticky - 0369591c",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ],
+      "parameters": {
+        "content": "## 1. Trigger + Budget Config\nSchedule fires Monday 06:00. Manual trigger is for on-demand test runs.\nSet Run Config reads MAX_PAGES_PER_SOURCE / MAX_NEW_PER_SOURCE / MAX_NEW_TOTAL env vars (with defaults 8/12/40) so a bad run can't blow the Apify budget.",
+        "height": 200,
+        "width": 480,
+        "color": 4
+      }
+    },
+    {
+      "id": "c4fbb2f2-daa5-4b3b-8593-671c438446b5",
+      "name": "Sticky - ab030ae6",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        -420
+      ],
+      "parameters": {
+        "content": "## 2. Scrape Cases\nLoops each enabled source, runs Apify Cheerio Scraper (HTTP call, no browser), dedupes against scraped_articles, and caps new articles per source and per run using workflow static data.\nVerify the Loop Over Sources 'done'/'loop' output order matches your n8n version - swap the connection if it runs backwards.",
+        "height": 220,
+        "width": 520,
+        "color": 5
+      }
+    },
+    {
+      "id": "2eab2cbf-c8af-4487-9c17-47cafe1d5408",
+      "name": "Sticky - 26a6e79c",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2360,
+        -20
+      ],
+      "parameters": {
+        "content": "## 3. AI Extraction\nAI Agent + Gemini Chat Model + Structured Output Parser decide relevance and extract fields. Irrelevant articles are logged but not inserted as cases. Adjust field names in 'Map Case Fields' and both Supabase insert nodes to match your real case_submissions columns.",
+        "height": 220,
+        "width": 520,
+        "color": 6
+      }
+    },
+    {
+      "id": "637a25f0-52d2-4f8d-9642-bd5ab1bdf394",
+      "name": "Sticky - 991c0fc5",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3400,
+        460
+      ],
+      "parameters": {
+        "content": "## 4. Weekly AI Digest\nAggregates the last 7 days of case_submissions, and if any exist, has an AI Agent write a labelled AI-generated digest into news_articles (published=true). Table/column names here are placeholders - rename to match your schema.",
+        "height": 200,
+        "width": 520,
+        "color": 3
+      }
+    },
+    {
+      "id": "41a084ee-d9dd-4d9c-83d5-0f431cf0acda",
+      "name": "Sticky - 0b7e161d",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        420
+      ],
+      "parameters": {
+        "content": "## Setup checklist\n1. Create 'Supabase account' credential (Supabase API, service role key)\n2. Create 'Google Gemini account' credential (Google AI Studio key)\n3. Set env vars: APIFY_API_TOKEN, MAX_PAGES_PER_SOURCE, MAX_NEW_PER_SOURCE, MAX_NEW_TOTAL\n4. Run 'Manual Test Run' once before activating the schedule",
+        "height": 240,
+        "width": 420,
+        "color": 7
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger - Weekly": {
+      "main": [
+        [
+          {
+            "node": "Set Run Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Test Run": {
+      "main": [
+        [
+          {
+            "node": "Set Run Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Run Config": {
+      "main": [
+        [
+          {
+            "node": "Get Scraped URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Scraped URLs": {
+      "main": [
+        [
+          {
+            "node": "Cache Scraped URL Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cache Scraped URL Set": {
+      "main": [
+        [
+          {
+            "node": "Get Enabled Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Enabled Sources": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Sources": {
+      "main": [
+        [
+          {
+            "node": "Load Aggregated New Articles",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Apify Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Apify Request": {
+      "main": [
+        [
+          {
+            "node": "Run Apify Scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Apify Scraper": {
+      "main": [
+        [
+          {
+            "node": "Filter & Track New URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Track New URLs": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Aggregated New Articles": {
+      "main": [
+        [
+          {
+            "node": "Loop Over New Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over New Articles": {
+      "main": [
+        [
+          {
+            "node": "Build Job Stats Rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent - Extract Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chat Model - Extraction": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Extract Case",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Case Extraction Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent - Extract Case",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Extract Case": {
+      "main": [
+        [
+          {
+            "node": "IF Is Relevant Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Is Relevant Case": {
+      "main": [
+        [
+          {
+            "node": "Map Case Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Scraped Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Case Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert Case Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Case Submission": {
+      "main": [
+        [
+          {
+            "node": "Log Scraped Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Scraped Article": {
+      "main": [
+        [
+          {
+            "node": "Loop Over New Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Job Stats Rows": {
+      "main": [
+        [
+          {
+            "node": "Insert Job Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Job Stats": {
+      "main": [
+        [
+          {
+            "node": "Get Cases From Last 7 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Cases From Last 7 Days": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Weekly Cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Weekly Cases": {
+      "main": [
+        [
+          {
+            "node": "IF Has Cases This Week",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Has Cases This Week": {
+      "main": [
+        [
+          {
+            "node": "AI Agent - Write Weekly Digest",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Cases This Week",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chat Model - Digest": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent - Write Weekly Digest",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Digest Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent - Write Weekly Digest",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent - Write Weekly Digest": {
+      "main": [
+        [
+          {
+            "node": "Insert Weekly Digest Article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
