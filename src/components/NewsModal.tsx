@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { NewsArticle, CreateNewsData, UpdateNewsData, useCreateNews, useUpdateNews } from '@/hooks/useNews';
 import MarkdownRenderer from './MarkdownRenderer';
+import { supabase } from '@/lib/supabase';
 
 interface NewsModalProps {
   isOpen: boolean;
@@ -127,15 +128,47 @@ const NewsModal = ({ isOpen, onClose, article, mode }: NewsModalProps) => {
     });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setSelectedImage(file);
+      // Show preview immediately
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `news-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `news/${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('case-photos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError);
+        toast({
+          title: "Upload Failed",
+          description: "Failed to upload image. Please try again.",
+          variant: "destructive",
+        });
+        setImagePreview(null);
+        setSelectedImage(null);
+        return;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('case-photos')
+        .getPublicUrl(filePath);
+
+      setSelectedImage(file);
+      setFormData({ ...formData, featured_image_url: publicUrl });
     }
   };
 

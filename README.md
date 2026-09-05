@@ -91,6 +91,7 @@ npm run build
 - [Technical Overview](docs/TECHNICAL_OVERVIEW.md) - Architecture details
 - [API Documentation](docs/API.md) - Supabase integration
 - [Deployment Guide](docs/DEPLOYMENT.md) - Netlify setup
+- [Scraping Workflow](docs/SCRAPING_WORKFLOW.md) - n8n + Apify weekly scraper and AI digest
 - [Contributing Guidelines](docs/CONTRIBUTING.md) - How to contribute
 
 ## License

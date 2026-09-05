@@ -223,102 +223,23 @@ export async function fetchPendingSubmissions(): Promise<DatabaseCaseSubmission[
   }
 }
 
-// Approve a case submission
+// Approve a case submission (uses transactional RPC function)
 export async function approveSubmission(submissionId: string, caseTypeOverride?: string): Promise<void> {
   try {
-    // First, get the submission data
-    const { data: submission, error: fetchError } = await supabase
-      .from('case_submissions')
-      .select('*')
-      .eq('id', submissionId)
-      .single()
+    const { data, error } = await supabase.rpc('approve_submission', {
+      p_submission_id: submissionId,
+      p_case_type_override: caseTypeOverride || null
+    })
 
-    if (fetchError) {
-      console.error('Error fetching submission:', fetchError)
-      throw fetchError
+    if (error) {
+      console.error('Error approving submission:', error)
+      throw error
     }
 
-    // Scraped submissions carry no coordinates; pin them to the county centroid
-    // so approved cases still appear on the map.
-    const centroid = getCountyCentroid(submission.county)
-
-    // Create a new case in the main cases table
-    const { data: newCase, error: insertError } = await supabase
-      .from('cases')
-      .insert({
-        victim_name: submission.victim_name,
-        age: submission.age,
-        incident_date: submission.incident_date,
-        incident_time: submission.incident_time,
-        location: submission.location,
-        county: submission.county,
-        latitude: submission.latitude || centroid?.lat || 0,
-        longitude: submission.longitude || centroid?.lng || 0,
-        case_type: caseTypeOverride || submission.case_type,
-        description: submission.description,
-        status: 'unconfirmed',
-        source: 'user_submission',
-        reported_by: submission.reporter_name,
-        justice_served: submission.justice_served || false,
-        officer_names: submission.officer_names || [],
-        witnesses: submission.witnesses || []
-      })
-      .select('id')
-      .single()
-
-    if (insertError || !newCase) {
-      console.error('Error creating approved case:', insertError)
-      throw insertError
-    }
-
-    // Insert photos into case_photos table
-    if (submission.photo_urls && submission.photo_urls.length > 0) {
-      const photoInserts = submission.photo_urls.map(photoUrl => ({
-        case_id: newCase.id,
-        photo_url: photoUrl,
-        uploaded_at: new Date().toISOString()
-      }))
-
-      const { error: photoError } = await supabase
-        .from('case_photos')
-        .insert(photoInserts)
-
-      if (photoError) {
-        console.error('Error inserting case photos:', photoError)
-        // Don't throw - case is still created even if photos fail
-      }
-    }
-
-    // Insert videos into case_videos table
-    if (submission.video_urls && submission.video_urls.length > 0) {
-      const videoInserts = submission.video_urls.map(videoUrl => ({
-        case_id: newCase.id,
-        video_url: videoUrl,
-        uploaded_at: new Date().toISOString()
-      }))
-
-      const { error: videoError } = await supabase
-        .from('case_videos')
-        .insert(videoInserts)
-
-      if (videoError) {
-        console.error('Error inserting case videos:', videoError)
-        // Don't throw - case is still created even if videos fail
-      }
-    }
-
-    // Update submission status to approved
-    const { error: updateError } = await supabase
-      .from('case_submissions')
-      .update({
-        status: 'approved',
-        reviewed_at: new Date().toISOString()
-      })
-      .eq('id', submissionId)
-
-    if (updateError) {
-      console.error('Error updating submission status:', updateError)
-      throw updateError
+    // RPC returns JSON with success field
+    const result = data as any
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to approve submission')
     }
   } catch (error) {
     console.error('Error in approveSubmission:', error)
@@ -326,21 +247,22 @@ export async function approveSubmission(submissionId: string, caseTypeOverride?:
   }
 }
 
-// Reject a case submission
+// Reject a case submission (uses RPC function)
 export async function rejectSubmission(submissionId: string, reason?: string): Promise<void> {
   try {
-    const { error } = await supabase
-      .from('case_submissions')
-      .update({
-        status: 'rejected',
-        review_notes: reason,
-        reviewed_at: new Date().toISOString()
-      })
-      .eq('id', submissionId)
+    const { data, error } = await supabase.rpc('reject_submission', {
+      p_submission_id: submissionId,
+      p_reason: reason || null
+    })
 
     if (error) {
       console.error('Error rejecting submission:', error)
       throw error
+    }
+
+    const result = data as any
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to reject submission')
     }
   } catch (error) {
     console.error('Error in rejectSubmission:', error)
@@ -368,90 +290,3 @@ export async function fetchCounties(): Promise<string[]> {
   }
 }
 
-// User Analytics Functions
-export interface UserAnalytics {
-  totalVisitors: number;
-  activeToday: number;
-  averageSessionMinutes: number;
-  totalPageViews: number;
-}
-
-export async function fetchUserAnalytics(): Promise<UserAnalytics> {
-  try {
-    // Get total unique visitors
-    const { count: totalVisitors, error: totalError } = await supabase
-      .from('site_users')
-      .select('*', { count: 'exact', head: true });
-
-    if (totalError) throw totalError;
-
-    // Get active users today
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const { count: activeToday, error: activeError } = await supabase
-      .from('site_users')
-      .select('*', { count: 'exact', head: true })
-      .gte('last_visit', today.toISOString());
-
-    if (activeError) throw activeError;
-
-    // Get average session time and total page views
-    const { data: sessionData, error: sessionError } = await supabase
-      .from('site_users')
-      .select('time_spent_seconds, page_views');
-
-    if (sessionError) throw sessionError;
-
-    const totalPageViews = sessionData?.reduce((sum, user) => sum + (user.page_views || 0), 0) || 0;
-    const averageSessionSeconds = sessionData?.length > 0
-      ? sessionData.reduce((sum, user) => sum + (user.time_spent_seconds || 0), 0) / sessionData.length
-      : 0;
-
-    return {
-      totalVisitors: totalVisitors || 0,
-      activeToday: activeToday || 0,
-      averageSessionMinutes: Math.round(averageSessionSeconds / 60),
-      totalPageViews
-    };
-  } catch (error) {
-    console.error('Error fetching user analytics:', error);
-    return {
-      totalVisitors: 0,
-      activeToday: 0,
-      averageSessionMinutes: 0,
-      totalPageViews: 0
-    };
-  }
-}
-
-export interface RecentActivity {
-  id: string;
-  type: 'visit' | 'submission' | 'interaction';
-  description: string;
-  location: string;
-  timestamp: string;
-}
-
-export async function fetchRecentActivity(): Promise<RecentActivity[]> {
-  try {
-    const { data, error } = await supabase
-      .from('site_users')
-      .select('id, city, last_visit, page_views')
-      .order('last_visit', { ascending: false })
-      .limit(5);
-
-    if (error) throw error;
-
-    return data?.map(user => ({
-      id: user.id,
-      type: 'visit' as const,
-      description: `New visitor from ${user.city || 'Unknown location'}`,
-      location: user.city || 'Unknown',
-      timestamp: user.last_visit
-    })) || [];
-  } catch (error) {
-    console.error('Error fetching recent activity:', error);
-    return [];
-  }
-}

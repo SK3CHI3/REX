@@ -241,9 +241,14 @@ const AdminDashboard = () => {
               </Badge>
             </div>
             <div className="text-3xl font-black bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent mb-2">
-              99.9%
+              {(() => {
+                const now = new Date();
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                const daysSinceStart = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+                return `${daysSinceStart}d`;
+              })()}
             </div>
-            <p className="text-sm text-gray-400">System Uptime</p>
+            <p className="text-sm text-gray-400">Days Online</p>
           </div>
         </div>
 
@@ -572,13 +577,7 @@ const AdminDashboard = () => {
                       </Badge>
                     </div>
                     <div className="text-center py-4">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-white/20 text-gray-300 hover:bg-white/10"
-                      >
-                        Manage Admin Users
-                      </Button>
+                      <p className="text-sm text-gray-400">Admin management coming soon</p>
                     </div>
                   </div>
                 </div>

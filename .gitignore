@@ -28,3 +28,6 @@ docs/SECURITY.md
 .env
 .env.local
 .env.production
+
+# MCP config contains personal access token
+.mcp.json

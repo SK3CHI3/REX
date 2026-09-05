@@ -485,7 +485,7 @@
       ],
       "parameters": {
         "resource": "row",
-        "operation": "create",
+        "operation": "upsert",
         "tableId": "scraped_articles",
         "dataToSend": "defineBelow",
         "fieldsUi": {

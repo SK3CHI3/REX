@@ -123,15 +123,15 @@ export function useUpdateNews() {
   return useMutation({
     mutationFn: async (newsData: UpdateNewsData) => {
       const { id, ...updateData } = newsData;
-      
+
       // Set published_at when status changes to published
       const publishedAt = updateData.status === 'published' ? new Date().toISOString() : undefined;
 
+      // Don't regenerate slug from title - preserve existing slug unless explicitly provided
       const { data, error } = await supabase
         .from('news')
         .update({
           ...updateData,
-          ...(updateData.title && !updateData.slug ? { slug: updateData.title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') } : {}),
           ...(publishedAt ? { published_at: publishedAt } : {}),
           updated_at: new Date().toISOString()
         } as any)

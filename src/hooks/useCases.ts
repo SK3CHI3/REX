@@ -57,6 +57,7 @@ export function usePendingSubmissions() {
     queryKey: ['pending-submissions'],
     queryFn: fetchPendingSubmissions,
     staleTime: 30 * 1000, // 30 seconds
+    refetchInterval: 60 * 1000, // Auto-refresh every 60 seconds
   })
 }
 
@@ -68,21 +69,16 @@ export function useApproveSubmission() {
     mutationFn: ({ submissionId, caseType }: { submissionId: string; caseType?: string }) =>
       approveSubmission(submissionId, caseType),
     onSuccess: async () => {
-      // Small delay to ensure database operation completes
-      await new Promise(resolve => setTimeout(resolve, 500))
-
+      // RPC is transactional, so data is committed atomically
       // Invalidate and refetch both pending submissions and cases
       queryClient.invalidateQueries({ queryKey: ['pending-submissions'] })
       queryClient.invalidateQueries({ queryKey: ['cases'] })
-      // Remove cached data and force immediate refetch
-      queryClient.removeQueries({ queryKey: ['cases'] })
       await queryClient.refetchQueries({ queryKey: ['cases'] })
-      console.log('Case approved - cache invalidated and refetched')
       toast.success('Case approved and published successfully!')
     },
     onError: (error) => {
       console.error('Error approving submission:', error)
-      toast.error('Failed to approve case. Please try again.')
+      toast.error(error instanceof Error && error.message ? error.message : 'Failed to approve case. Please try again.')
     },
   })
 }
