@@ -5,6 +5,7 @@ export const CASE_TYPE_META: Record<Case['type'], { label: string; color: string
   assault: { label: 'Assault', color: '#fb923c', badgeClass: 'bg-orange-500/15 text-orange-400 border-orange-500/30' },
   harassment: { label: 'Harassment', color: '#facc15', badgeClass: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30' },
   unlawful_arrest: { label: 'Unlawful Arrest', color: '#60a5fa', badgeClass: 'bg-blue-500/15 text-blue-400 border-blue-500/30' },
+  abduction: { label: 'Abduction', color: '#c084fc', badgeClass: 'bg-purple-500/15 text-purple-400 border-purple-500/30' },
   other: { label: 'Other', color: '#9ca3af', badgeClass: 'bg-gray-500/15 text-gray-400 border-gray-500/30' },
 };
 

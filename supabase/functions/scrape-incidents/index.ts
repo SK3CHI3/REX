@@ -389,7 +389,7 @@ async function scrapeAndExtractIncident(url: string, apiKey: string) {
           - incident_date: string (YYYY-MM-DD format - when the incident occurred)
           - location: string (SPECIFIC location where incident happened - city, area, street)
           - county: string (Kenyan county where incident occurred)
-          - case_type: "death" | "assault" | "harassment" | "unlawful_arrest" | "torture"
+          - case_type: "death" | "assault" | "harassment" | "unlawful_arrest" | "abduction" | "torture"
           - description: string (DETAILED description of what happened to the victim)
           - justice_served: boolean (has justice been served or case resolved)
           - police_station: string (which police station was involved)
@@ -411,7 +411,7 @@ async function scrapeAndExtractIncident(url: string, apiKey: string) {
               county: { type: 'string' },
               case_type: {
                 type: 'string',
-                enum: ['death', 'assault', 'harassment', 'unlawful_arrest', 'torture']
+                enum: ['death', 'assault', 'harassment', 'unlawful_arrest', 'abduction', 'torture']
               },
               description: { type: 'string' },
               justice_served: { type: 'boolean' },

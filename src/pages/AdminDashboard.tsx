@@ -37,6 +37,7 @@ const CASE_TYPE_OPTIONS = [
   { value: 'assault', label: 'Assault' },
   { value: 'harassment', label: 'Harassment' },
   { value: 'unlawful_arrest', label: 'Unlawful arrest' },
+  { value: 'abduction', label: 'Abduction' },
   { value: 'other', label: 'Other' },
 ];
 

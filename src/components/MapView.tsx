@@ -156,6 +156,7 @@ const MapView = ({ cases, onCaseHover, onCaseLeave, onCaseClick, onCaseSelect, o
       case 'assault': return 'Physical Assault';
       case 'harassment': return 'Harassment';
       case 'unlawful_arrest': return 'Unlawful Arrest';
+      case 'abduction': return 'Abduction';
       case 'other': return 'Other';
       default: return type;
     }
@@ -167,6 +168,7 @@ const MapView = ({ cases, onCaseHover, onCaseLeave, onCaseClick, onCaseSelect, o
       case 'assault': return 'text-orange-700 bg-orange-50';
       case 'harassment': return 'text-yellow-700 bg-yellow-50';
       case 'unlawful_arrest': return 'text-purple-700 bg-purple-50';
+      case 'abduction': return 'text-violet-700 bg-violet-50';
       default: return 'text-gray-700 bg-gray-50';
     }
   };

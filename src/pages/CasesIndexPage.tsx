@@ -27,6 +27,7 @@ const CasesIndexPage = () => {
       case 'assault': return 'bg-orange-600 text-white';
       case 'harassment': return 'bg-yellow-600 text-white';
       case 'unlawful_arrest': return 'bg-purple-600 text-white';
+      case 'abduction': return 'bg-violet-600 text-white';
       default: return 'bg-gray-600 text-white';
     }
   };

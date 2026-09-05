@@ -19,5 +19,6 @@ export const caseTypes = [
   { value: 'assault', label: 'Physical Assault' },
   { value: 'harassment', label: 'Harassment' },
   { value: 'unlawful_arrest', label: 'Unlawful Arrest' },
+  { value: 'abduction', label: 'Abduction' },
   { value: 'other', label: 'Other' }
 ];

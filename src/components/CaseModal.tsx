@@ -84,6 +84,12 @@ const CaseModal = ({ case: caseData, onClose }: CaseModalProps) => {
           label: 'Unlawful Arrest',
           icon: Scale
         };
+      case 'abduction':
+        return {
+          color: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+          label: 'Abduction',
+          icon: AlertTriangle
+        };
       case 'other':
         return {
           color: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
