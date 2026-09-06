@@ -31,3 +31,15 @@ docs/SECURITY.md
 
 # MCP config contains personal access token
 .mcp.json
+
+# Temp data files (scraping, imports, PDFs)
+tmp_*.json
+tmp_*.sql
+tmp_*.txt
+khrc_*.pdf
+khrc_*.txt
+scrape_log.txt
+
+# Local settings and Supabase CLI metadata
+.qwen/
+supabase/.temp/
