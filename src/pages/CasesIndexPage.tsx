@@ -1,17 +1,24 @@
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Calendar, AlertCircle } from 'lucide-react';
+import { MapPin, Calendar, AlertCircle, Search, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCases } from '@/hooks/useCases';
+import { normalizeCountyName } from '@/utils/countyNormalization';
+import { kenyanCounties, caseTypes } from '@/data/mockData';
 import SEOHead from '@/components/SEOHead';
 
-/**
- * CasesIndexPage - A dedicated page listing all police brutality cases
- * Purpose: Make individual cases discoverable by AI crawlers
- * Each case has a clickable link to its dedicated page (/case/:id)
- */
 const CasesIndexPage = () => {
   const { data: cases, isLoading } = useCases();
+
+  const [search, setSearch] = useState('');
+  const [selectedCounty, setSelectedCounty] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -32,29 +39,37 @@ const CasesIndexPage = () => {
     }
   };
 
-  // Generate structured data for the collection
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    "name": "Police Brutality Cases in Kenya",
-    "description": "Comprehensive database of documented police brutality cases across all 47 counties in Kenya",
-    "url": "https://policebrutalitytracker.co.ke/cases-index",
-    "publisher": {
-      "@type": "Organization",
-      "name": "PoliceBrutalityTracker",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://policebrutalitytracker.co.ke/logo.svg"
-      }
-    },
-    "numberOfItems": cases?.length || 0,
-    "itemListElement": cases?.slice(0, 100).map((caseItem, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "url": `https://policebrutalitytracker.co.ke/case/${caseItem.id}`,
-      "name": `${caseItem.victimName} - ${caseItem.county}`,
-      "description": caseItem.description.substring(0, 200)
-    })) || []
+  const filteredCases = useMemo(() => {
+    if (!cases) return [];
+
+    return cases.filter(c => {
+      const q = search.toLowerCase();
+      const matchesSearch = !q ||
+        c.victimName?.toLowerCase().includes(q) ||
+        c.location?.toLowerCase().includes(q) ||
+        c.county?.toLowerCase().includes(q) ||
+        c.description?.toLowerCase().includes(q);
+
+      const normalizedCounty = normalizeCountyName(c.county);
+      const matchesCounty = selectedCounty === 'all' || normalizedCounty === selectedCounty;
+
+      const matchesType = selectedType === 'all' || c.type === selectedType;
+
+      const matchesFrom = !dateFrom || c.date >= dateFrom;
+      const matchesTo = !dateTo || c.date <= dateTo;
+
+      return matchesSearch && matchesCounty && matchesType && matchesFrom && matchesTo;
+    });
+  }, [cases, search, selectedCounty, selectedType, dateFrom, dateTo]);
+
+  const hasFilters = search || selectedCounty !== 'all' || selectedType !== 'all' || dateFrom || dateTo;
+
+  const clearFilters = () => {
+    setSearch('');
+    setSelectedCounty('all');
+    setSelectedType('all');
+    setDateFrom('');
+    setDateTo('');
   };
 
   return (
@@ -65,11 +80,6 @@ const CasesIndexPage = () => {
         keywords="police brutality cases, Kenya database, all cases, incident list, human rights violations, police accountability"
         url="https://policebrutalitytracker.co.ke/cases-index"
       />
-      
-      {/* Structured Data for AI */}
-      <script type="application/ld+json">
-        {JSON.stringify(structuredData)}
-      </script>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-950 to-slate-900 text-white">
         {/* Header */}
@@ -81,9 +91,86 @@ const CasesIndexPage = () => {
             <p className="text-gray-400 text-lg">
               {cases?.length || 0} documented cases across Kenya's 47 counties
             </p>
-            <p className="text-gray-500 text-sm mt-2">
-              This page lists all police brutality cases tracked by PoliceBrutalityTracker. Click any case to view full details.
-            </p>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-black/20 border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              {/* Search */}
+              <div className="lg:col-span-2 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search by name, location, county..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 bg-black/30 border-white/20 text-white placeholder:text-gray-500 focus:border-red-400"
+                />
+              </div>
+
+              {/* County */}
+              <Select value={selectedCounty} onValueChange={setSelectedCounty}>
+                <SelectTrigger className="bg-black/30 border-white/20 text-white focus:border-red-400">
+                  <SelectValue placeholder="All counties" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-white/10">
+                  <SelectItem value="all">All counties</SelectItem>
+                  {kenyanCounties.map(county => (
+                    <SelectItem key={county} value={county}>{county}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Case Type */}
+              <Select value={selectedType} onValueChange={setSelectedType}>
+                <SelectTrigger className="bg-black/30 border-white/20 text-white focus:border-red-400">
+                  <SelectValue placeholder="All types" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-white/10">
+                  <SelectItem value="all">All types</SelectItem>
+                  {caseTypes.map(type => (
+                    <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Date range */}
+              <div className="flex gap-2">
+                <Input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="bg-black/30 border-white/20 text-white focus:border-red-400 text-sm"
+                  title="From date"
+                />
+                <Input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="bg-black/30 border-white/20 text-white focus:border-red-400 text-sm"
+                  title="To date"
+                />
+              </div>
+            </div>
+
+            {/* Filter summary + clear */}
+            <div className="flex items-center justify-between mt-3">
+              <p className="text-sm text-gray-400">
+                Showing <span className="text-white font-semibold">{filteredCases.length}</span> of {cases?.length || 0} cases
+              </p>
+              {hasFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-gray-400 hover:text-white hover:bg-white/10"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Clear filters
+                </Button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -95,7 +182,7 @@ const CasesIndexPage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cases?.map((caseItem) => (
+              {filteredCases.map((caseItem) => (
                 <Link
                   key={caseItem.id}
                   to={`/case/${caseItem.id}`}
@@ -160,33 +247,23 @@ const CasesIndexPage = () => {
           )}
 
           {/* No Cases */}
-          {!isLoading && (!cases || cases.length === 0) && (
+          {!isLoading && filteredCases.length === 0 && (
             <div className="text-center py-12">
               <AlertCircle className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-              <p className="text-gray-400">No cases found in the database.</p>
+              <p className="text-gray-400">
+                {hasFilters ? 'No cases match your filters.' : 'No cases found in the database.'}
+              </p>
+              {hasFilters && (
+                <Button
+                  onClick={clearFilters}
+                  variant="outline"
+                  className="mt-4 border-white/20 text-gray-300 hover:bg-white/10"
+                >
+                  Clear filters
+                </Button>
+              )}
             </div>
           )}
-
-          {/* SEO Footer Content for AI */}
-          <div className="mt-12 pt-8 border-t border-white/10">
-            <div className="prose prose-invert max-w-none">
-              <h2 className="text-2xl font-bold mb-4">About This Database</h2>
-              <p className="text-gray-300 mb-4">
-                PoliceBrutalityTracker maintains a comprehensive database of police brutality cases across all 47 counties in Kenya. 
-                Each case is documented with location data, incident details, victim information, and current investigation status.
-              </p>
-              <p className="text-gray-300 mb-4">
-                Our database serves as a tool for transparency and accountability, helping journalists, researchers, 
-                human rights organizations, and concerned citizens track patterns of police violence in Kenya.
-              </p>
-              <h3 className="text-xl font-semibold mb-3">How Cases Are Verified</h3>
-              <p className="text-gray-300">
-                Each case in our database goes through a community verification process where users can confirm 
-                the authenticity of reports. Cases with 2 or more community confirmations are marked as verified. 
-                All cases are also reviewed by our team for accuracy before publication.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </>
@@ -194,4 +271,3 @@ const CasesIndexPage = () => {
 };
 
 export default CasesIndexPage;
-

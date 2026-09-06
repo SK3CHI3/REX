@@ -24,7 +24,7 @@ const MapPage = () => {
     search: '',
     counties: [],
     caseTypes: [],
-    dateRange: { start: '', end: '' }
+    dateRange: { start: '', end: '' },
   });
 
   // Fetch cases from Supabase
@@ -40,8 +40,10 @@ const MapPage = () => {
     const matchesCounty = filters.counties.length === 0 || filters.counties.includes(normalizedCounty);
     const matchesCaseType = filters.caseTypes.length === 0 || filters.caseTypes.includes(caseItem.type);
 
-    const matchesDateRange = (!filters.dateRange.start || caseItem.date >= filters.dateRange.start) &&
-                            (!filters.dateRange.end || caseItem.date <= filters.dateRange.end);
+    const start = filters.dateRange?.start;
+    const end = filters.dateRange?.end;
+    const matchesDateRange = (!start || caseItem.date >= start) &&
+                            (!end || caseItem.date <= end);
 
     return matchesSearch && matchesCounty && matchesCaseType && matchesDateRange;
   });
@@ -104,6 +106,7 @@ const MapPage = () => {
               onFiltersChange={setFilters}
               filteredCasesCount={filteredCases.length}
               totalCasesCount={cases.length}
+              cases={cases}
             />
           </Sidebar>
           <div className="flex-1 relative">

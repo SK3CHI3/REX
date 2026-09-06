@@ -1,62 +1,51 @@
-import { Filter, Search, Calendar, BarChart3, TrendingUp, MapPin, AlertTriangle, Sliders, X } from 'lucide-react';
+import { Search, Calendar, BarChart3, TrendingUp, MapPin, AlertTriangle, Sliders, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { FilterState } from '@/types';
+import { Case, FilterState } from '@/types';
 import { kenyanCounties, caseTypes } from '@/data/mockData';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSidebar } from '@/components/ui/sidebar';
+import { normalizeCountyName } from '@/utils/countyNormalization';
 
 interface DataSidebarProps {
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
   filteredCasesCount: number;
   totalCasesCount: number;
+  cases: Case[];
 }
 
-const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesCount }: DataSidebarProps) => {
+const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesCount, cases }: DataSidebarProps) => {
   const [countySearch, setCountySearch] = useState('');
   const isMobile = useIsMobile();
   const { setOpenMobile } = useSidebar();
 
-  const handleCountyChange = (county: string, checked: boolean) => {
-    const newCounties = checked
-      ? [...filters.counties, county]
-      : filters.counties.filter(c => c !== county);
-    
-    onFiltersChange({ ...filters, counties: newCounties });
-  };
-
-  const handleCaseTypeChange = (caseType: string, checked: boolean) => {
-    const newCaseTypes = checked
-      ? [...filters.caseTypes, caseType]
-      : filters.caseTypes.filter(t => t !== caseType);
-    
-    onFiltersChange({ ...filters, caseTypes: newCaseTypes });
-  };
-
-  const handleYearRangeChange = (value: number[]) => {
-    onFiltersChange({ ...filters, yearRange: [value[0], value[1]] as [number, number] });
-  };
+  const caseTypeCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of cases) {
+      counts[c.type] = (counts[c.type] || 0) + 1;
+    }
+    return counts;
+  }, [cases]);
 
   const clearAllFilters = () => {
     onFiltersChange({
+      search: '',
       counties: [],
       caseTypes: [],
-      yearRange: [2020, 2024],
+      dateRange: { start: '', end: '' },
     });
     setCountySearch('');
   };
 
-  const filteredCounties = kenyanCounties.filter(county =>
-    county.toLowerCase().includes(countySearch.toLowerCase())
-  );
+  const activeFiltersCount = filters.counties.length + filters.caseTypes.length +
+    (filters.search ? 1 : 0) +
+    (filters.dateRange?.start || filters.dateRange?.end ? 1 : 0);
 
-  const activeFiltersCount = filters.counties.length + filters.caseTypes.length;
   const filterPercentage = totalCasesCount > 0 ? Math.round((filteredCasesCount / totalCasesCount) * 100) : 0;
 
   return (
@@ -155,8 +144,8 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
                     className="text-sm text-gray-300 cursor-pointer flex-1 flex items-center justify-between"
                   >
                     <span>{type.label}</span>
-                     <Badge variant="outline" className="text-xs border-white/20 text-gray-400">
-                      {(type as any).count || 0}
+                    <Badge variant="outline" className="text-xs border-white/20 text-gray-400">
+                      {caseTypeCounts[type.value] || 0}
                     </Badge>
                   </label>
                 </div>
@@ -180,7 +169,6 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
                 .filter(county =>
                   county.toLowerCase().includes(countySearch.toLowerCase())
                 )
-                .slice(0, 10)
                 .map((county) => (
                   <div key={county} className="flex items-center space-x-3">
                     <Checkbox
@@ -223,10 +211,10 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
                 <label className="text-xs text-gray-400 mb-1 block">From</label>
                 <Input
                   type="date"
-                  value={filters.dateRange.start}
+                  value={filters.dateRange?.start || ''}
                   onChange={(e) => onFiltersChange({
                     ...filters,
-                    dateRange: { ...filters.dateRange, start: e.target.value }
+                    dateRange: { start: e.target.value, end: filters.dateRange?.end || '' }
                   })}
                   className="bg-black/30 border-white/20 text-white focus:border-red-400 text-sm"
                 />
@@ -235,10 +223,10 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
                 <label className="text-xs text-gray-400 mb-1 block">To</label>
                 <Input
                   type="date"
-                  value={filters.dateRange.end}
+                  value={filters.dateRange?.end || ''}
                   onChange={(e) => onFiltersChange({
                     ...filters,
-                    dateRange: { ...filters.dateRange, end: e.target.value }
+                    dateRange: { start: filters.dateRange?.start || '', end: e.target.value }
                   })}
                   className="bg-black/30 border-white/20 text-white focus:border-red-400 text-sm"
                 />
@@ -250,12 +238,7 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
           {activeFiltersCount > 0 && (
             <div className="pt-4 border-t border-white/10">
               <Button
-                onClick={() => onFiltersChange({
-                  search: '',
-                  counties: [],
-                  caseTypes: [],
-                  dateRange: { start: '', end: '' }
-                })}
+                onClick={clearAllFilters}
                 variant="outline"
                 className="w-full border-white/20 text-gray-300 hover:bg-white/10 hover:text-white"
               >
@@ -270,4 +253,3 @@ const DataSidebar = ({ filters, onFiltersChange, filteredCasesCount, totalCasesC
 };
 
 export default DataSidebar;
-

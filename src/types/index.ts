@@ -77,7 +77,6 @@ export interface FilterState {
     start: string;
     end: string;
   };
-  yearRange?: [number, number];
 }
 
 export interface SubmitCaseData {
