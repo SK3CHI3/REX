@@ -16,12 +16,6 @@ We document and visualize police incidents to promote accountability and justice
 
 ---
 
-## Built With
-
-`React 18` · `TypeScript` · `Vite` · `Tailwind CSS` · `Supabase` · `PostgreSQL` · `React Leaflet`
-
----
-
 ## Documentation
 
 Everything you need:
@@ -34,15 +28,6 @@ Everything you need:
 
 ---
 
-## Quick Start
 
-```bash
-git clone https://github.com/SK3CHI3/PoliceBrutalityTracker.git
-cd PoliceBrutalityTracker
-npm install
-npm run dev
-```
-
----
 
 **policebrutalitytracker.co.ke** · [Issues](https://github.com/SK3CHI3/PoliceBrutalityTracker/issues) · [License](LICENSE)
