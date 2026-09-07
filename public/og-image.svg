@@ -28,20 +28,19 @@
   
   <!-- Logo circle -->
   <g transform="translate(600, 220)">
-    <circle cx="0" cy="0" r="100" fill="url(#accentGrad)"/>
+    <circle cx="0" cy="0" r="100" fill="#1a1a1a"/>
     
-    <!-- Scales of Justice -->
-    <g stroke="#ffffff" fill="#ffffff" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="0" y1="-40" x2="0" y2="45" stroke-width="6"/>
-      <line x1="-22" y1="45" x2="22" y2="45" stroke-width="6"/>
-      <line x1="-50" y1="-40" x2="50" y2="-40" stroke-width="6"/>
-      <line x1="-50" y1="-40" x2="-60" y2="-12" stroke-width="4"/>
-      <line x1="-50" y1="-40" x2="-40" y2="-12" stroke-width="4"/>
-      <line x1="50" y1="-40" x2="60" y2="-12" stroke-width="4"/>
-      <line x1="50" y1="-40" x2="40" y2="-12" stroke-width="4"/>
-      <path d="M-65,-12 Q-50,2 -35,-12" stroke-width="5" fill="none"/>
-      <path d="M35,-12 Q50,2 65,-12" stroke-width="5" fill="none"/>
-      <circle cx="0" cy="-40" r="6" fill="#ffffff" stroke="none"/>
+    <!-- Eye -->
+    <path d="M-60,0 Q0,-50 60,0 Q0,50 -60,0 Z" fill="none" stroke="url(#accentGrad)" stroke-width="6"/>
+    <circle cx="0" cy="0" r="28" fill="url(#accentGrad)" opacity="0.9"/>
+    <circle cx="0" cy="0" r="14" fill="#1a1a1a"/>
+    <circle cx="-5" cy="-5" r="4" fill="#ef4444" opacity="0.6"/>
+    
+    <!-- Grid lines -->
+    <g stroke="#dc2626" stroke-width="1" opacity="0.3">
+      <line x1="0" y1="-45" x2="0" y2="45"/>
+      <line x1="-45" y1="0" x2="45" y2="0"/>
+      <circle cx="0" cy="0" r="45" fill="none"/>
     </g>
   </g>
   

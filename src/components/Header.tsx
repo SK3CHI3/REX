@@ -35,8 +35,8 @@ const Header = ({ onOpenFilters, onSubmitCase, caseCount }: HeaderProps) => {
           </Button>
           
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg">
+              <img src="/logo.svg" alt="PoliceBrutalityTracker" className="w-full h-full" />
             </div>
             <div>
               <h1 className="text-lg sm:text-xl font-bold tracking-tight text-white">PoliceBrutalityTracker</h1>

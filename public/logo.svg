@@ -1,47 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ef4444"/>
-      <stop offset="100%" stop-color="#991b1b"/>
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#2d0a0a"/>
     </linearGradient>
-    <linearGradient id="fg" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff"/>
-      <stop offset="100%" stop-color="#e2e8f0"/>
+    <linearGradient id="red" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#ef4444"/>
     </linearGradient>
   </defs>
   
-  <!-- Background circle -->
-  <circle cx="100" cy="100" r="95" fill="url(#bg)"/>
+  <!-- Dark background -->
+  <circle cx="100" cy="100" r="98" fill="url(#bg)"/>
   
-  <!-- Scales of Justice -->
-  <g transform="translate(100, 90)" stroke="url(#fg)" fill="url(#fg)" stroke-linecap="round" stroke-linejoin="round">
-    <!-- Vertical post -->
-    <line x1="0" y1="-35" x2="0" y2="40" stroke-width="8"/>
-    
-    <!-- Base -->
-    <line x1="-20" y1="40" x2="20" y2="40" stroke-width="8"/>
-    
-    <!-- Beam -->
-    <line x1="-45" y1="-35" x2="45" y2="-35" stroke-width="8"/>
-    
-    <!-- Left chains -->
-    <line x1="-45" y1="-35" x2="-55" y2="-10" stroke-width="5"/>
-    <line x1="-45" y1="-35" x2="-35" y2="-10" stroke-width="5"/>
-    
-    <!-- Right chains -->
-    <line x1="45" y1="-35" x2="55" y2="-10" stroke-width="5"/>
-    <line x1="45" y1="-35" x2="35" y2="-10" stroke-width="5"/>
-    
-    <!-- Left pan -->
-    <path d="M-60,-10 Q-45,2 -30,-10" stroke-width="6" fill="none"/>
-    
-    <!-- Right pan -->
-    <path d="M30,-10 Q45,2 60,-10" stroke-width="6" fill="none"/>
-    
-    <!-- Pivot -->
-    <circle cx="0" cy="-35" r="7" fill="url(#fg)" stroke="none"/>
+  <!-- Eye - outer shape -->
+  <path d="M30,100 Q100,40 170,100 Q100,160 30,100 Z" 
+        fill="none" stroke="url(#red)" stroke-width="6"/>
+  
+  <!-- Iris -->
+  <circle cx="100" cy="100" r="28" fill="url(#red)" opacity="0.9"/>
+  
+  <!-- Pupil -->
+  <circle cx="100" cy="100" r="14" fill="#1a1a1a"/>
+  
+  <!-- Inner pupil reflection -->
+  <circle cx="95" cy="95" r="4" fill="#ef4444" opacity="0.6"/>
+  
+  <!-- Subtle grid lines (tracking metaphor) -->
+  <g stroke="#dc2626" stroke-width="1" opacity="0.3">
+    <line x1="100" y1="60" x2="100" y2="140"/>
+    <line x1="60" y1="100" x2="140" y2="100"/>
+    <circle cx="100" cy="100" r="45" fill="none"/>
   </g>
-  
-  <!-- PBT Text -->
-  <text x="100" y="165" font-family="Arial, sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="url(#fg)">PBT</text>
 </svg>

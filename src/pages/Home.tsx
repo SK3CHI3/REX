@@ -100,8 +100,8 @@ const Home = () => {
           <div className="px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
+                <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg">
+                  <img src="/logo.svg" alt="PoliceBrutalityTracker" className="w-full h-full" />
                 </div>
                 <div>
                   <h1 className="text-lg sm:text-xl font-bold tracking-tight">PoliceBrutalityTracker</h1>
@@ -200,8 +200,8 @@ const Home = () => {
             <div className="grid md:grid-cols-4 gap-8 mb-8">
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center">
-                    <span className="text-2xl" role="img" aria-label="Scales of Justice">⚖️</span>
+                  <div className="w-10 h-10 rounded-xl overflow-hidden">
+                    <img src="/logo.svg" alt="PoliceBrutalityTracker" className="w-full h-full" />
                   </div>
                   <span className="text-xl font-bold">PoliceBrutalityTracker</span>
                 </div>
