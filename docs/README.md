@@ -1,77 +1,34 @@
-﻿# 📚 PoliceBrutalityTracker Documentation
+﻿# PoliceBrutalityTracker Documentation
 
-Welcome to the comprehensive documentation for PoliceBrutalityTracker - Justice through visibility.
+Technical documentation for the Kenya police brutality tracking platform.
 
-## 📖 Documentation Index
+## Core Documentation
 
-### 🚀 Getting Started
-- **[Main README](../README.md)** - Project overview and quick start
-- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
-- **[License](../LICENSE)** - Software licensing and usage terms
+- [API Reference](API.md) - Database integration, RPC functions, authentication
+- [Technical Architecture](TECHNICAL_OVERVIEW.md) - Frontend, backend, database design
+- [Deployment Guide](DEPLOYMENT.md) - Netlify deployment, environment setup, monitoring
+- [Contributing](CONTRIBUTING.md) - Code standards, development workflow, PR process
 
-### 🔧 Technical Documentation
-- **[Technical Overview](TECHNICAL_OVERVIEW.md)** - Architecture and implementation details
-- **[API Documentation](API.md)** - Supabase integration and API usage
-- **[Deployment Guide](DEPLOYMENT.md)** - Netlify deployment and monitoring
-- **[SEO Implementation](SEO_IMPLEMENTATION.md)** - Search engine optimization setup
-- **[Scraping System](SCRAPING_README.md)** - Data collection and automation
+## Feature Documentation
 
-## 🏗️ Project Structure
+- [Community Verification System](COMMUNITY_VERIFICATION_SYSTEM.md) - Two-tier verification, database schema, security
+- [SEO Implementation](SEO_IMPLEMENTATION.md) - Meta tags, structured data, performance optimization
+- [AI Optimization](AI_OPTIMIZATION_REPORT.md) - AI crawler optimization, citation strategy
+- [Caching Strategy](CACHING_STRATEGY.md) - Service worker, cache invalidation, performance
+
+## Project Structure
 
 ```
 PoliceBrutalityTracker/
-├── 📁 docs/                    # Documentation
-├── 📁 src/                     # Source code
-│   ├── 📁 components/          # React components
-│   ├── 📁 pages/              # Page components
-│   ├── 📁 hooks/              # Custom hooks
-│   ├── 📁 lib/                # Utilities
-│   └── 📁 types/              # TypeScript definitions
-├── 📁 public/                 # Static assets
-├── 📁 supabase/               # Database and functions
-└── 📁 scripts/                # Automation scripts
+├── src/                 # React components, pages, hooks
+├── supabase/            # Database migrations, functions
+├── docs/                # Documentation
+├── public/              # Static assets
+└── scripts/             # Build scripts
 ```
 
-## 🎯 Quick Links
+## Quick Links
 
-### For Developers
-- [Setup Guide](TECHNICAL_OVERVIEW.md#setup)
-- [API Reference](API.md)
-- [Contributing Guidelines](CONTRIBUTING.md)
-
-### For Deployment
-- [Netlify Setup](DEPLOYMENT.md)
-- [Environment Variables](DEPLOYMENT.md#environment-variables)
-- [Performance Monitoring](DEPLOYMENT.md#monitoring)
-
-### For SEO
-- [Meta Tags Setup](SEO_IMPLEMENTATION.md)
-- [Structured Data](SEO_IMPLEMENTATION.md#structured-data)
-- [Performance Optimization](TECHNICAL_OVERVIEW.md#performance-optimizations)
-
-## 🔍 Key Features
-
-- **Interactive Mapping** - Real-time incident visualization
-- **Data Scraping** - Automated news and case collection
-- **SEO Optimized** - 98/100 Lighthouse score
-- **Mobile Responsive** - Works on all devices
-- **Real-time Updates** - Live data synchronization
-- **Management Dashboard** - Content management system
-
-## 🛠️ Tech Stack
-
-- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS
-- **Backend**: Supabase (PostgreSQL, Auth, Real-time)
-- **Maps**: Leaflet, React Leaflet
-- **Deployment**: Netlify
-- **Analytics**: Google Analytics 4
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/SK3CHI3/PoliceBrutalityTracker/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/SK3CHI3/PoliceBrutalityTracker/discussions)
-- **Email**: [support@policebrutalitytracker.co.ke](mailto:support@policebrutalitytracker.co.ke)
-
----
-
-*This documentation is maintained by the PoliceBrutalityTracker team. For updates and contributions, see our [Contributing Guide](CONTRIBUTING.md).*
+- Live site: [policebrutalitytracker.co.ke](https://policebrutalitytracker.co.ke)
+- GitHub: [SK3CHI3/PoliceBrutalityTracker](https://github.com/SK3CHI3/PoliceBrutalityTracker)
+- Issues: [GitHub Issues](https://github.com/SK3CHI3/PoliceBrutalityTracker/issues)

@@ -1,113 +1,93 @@
-﻿# Caching Strategy Documentation
+﻿# Caching Strategy
 
-## Overview
+Multi-layered caching strategy for optimal performance.
 
-PoliceBrutalityTracker uses a multi-layered caching strategy following web performance best practices to ensure fast load times while maintaining data freshness.
-
-## Service Worker Version
+## Service Worker
 
 **Current Version:** v3.0.0
 
-When deploying changes, increment the `CACHE_VERSION` constant in `public/sw.js` to force cache invalidation.
+Increment `CACHE_VERSION` in `public/sw.js` when deploying changes to force cache invalidation.
 
 ## Caching Strategies
 
-### 1. Cache-First Strategy (Static Assets)
+### 1. Cache-First (Static Assets)
 
 **Used for:** Versioned static assets (JS, CSS, images, fonts in `/assets/`)
 
 **Behavior:**
 - Check cache first
-- If found, return cached version immediately
-- If not found, fetch from network and cache
-- Best for: Hashed/versioned files that never change
+- Return cached version if found
+- Fetch from network and cache if not found
 
 **Cache Duration:** 1 year (immutable)
 
-**Example Files:**
-- `/assets/index-DSdqlzfk.js`
-- `/assets/index-BiZNOzuU.css`
-- Fonts (`.woff2`, `.ttf`, etc.)
-- Images (`.png`, `.jpg`, `.svg`, etc.)
+**Example:** `/assets/index-DSdqlzfk.js`, fonts, images
 
-### 2. Network-First Strategy (HTML/Routes)
+### 2. Network-First (HTML/Routes)
 
 **Used for:** HTML pages and route endpoints
 
 **Behavior:**
 - Try network first
-- If network succeeds, cache response and return
-- If network fails, fallback to cached version
-- Best for: Content that changes frequently
+- Cache response and return if successful
+- Fallback to cached version if network fails
 
 **Cache Duration:** 0 seconds (must-revalidate)
 
-**Example Routes:**
-- `/` (homepage)
-- `/map`
-- `/cases`
-- `/case/:id`
+**Example:** `/`, `/map`, `/cases`, `/case/:id`
 
-### 3. Stale-While-Revalidate (Other Resources)
+### 3. Stale-While-Revalidate (Dynamic Resources)
 
 **Used for:** Non-critical dynamic resources
 
 **Behavior:**
-- Return cached version immediately if available
-- Fetch fresh version in background and update cache
-- Best for: Resources that benefit from fast response but need updates
+- Return cached version immediately
+- Fetch fresh version in background
+- Update cache with new version
 
-**Cache Duration:** 1 day for dynamic content
+**Cache Duration:** 1 day
 
 ### 4. Network-Only (API Calls)
 
-**Used for:** Supabase API calls and other external APIs
+**Used for:** Supabase API calls and external APIs
 
 **Behavior:**
 - Never cache
-- Always fetch fresh data from network
-- Best for: Real-time data that must be current
+- Always fetch fresh data
 
 **No caching applied**
 
 ## HTTP Cache Headers
 
 ### HTML Files
+
 ```
 Cache-Control: public, max-age=0, must-revalidate
 ```
-- Always check with server for updates
-- Can be cached but must revalidate
 
 ### Service Worker
+
 ```
 Cache-Control: no-cache, no-store, must-revalidate
 ```
-- Never cache the service worker itself
-- Ensures users always get latest SW version
 
 ### Vite Build Assets (Hashed)
+
 ```
 Cache-Control: public, max-age=31536000, immutable
 ```
-- Cache for 1 year
-- Immutable flag tells browser file will never change
-- Safe because Vite uses content hashes in filenames
 
 ### Root Level JS/CSS
+
 ```
 Cache-Control: public, max-age=86400, s-maxage=31536000
 ```
-- Browser cache: 1 day
-- CDN cache: 1 year
-- Allows CDN to cache longer while browsers check daily
 
 ### Images and Fonts
+
 ```
 Cache-Control: public, max-age=31536000, immutable
 ```
-- Long-term caching (1 year)
-- Marked immutable for maximum efficiency
 
 ## Service Worker Cache Management
 
@@ -125,89 +105,84 @@ Cache-Control: public, max-age=31536000, immutable
 
 ### Update Mechanism
 
-1. **On SW Update:**
-   - New SW installs in background
-   - Calls `skipWaiting()` to activate immediately
-   - Old caches are deleted
-   - Page reloads to use new SW
+1. New SW installs in background
+2. Calls `skipWaiting()` to activate immediately
+3. Old caches are deleted
+4. Page reloads to use new SW
 
-2. **Periodic Checks:**
-   - Every hour, check for SW updates
-   - Implemented in `main.tsx`
+### Periodic Checks
 
-3. **Manual Cache Clear:**
-   - Service worker listens for `CLEAR_CACHE` message
-   - Utility script available at `/clear-cache.js`
+Every hour, check for SW updates (implemented in `main.tsx`)
 
-## Best Practices Implemented
+### Manual Cache Clear
 
-### ✅ Appropriate TTL Values
-- Static assets: Long cache (1 year)
-- Dynamic content: Short cache (1 day)
-- HTML: No cache, must revalidate
-- API calls: No cache
+Service worker listens for `CLEAR_CACHE` message. Utility available at `/clear-cache.js`.
 
-### ✅ Client-Side Caching
+## Best Practices
+
+### Appropriate TTL Values
+
+- Static assets: 1 year (immutable)
+- Dynamic content: 1 day
+- HTML: 0 (must-revalidate)
+- API calls: Never cache
+
+### Client-Side Caching
+
 - Service Worker caches static assets
 - Browser cache via Cache-Control headers
 - Reduces server requests significantly
 
-### ✅ Cache Invalidation
+### Cache Invalidation
+
 - Version-based cache names
 - Automatic old cache deletion
 - Service worker update notifications
 
-### ✅ Cache Busting
+### Cache Busting
+
 - Vite generates content hashes for assets
 - Automatic when files change
 - Ensures users get latest code
 
-### ✅ Performance Monitoring
+### Performance Monitoring
+
 - Console logs for cache operations
-- Service worker lifecycle events logged
-- Easy debugging of cache behavior
+- Service worker lifecycle events
+- Easy debugging
 
 ## Troubleshooting
 
-### Problem: Stale Content After Deploy
+### Stale Content After Deploy
 
-**Solution:**
 1. Increment `CACHE_VERSION` in `public/sw.js`
 2. Rebuild and redeploy
 3. Service worker will auto-update on next visit
 
-### Problem: JavaScript Loading Issues
+### JavaScript Loading Issues
 
-**Check:**
 1. Verify `/assets/*.js` files have correct MIME type
 2. Check browser console for cache/network errors
-3. Ensure `_redirects` files aren't intercepting asset requests
+3. Ensure `_redirects` files aren't intercepting assets
 
-### Problem: Service Worker Not Updating
+### Service Worker Not Updating
 
-**Solution:**
 1. Clear browser cache manually
 2. Unregister service worker in DevTools
 3. Hard refresh (Ctrl+Shift+R)
 
-### Problem: Too Much Cache Usage
+### Too Much Cache Usage
 
-**Check:**
 1. Review cached items in DevTools > Application > Cache Storage
 2. Ensure old caches are being deleted
 3. Verify cache quotas aren't exceeded
 
 ## Cache Clear Utility
 
-For users experiencing caching issues, direct them to:
+For users experiencing caching issues:
 
 ```
 https://policebrutalitytracker.co.ke/clear-cache.js
-```
-
-Or add to HTML:
-```html
-<script src="/clear-cache.js"></script>
 ```
 
 This will:
@@ -218,54 +193,47 @@ This will:
 
 ## Deployment Checklist
 
-Before deploying:
-
-- [ ] Increment `CACHE_VERSION` if SW logic changed
-- [ ] Test caching in production mode locally (`npm run build && npm run preview`)
-- [ ] Verify service worker updates properly
-- [ ] Check Network tab in DevTools for cache headers
-- [ ] Test offline functionality
-- [ ] Verify no `_redirects` files in dist
+- Increment `CACHE_VERSION` if SW logic changed
+- Test caching in production mode locally
+- Verify service worker updates properly
+- Check Network tab for cache headers
+- Test offline functionality
 
 ## Monitoring
 
-Monitor these metrics:
+### Cache Hit Rate
 
-1. **Cache Hit Rate**
-   - Should be >80% for static assets
-   - Check in Service Worker logs
+- Should be >80% for static assets
+- Check in Service Worker logs
 
-2. **Page Load Time**
-   - First visit: Network dependent
-   - Return visits: Should be <1s with cache
+### Page Load Time
 
-3. **Service Worker Installation Success**
-   - Check registration success rate
-   - Monitor update completion
+- First visit: Network dependent
+- Return visits: Should be <1s with cache
 
-## References
+### Service Worker Installation
 
-- [MDN: Using Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers)
-- [Google: Service Worker Caching Strategies](https://web.dev/offline-cookbook/)
-- [MDN: HTTP Caching](https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching)
-- [Web.dev: Cache Control Best Practices](https://web.dev/http-cache/)
+- Check registration success rate
+- Monitor update completion
 
 ## Version History
 
 ### v3.0.0 (Current)
-- Implemented three-tier caching strategy
-- Added automatic service worker updates
+
+- Three-tier caching strategy
+- Automatic service worker updates
 - Separated static and dynamic caches
-- Added proper cache invalidation
+- Proper cache invalidation
 - Fixed duplicate SW registration
 - Optimized HTTP cache headers
 
 ### v2.0.0 (Previous)
+
 - Basic service worker implementation
 - Simple cache-first strategy
 - Manual cache management
 
 ### v1.0.0 (Initial)
+
 - No service worker
 - Browser cache only
-
